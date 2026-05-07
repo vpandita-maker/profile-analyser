@@ -14,7 +14,7 @@ export interface LinkedInProfile {
   skills?: string[];
   education?: string[];
   rawProfileText?: string;
-  importSource?: "oauth" | "pdf" | "paste" | "demo";
+  importSource?: "oauth" | "pdf" | "paste";
 }
 
 export interface ContextAnswers {

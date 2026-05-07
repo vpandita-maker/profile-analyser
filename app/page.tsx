@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Linkedin, Trophy } from "lucide-react";
+import { Linkedin, Trophy } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -75,10 +75,6 @@ function HomeContent() {
           <Button loading={status === "loading"} onClick={() => signIn("linkedin", { callbackUrl: "/profile-import" })}>
             <Linkedin className="h-5 w-5" />
             Continue with LinkedIn
-          </Button>
-          <Button variant="secondary" onClick={() => router.push("/questions")}>
-            Try demo flow
-            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </section>

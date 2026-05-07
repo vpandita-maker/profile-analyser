@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input, Select, Textarea } from "@/components/ui/Input";
@@ -40,18 +40,29 @@ export default function QuestionsPage() {
 
   const canContinue = useMemo(() => screenChecks[step](answers), [answers, step]);
 
+  useEffect(() => {
+    if (!linkedinData) {
+      router.replace("/");
+      return;
+    }
+
+    if (!linkedinData.rawProfileText && linkedinData.importSource !== "pdf" && linkedinData.importSource !== "paste") {
+      router.replace("/profile-import");
+    }
+  }, [linkedinData, router]);
+
   async function submit() {
     setLoading(true);
     const profile =
       linkedinData ||
       ({
-        linkedinId: "demo-user",
-        name: "Demo LinkedIn Member",
-        headline: "Growth-focused operator building useful products",
+        linkedinId: "profile-user",
+        name: "Profile Member",
+        headline: "Profile ready for review",
         about: "",
         experience: [],
         skills: [],
-        importSource: "demo"
+        importSource: "oauth"
       } as const);
     setLinkedinData(profile);
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Textarea } from "@/components/ui/Input";
 import { useAnalyzerStore } from "@/lib/store";
+import { useEffect } from "react";
 
 export default function ProfileImportPage() {
   const router = useRouter();
@@ -17,6 +18,12 @@ export default function ProfileImportPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [imported, setImported] = useState(false);
+
+  useEffect(() => {
+    if (!linkedinData) {
+      router.replace("/");
+    }
+  }, [linkedinData, router]);
 
   async function importProfile(file?: File) {
     setError("");
@@ -54,21 +61,6 @@ export default function ProfileImportPage() {
     if (!file) return;
     setFileName(file.name);
     await importProfile(file);
-  }
-
-  function skip() {
-    mergeLinkedinData({
-      linkedinId: linkedinData?.linkedinId || "demo-user",
-      name: linkedinData?.name || "Demo LinkedIn Member",
-      headline: linkedinData?.headline || "Growth-focused operator building useful products",
-      photo: linkedinData?.photo,
-      email: linkedinData?.email,
-      about: linkedinData?.about || "",
-      experience: linkedinData?.experience || [],
-      skills: linkedinData?.skills || [],
-      importSource: linkedinData ? "oauth" : "demo"
-    });
-    router.push("/questions");
   }
 
   return (
@@ -110,9 +102,6 @@ export default function ProfileImportPage() {
           <Button disabled={!imported} onClick={() => router.push("/questions")}>
             Continue
             <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button variant="secondary" onClick={skip}>
-            Skip for now
           </Button>
         </div>
       </section>
