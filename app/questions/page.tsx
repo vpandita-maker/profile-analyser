@@ -36,7 +36,7 @@ export default function QuestionsPage() {
   const toggleChallenge = useAnalyzerStore((state) => state.toggleChallenge);
   const linkedinData = useAnalyzerStore((state) => state.linkedinData);
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
-  const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
+  const clearAnalysis = useAnalyzerStore((state) => state.clearAnalysis);
 
   const canContinue = useMemo(() => screenChecks[step](answers), [answers, step]);
 
@@ -65,14 +65,7 @@ export default function QuestionsPage() {
         importSource: "oauth"
       } as const);
     setLinkedinData(profile);
-
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...profile, contextAnswers: answers })
-    });
-    const data = await response.json();
-    setAnalysis(data.analysis, data.analysisId);
+    clearAnalysis();
     router.push("/loading");
   }
 

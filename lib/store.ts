@@ -32,6 +32,7 @@ interface AnalyzerState {
   setLinkedinData: (profile: LinkedInProfile) => void;
   mergeLinkedinData: (profile: Partial<LinkedInProfile>) => void;
   setAnalysis: (analysis: AnalysisResult, analysisId: string) => void;
+  clearAnalysis: () => void;
   setUnlocked: (value: boolean) => void;
   resetContext: () => void;
 }
@@ -76,6 +77,7 @@ export const useAnalyzerStore = create<AnalyzerState>()(
           }
         })),
       setAnalysis: (analysis, analysisId) => set({ analysis, analysisId }),
+      clearAnalysis: () => set({ analysis: null, analysisId: null, isUnlocked: false }),
       setUnlocked: (value) => set({ isUnlocked: value }),
       resetContext: () => set({ contextAnswers: emptyContext })
     }),
