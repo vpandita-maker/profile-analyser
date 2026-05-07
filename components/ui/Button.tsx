@@ -16,10 +16,10 @@ export function Button({ className, variant = "primary", fullWidth = true, loadi
   return (
     <button
       className={cn(
-        "inline-flex h-12 min-h-12 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex h-12 min-h-12 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-[0.99] disabled:pointer-events-none disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none",
         fullWidth && "w-full",
-        variant === "primary" && "bg-teal-600 text-white shadow-soft shadow-teal-900/10",
-        variant === "secondary" && "border border-slate-200 bg-white text-slate-900",
+        variant === "primary" && "bg-teal-600 text-white shadow-teal-900/15 hover:bg-teal-700 hover:shadow-teal-900/20",
+        variant === "secondary" && "border border-slate-200 bg-white text-slate-900 hover:border-slate-300",
         variant === "ghost" && "bg-transparent text-slate-700",
         className
       )}

@@ -12,5 +12,5 @@ export default function AnalysisLoadingPage() {
     return () => window.clearTimeout(timeout);
   }, [router]);
 
-  return <Loading label="Analyzing profile signals..." />;
+  return <Loading label="Building your personalized profile analysis" />;
 }

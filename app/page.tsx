@@ -44,9 +44,9 @@ function HomeContent() {
             <Trophy className="h-5 w-5 text-teal-600" />
           </div>
 
-          <h1 className="text-4xl font-black leading-tight text-slate-950">Know what your LinkedIn profile is costing you.</h1>
+          <h1 className="text-4xl font-black leading-tight text-slate-950">Align your LinkedIn to your goals—and actually get noticed.</h1>
           <p className="mt-4 text-base leading-7 text-slate-600">
-            Connect your profile, answer a few career questions, and get agentic analysis trained on expert career data.
+            Connect your LinkedIn profile, tell us your career goals, and get a personalized analysis with specific fixes—no generic advice, just what actually matters for your path.
           </p>
         </div>
 
@@ -74,7 +74,7 @@ function HomeContent() {
           </Card>
           <Button loading={status === "loading"} onClick={() => signIn("linkedin", { callbackUrl: "/profile-import" })}>
             <Linkedin className="h-5 w-5" />
-            Continue with LinkedIn
+            Analyze My Profile
           </Button>
         </div>
       </section>
