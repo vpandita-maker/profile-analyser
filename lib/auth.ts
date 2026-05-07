@@ -1,27 +1,38 @@
 import type { NextAuthOptions } from "next-auth";
-import LinkedInProvider from "next-auth/providers/linkedin";
 import { fetchLinkedInProfile } from "@/lib/linkedin";
+
+type LinkedInOidcProfile = {
+  sub?: string;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+  email?: string;
+};
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    LinkedInProvider({
+    {
+      id: "linkedin",
+      name: "LinkedIn",
+      type: "oauth",
       clientId: process.env.LINKEDIN_CLIENT_ID || "",
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET || "",
+      wellKnown: "https://www.linkedin.com/oauth/.well-known/openid-configuration",
       authorization: {
         params: {
           scope: "openid profile email"
         }
       },
-      userinfo: "https://api.linkedin.com/v2/userinfo",
+      client: {
+        token_endpoint_auth_method: "client_secret_post"
+      },
+      checks: ["state"],
+      userinfo: {
+        url: "https://api.linkedin.com/v2/userinfo"
+      },
       profile(profile) {
-        const oidcProfile = profile as unknown as {
-          sub?: string;
-          name?: string;
-          given_name?: string;
-          family_name?: string;
-          picture?: string;
-          email?: string;
-        };
+        const oidcProfile = profile as LinkedInOidcProfile;
 
         return {
           id: oidcProfile.sub || oidcProfile.email || "linkedin-user",
@@ -30,7 +41,7 @@ export const authOptions: NextAuthOptions = {
           image: oidcProfile.picture
         };
       }
-    })
+    }
   ],
   pages: {
     signIn: "/"

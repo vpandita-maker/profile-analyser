@@ -2,16 +2,26 @@
 
 import { ArrowRight, Linkedin, Trophy } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useAnalyzerStore } from "@/lib/store";
 
 export default function HomePage() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
+  const authError = searchParams.get("error");
 
   useEffect(() => {
     if (session?.user.linkedinProfile) {
@@ -41,6 +51,11 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-3">
+          {authError ? (
+            <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">
+              Sign-in could not finish. Please try again after confirming the redirect URL is saved in the developer portal.
+            </Card>
+          ) : null}
           <Card className="bg-white">
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
