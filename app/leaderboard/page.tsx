@@ -100,7 +100,10 @@ export default function LeaderboardPage() {
                   <span className="block truncate text-sm font-bold text-slate-950">{entry.name}</span>
                   <span className="line-clamp-1 text-xs text-slate-500">{entry.headline}</span>
                 </span>
-                <span className="text-lg font-black text-teal-700">{entry.overallScore}</span>
+                <span className="text-right text-lg font-black leading-none text-teal-700">
+                  {entry.overallScore}
+                  <span className="block text-[10px] font-bold text-slate-400">/100</span>
+                </span>
               </button>
             ))}
           </div>

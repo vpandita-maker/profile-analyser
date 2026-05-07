@@ -34,6 +34,7 @@ export default function UnlockedResultsPage() {
             <div>
               <Badge tone="teal">Fixes Unlocked</Badge>
               <h1 className="mt-2 text-2xl font-black text-slate-950">Your Personalized Fixes</h1>
+              <p className="mt-1 text-xs font-semibold text-slate-500">Overall score out of 100</p>
             </div>
             <ScoreBadge score={analysis.overallScore} />
           </section>

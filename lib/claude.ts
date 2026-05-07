@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { AnalysisResult, ContextAnswers, LinkedInProfile } from "@/lib/types";
 import { compactList } from "@/lib/utils";
 
-export const LINKEDIN_ANALYSIS_SYSTEM_PROMPT = `You are a LinkedIn profile optimization expert. Analyze the user's profile based on their stated goal, geography, seniority, and industry.
+export const LINKEDIN_ANALYSIS_SYSTEM_PROMPT = `You are a LinkedIn profile optimization expert. Analyze the user's profile based on their stated goal, geography, seniority, industry, profile fields, and questionnaire answers.
 
 Return a JSON object with:
 - overallScore (1-100)
@@ -12,7 +12,14 @@ Return a JSON object with:
 - topFixes (3 items: title, current text, recommended text, why it matters, difficulty)
 - secondaryFixes (2-3 items: same structure)
 
-Be specific, honest, and actionable. Consider geography (India vs US), goal context (recruiting vs fundraising signals), seniority benchmarks, and industry norms.
+Writing rules:
+- Always write directly to the user in second person: "you", "your", "you should".
+- Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
+- Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, companies, outcomes, network size, relocation preference, salary expectations, or recent wins when relevant.
+- If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
+- Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
+- Recommended text should be ready to paste into a profile where possible.
+- Be specific, honest, and actionable. Consider geography (India vs US), goal context (recruiting vs fundraising signals), seniority benchmarks, and industry norms.
 
 Output ONLY valid JSON, no markdown or preamble.`;
 
@@ -109,7 +116,12 @@ Context:
 - Network Size: ${context.networkSize || "Not specified"}
 - Open To Relocation: ${context.relocation === null ? "Not specified" : context.relocation ? "Yes" : "No"}
 - Salary Expectations: ${context.salary || "Not specified"}
-- Recent Wins: ${context.wins || "Not specified"}`;
+- Recent Wins: ${context.wins || "Not specified"}
+
+Important output style:
+- Address the reader as "you" and "your" in every explanation and recommendation.
+- Do not refer to ${profile.name} in third person.
+- Personalize the analysis using the profile data and context above.`;
 }
 
 export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswers): AnalysisResult {
@@ -129,7 +141,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       {
         title: "Clear starting point",
         score: 7,
-        explanation: `The profile has enough signal to begin positioning around ${goal.toLowerCase()}, especially with a sharper role narrative.`
+        explanation: `You have enough signal to begin positioning around ${goal.toLowerCase()}, especially if you sharpen your role narrative for ${role}.`
       },
       {
         title: "Context-aware targeting",
@@ -139,14 +151,14 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       {
         title: "Readable professional baseline",
         score: 7,
-        explanation: "The current profile can be upgraded quickly with sharper proof points and more audience-specific keywords."
+        explanation: "You can upgrade your current profile quickly by adding sharper proof points and more audience-specific keywords."
       }
     ],
     weaknesses: [
       {
         title: "Headline needs stronger positioning",
         score: profile.headline ? 5 : 3,
-        explanation: "The headline should state who you help, what you do, and the proof or niche that makes you credible."
+        explanation: "Your headline should state who you help, what you do, and the proof or niche that makes you credible."
       },
       {
         title: "Missing measurable proof",
@@ -156,7 +168,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       {
         title: "Audience fit can be tighter",
         score: 6,
-        explanation: `The profile should speak directly to ${context.geography || "your market"} expectations and ${context.seniority || "your"} seniority benchmarks.`
+        explanation: `Your profile should speak directly to ${context.geography || "your market"} expectations and ${context.seniority || "your"} seniority benchmarks.`
       }
     ],
     topFixes: [

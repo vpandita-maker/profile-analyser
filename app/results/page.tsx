@@ -36,7 +36,7 @@ export default function ResultsPage() {
         <div className="px-4 py-5">
           <section className="mb-6 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <div>
-              <p className="text-sm font-semibold text-slate-500">Overall score</p>
+              <p className="text-sm font-semibold text-slate-500">Overall score out of 100</p>
               <h1 className="mt-1 text-2xl font-black text-slate-950">Profile analysis</h1>
             </div>
             <ScoreBadge score={analysis.overallScore} />
