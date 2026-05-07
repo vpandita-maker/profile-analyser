@@ -30,6 +30,7 @@ interface AnalyzerState {
   setContextAnswers: (answers: Partial<ContextAnswers>) => void;
   toggleChallenge: (challenge: string) => void;
   setLinkedinData: (profile: LinkedInProfile) => void;
+  mergeLinkedinData: (profile: Partial<LinkedInProfile>) => void;
   setAnalysis: (analysis: AnalysisResult, analysisId: string) => void;
   setUnlocked: (value: boolean) => void;
   resetContext: () => void;
@@ -65,6 +66,15 @@ export const useAnalyzerStore = create<AnalyzerState>()(
           };
         }),
       setLinkedinData: (profile) => set({ linkedinData: profile }),
+      mergeLinkedinData: (profile) =>
+        set((state) => ({
+          linkedinData: {
+            linkedinId: state.linkedinData?.linkedinId || profile.linkedinId || "profile-user",
+            name: state.linkedinData?.name || profile.name || "Profile Member",
+            ...state.linkedinData,
+            ...profile
+          }
+        })),
       setAnalysis: (analysis, analysisId) => set({ analysis, analysisId }),
       setUnlocked: (value) => set({ isUnlocked: value }),
       resetContext: () => set({ contextAnswers: emptyContext })

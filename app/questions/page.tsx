@@ -50,7 +50,8 @@ export default function QuestionsPage() {
         headline: "Growth-focused operator building useful products",
         about: "",
         experience: [],
-        skills: []
+        skills: [],
+        importSource: "demo"
       } as const);
     setLinkedinData(profile);
 

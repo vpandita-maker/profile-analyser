@@ -5,6 +5,7 @@ Mobile-first professional profile analysis app built with Next.js, LinkedIn Open
 ## Features
 
 - LinkedIn OpenID Connect sign-in
+- LinkedIn profile PDF upload with pasted-text fallback
 - Progressive career context questionnaire
 - Profile scoring and strengths/weaknesses report
 - Invite-based unlock flow for personalized fixes

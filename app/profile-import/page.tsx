@@ -1,0 +1,121 @@
+"use client";
+
+import { ArrowRight, FileText, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Textarea } from "@/components/ui/Input";
+import { useAnalyzerStore } from "@/lib/store";
+
+export default function ProfileImportPage() {
+  const router = useRouter();
+  const linkedinData = useAnalyzerStore((state) => state.linkedinData);
+  const mergeLinkedinData = useAnalyzerStore((state) => state.mergeLinkedinData);
+  const [text, setText] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [imported, setImported] = useState(false);
+
+  async function importProfile(file?: File) {
+    setError("");
+    setLoading(true);
+
+    const formData = new FormData();
+    if (file) formData.append("file", file);
+    if (text.trim()) formData.append("text", text);
+
+    const response = await fetch("/api/profile/import", {
+      method: "POST",
+      body: formData
+    });
+    const data = await response.json();
+    setLoading(false);
+
+    if (!response.ok) {
+      setError(data.error || "Could not import this profile.");
+      return;
+    }
+
+    mergeLinkedinData({
+      ...data.profile,
+      linkedinId: linkedinData?.linkedinId || "profile-user",
+      name: linkedinData?.name || "Profile Member",
+      photo: linkedinData?.photo,
+      email: linkedinData?.email,
+      importSource: file ? "pdf" : "paste"
+    });
+    setImported(true);
+  }
+
+  async function onFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setFileName(file.name);
+    await importProfile(file);
+  }
+
+  function skip() {
+    mergeLinkedinData({
+      linkedinId: linkedinData?.linkedinId || "demo-user",
+      name: linkedinData?.name || "Demo LinkedIn Member",
+      headline: linkedinData?.headline || "Growth-focused operator building useful products",
+      photo: linkedinData?.photo,
+      email: linkedinData?.email,
+      about: linkedinData?.about || "",
+      experience: linkedinData?.experience || [],
+      skills: linkedinData?.skills || [],
+      importSource: linkedinData ? "oauth" : "demo"
+    });
+    router.push("/questions");
+  }
+
+  return (
+    <main className="safe-bottom min-h-dvh bg-slate-50 px-4 py-5">
+      <section className="mx-auto flex min-h-[calc(100dvh-48px)] max-w-md flex-col justify-between">
+        <div>
+          <div className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-950">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
+              <FileText className="h-4 w-4" />
+            </span>
+            Profile Import
+          </div>
+
+          <h1 className="text-3xl font-black leading-tight text-slate-950">Add your profile PDF for a sharper review.</h1>
+          <p className="mt-4 text-base leading-7 text-slate-600">
+            From your profile, choose More, save as PDF, then upload it here. You can also paste your profile text instead.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {error ? <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">{error}</Card> : null}
+          {imported ? (
+            <Card className="border border-teal-200 bg-teal-50 text-sm leading-6 text-teal-800">
+              Imported {fileName || "profile text"}. Your analysis will use these profile sections.
+            </Card>
+          ) : null}
+
+          <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 text-center active:scale-[0.99]">
+            <Upload className="mb-2 h-6 w-6 text-teal-600" />
+            <span className="text-sm font-bold text-slate-950">{fileName || "Upload LinkedIn PDF"}</span>
+            <span className="mt-1 text-xs leading-5 text-slate-500">PDF only, under 8MB</span>
+            <input className="sr-only" type="file" accept="application/pdf,.pdf" onChange={onFileChange} />
+          </label>
+
+          <Textarea value={text} onChange={(event) => setText(event.target.value)} placeholder="Or paste your profile text here." />
+          <Button disabled={!text.trim()} loading={loading} onClick={() => importProfile()}>
+            Import Pasted Text
+          </Button>
+          <Button disabled={!imported} onClick={() => router.push("/questions")}>
+            Continue
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button variant="secondary" onClick={skip}>
+            Skip for now
+          </Button>
+        </div>
+      </section>
+    </main>
+  );
+}

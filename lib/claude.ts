@@ -101,6 +101,9 @@ export function buildAnalysisUserMessage(profile: LinkedInProfile, context: Cont
 - About: ${profile.about || "Not provided"}
 - Experience: ${compactList(profile.experience)}
 - Skills: ${compactList(profile.skills)}
+- Education: ${compactList(profile.education)}
+- Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0, 8000) : "Not provided"}
+- Import Source: ${profile.importSource || "oauth"}
 
 Context:
 - Goal: ${context.goal || "Not specified"}

@@ -26,7 +26,7 @@ function HomeContent() {
   useEffect(() => {
     if (session?.user.linkedinProfile) {
       setLinkedinData(session.user.linkedinProfile);
-      router.replace("/questions");
+      router.replace("/profile-import");
     }
   }, [session, router, setLinkedinData]);
 
@@ -72,7 +72,7 @@ function HomeContent() {
               </div>
             </div>
           </Card>
-          <Button loading={status === "loading"} onClick={() => signIn("linkedin", { callbackUrl: "/questions" })}>
+          <Button loading={status === "loading"} onClick={() => signIn("linkedin", { callbackUrl: "/profile-import" })}>
             <Linkedin className="h-5 w-5" />
             Continue with LinkedIn
           </Button>
