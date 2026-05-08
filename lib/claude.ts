@@ -15,7 +15,8 @@ Return a JSON object with:
 Writing rules:
 - Always write directly to the user in second person: "you", "your", "you should".
 - Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
-- Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, companies, outcomes, network size, relocation preference, salary expectations, or recent wins when relevant.
+- Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, companies, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
+- Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
 - If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
 - Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
 - Recommended text should be ready to paste into a profile where possible.
@@ -118,7 +119,7 @@ Context:
 - Ideal Outcome: ${context.outcome || "Not specified"}
 - Network Size: ${context.networkSize || "Not specified"}
 - Open To Relocation: ${context.relocation === null ? "Not specified" : context.relocation ? "Yes" : "No"}
-- Salary Expectations: ${context.salary || "Not specified"}
+- Market Benchmarking: Use the target role, seniority, geography, industry, and broadly available market benchmarks. Do not use or ask for desired salary.
 - Recent Wins: ${context.wins || "Not specified"}
 
 Important output style:

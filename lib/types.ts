@@ -30,7 +30,6 @@ export interface ContextAnswers {
   outcome: string;
   networkSize: string;
   relocation: boolean | null;
-  salary: string;
   wins: string;
 }
 

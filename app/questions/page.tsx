@@ -214,12 +214,12 @@ export default function QuestionsPage() {
 
             {step === 6 ? (
               <>
-                <Field label="Salary expectations?">
-                  <Input value={answers.salary} onChange={(event) => setAnswers({ salary: event.target.value })} placeholder="Optional" />
-                </Field>
                 <Field label="Recent wins or achievements?">
                   <Textarea value={answers.wins} onChange={(event) => setAnswers({ wins: event.target.value })} placeholder="Optional but useful for sharper fixes." />
                 </Field>
+                <div className="rounded-lg bg-slate-100 px-3 py-3 text-sm font-semibold leading-relaxed text-slate-600">
+                  We will benchmark your positioning against the role, seniority, and market you are targeting.
+                </div>
               </>
             ) : null}
           </div>
