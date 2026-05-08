@@ -3,6 +3,20 @@ import type { LinkedInProfile } from "@/lib/types";
 
 type ApifyProfile = Record<string, unknown>;
 
+function formatPeriod(period: unknown): string {
+  if (!period || typeof period !== "object") return "";
+
+  const record = period as ApifyProfile;
+  const start = record.startDate as ApifyProfile | undefined;
+  const end = record.endDate as ApifyProfile | undefined;
+  const formatDate = (date?: ApifyProfile) => [asText(date?.month), asText(date?.year)].filter(Boolean).join("/");
+  const startText = formatDate(start);
+  const endText = formatDate(end) || "Present";
+
+  if (!startText && !endText) return "";
+  return [startText, endText].filter(Boolean).join(" to ");
+}
+
 function asText(value: unknown): string {
   if (typeof value === "string") return value.trim();
   if (typeof value === "number") return String(value);
@@ -28,7 +42,9 @@ function listText(value: unknown, keys: string[] = []) {
       if (!item || typeof item !== "object") return "";
 
       const record = item as ApifyProfile;
-      const parts = keys.length ? keys.map((key) => asText(record[key])) : Object.values(record).map(asText);
+      const parts = keys.length
+        ? keys.map((key) => (key === "timePeriod" ? formatPeriod(record[key]) : asText(record[key])))
+        : Object.values(record).map(asText);
       return parts.filter(Boolean).join(", ");
     })
     .filter(Boolean)
@@ -49,14 +65,17 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
     firstText(item, ["fullName", "name", "title"]) ||
     [firstText(item, ["firstName", "first_name"]), firstText(item, ["lastName", "last_name"])].filter(Boolean).join(" ");
 
-  const headline = firstText(item, ["headline", "subTitle", "subtitle", "occupation", "currentPosition"]);
+  const headline = firstText(item, ["headline", "occupation", "subTitle", "subtitle", "currentPosition", "jobTitle"]);
   const about = firstText(item, ["about", "summary", "bio", "description"]);
-  const photo = firstText(item, ["profilePicture", "profilePic", "profilePicUrl", "profileImage", "image"]);
+  const photo = firstText(item, ["pictureUrl", "profilePicture", "profilePic", "profilePicUrl", "profileImage", "image"]);
   const experience = listText(firstArray(item, ["positions", "experience", "experiences", "positionHistory"]), [
     "title",
+    "jobTitle",
     "companyName",
     "company",
+    "locationName",
     "location",
+    "timePeriod",
     "dateRange",
     "duration",
     "description"
@@ -89,6 +108,7 @@ export async function scrapeLinkedInProfile(profileUrl: string) {
   const client = new ApifyClient({ token });
   const run = await client.actor(actorId).call({
     cookie,
+    profileUrls: [profileUrl],
     urls: [profileUrl],
     minDelay: 15,
     maxDelay: 60,
