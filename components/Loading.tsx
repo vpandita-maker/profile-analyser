@@ -5,16 +5,16 @@ import { useEffect, useMemo, useState } from "react";
 const steps = ["Reading profile sections", "Mapping goals to signals", "Scoring profile strength", "Preparing fixes"];
 
 const businessFacts = [
-  "Recruiters often scan a profile headline before they read the About section.",
-  "Specific numbers make experience bullets easier to trust and remember.",
-  "A focused profile usually converts better than one that tries to speak to everyone.",
-  "Your first two About lines do most of the work on mobile.",
-  "Clear positioning helps people understand when to refer you.",
-  "Strong profiles make the target audience obvious within a few seconds.",
-  "Proof beats adjectives: shipped, grew, led, saved, closed, hired, launched.",
-  "A narrow target role can make your profile look more senior, not less.",
-  "Skills are stronger when they match the role you want next.",
-  "Recent wins can make your profile feel current and active."
+  "The first barcode scanned in a store was on a pack of Wrigley's gum in 1974.",
+  "FedEx was originally called Federal Express before the shorter brand name took over.",
+  "The term unicorn is used for private startups valued at $1 billion or more.",
+  "IKEA names many products using Swedish places, people, and common words.",
+  "Nintendo started in 1889 as a company that made playing cards.",
+  "The first McDonald's franchise opened in Des Plaines, Illinois in 1955.",
+  "The S&P 500 tracks 500 large public companies listed in the United States.",
+  "Amazon started as an online bookstore before expanding into almost every category.",
+  "Airbnb's founders first rented out air mattresses during a design conference.",
+  "Coca-Cola was first sold at a pharmacy soda fountain in Atlanta."
 ];
 
 export function Loading({ label = "Loading" }: { label?: string }) {
