@@ -85,14 +85,14 @@ export default function ProfileImportPage() {
             </Card>
           ) : null}
 
-          <label className="group flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 text-center shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:border-teal-500 hover:bg-teal-50 hover:shadow-lg hover:shadow-teal-900/10 active:translate-y-0 active:scale-[0.99]">
+          <label className="group mx-auto flex min-h-28 w-full max-w-xs cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 text-center shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:border-teal-500 hover:bg-teal-50 hover:shadow-lg hover:shadow-teal-900/10 active:translate-y-0 active:scale-[0.99]">
             <Upload className="mb-2 h-6 w-6 text-teal-600 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:scale-110" />
             <span className="text-sm font-bold text-slate-950">{fileName || "Upload LinkedIn PDF"}</span>
             <span className="mt-1 text-xs leading-5 text-slate-500">PDF only, under 8MB</span>
             <input className="sr-only" type="file" accept="application/pdf,.pdf" onChange={onFileChange} />
           </label>
 
-          <Button disabled={!imported || loading} loading={loading} onClick={() => router.push("/questions")}>
+          <Button className="mx-auto max-w-xs" disabled={!imported || loading} loading={loading} onClick={() => router.push("/questions")}>
             Continue
             <ArrowRight className="h-4 w-4" />
           </Button>
