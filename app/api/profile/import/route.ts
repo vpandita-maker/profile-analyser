@@ -5,10 +5,9 @@ import { parseProfileText } from "@/lib/profile-import";
 export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
-  const pastedText = formData.get("text");
 
   try {
-    let text = typeof pastedText === "string" ? pastedText : "";
+    let text = "";
 
     if (file instanceof File && file.size > 0) {
       if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
@@ -21,12 +20,14 @@ export async function POST(request: Request) {
 
       const buffer = Buffer.from(await file.arrayBuffer());
       text = await extractPdfText(buffer);
+    } else {
+      return NextResponse.json({ error: "Please upload your LinkedIn profile PDF." }, { status: 400 });
     }
 
     if (!text.trim()) {
       return NextResponse.json(
         {
-          error: "Could not find readable profile text in this PDF. Try pasting your profile text instead."
+          error: "Could not read profile text from this PDF. On your LinkedIn profile, open Resources and choose Save to PDF, then upload that file."
         },
         { status: 400 }
       );
@@ -36,6 +37,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ profile, characterCount: text.length });
   } catch (error) {
     console.error("Profile import failed", error);
-    return NextResponse.json({ error: "Could not read this profile file. Try pasting your profile text instead." }, { status: 500 });
+    return NextResponse.json({ error: "Could not read this profile PDF. Download it again from LinkedIn Resources, then upload the new file." }, { status: 500 });
   }
 }

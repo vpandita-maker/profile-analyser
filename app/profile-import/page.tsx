@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Textarea } from "@/components/ui/Input";
 import { useAnalyzerStore } from "@/lib/store";
 import { useEffect } from "react";
 
@@ -13,7 +12,6 @@ export default function ProfileImportPage() {
   const router = useRouter();
   const linkedinData = useAnalyzerStore((state) => state.linkedinData);
   const mergeLinkedinData = useAnalyzerStore((state) => state.mergeLinkedinData);
-  const [text, setText] = useState("");
   const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,7 +29,6 @@ export default function ProfileImportPage() {
 
     const formData = new FormData();
     if (file) formData.append("file", file);
-    if (text.trim()) formData.append("text", text);
 
     const response = await fetch("/api/profile/import", {
       method: "POST",
@@ -51,7 +48,7 @@ export default function ProfileImportPage() {
       name: linkedinData?.name || "Profile Member",
       photo: linkedinData?.photo,
       email: linkedinData?.email,
-      importSource: file ? "pdf" : "paste"
+      importSource: "pdf"
     });
     setImported(true);
   }
@@ -76,7 +73,7 @@ export default function ProfileImportPage() {
 
           <h1 className="text-3xl font-black leading-tight text-slate-950">Add your profile PDF for a sharper review.</h1>
           <p className="mt-4 text-base leading-7 text-slate-600">
-            From your profile, choose More, save as PDF, then upload it here. You can also paste your profile text instead.
+            On your LinkedIn profile, open Resources and choose Save to PDF. Upload that PDF here.
           </p>
         </div>
 
@@ -84,7 +81,7 @@ export default function ProfileImportPage() {
           {error ? <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">{error}</Card> : null}
           {imported ? (
             <Card className="border border-teal-200 bg-teal-50 text-sm leading-6 text-teal-800">
-              Imported {fileName || "profile text"}. Your analysis will use these profile sections.
+              Imported {fileName || "your profile PDF"}. Your analysis will use these profile sections.
             </Card>
           ) : null}
 
@@ -95,11 +92,7 @@ export default function ProfileImportPage() {
             <input className="sr-only" type="file" accept="application/pdf,.pdf" onChange={onFileChange} />
           </label>
 
-          <Textarea value={text} onChange={(event) => setText(event.target.value)} placeholder="Or paste your profile text here." />
-          <Button disabled={!text.trim()} loading={loading} onClick={() => importProfile()}>
-            Import Pasted Text
-          </Button>
-          <Button disabled={!imported} onClick={() => router.push("/questions")}>
+          <Button disabled={!imported || loading} loading={loading} onClick={() => router.push("/questions")}>
             Continue
             <ArrowRight className="h-4 w-4" />
           </Button>

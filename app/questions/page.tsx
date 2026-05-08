@@ -46,7 +46,7 @@ export default function QuestionsPage() {
       return;
     }
 
-    if (!linkedinData.rawProfileText && linkedinData.importSource !== "pdf" && linkedinData.importSource !== "paste") {
+    if (!linkedinData.rawProfileText && linkedinData.importSource !== "pdf") {
       router.replace("/profile-import");
     }
   }, [linkedinData, router]);
