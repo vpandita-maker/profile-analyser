@@ -94,7 +94,7 @@ export default function ProfileImportPage() {
   return (
     <main className="safe-bottom min-h-dvh bg-slate-50 px-4 py-5">
       <section className="mx-auto flex min-h-[calc(100dvh-48px)] max-w-md flex-col justify-between">
-        <div className="text-center">
+        <div>
           <div className="mb-8 flex items-center justify-center gap-2 text-sm font-bold text-slate-950">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
               <FileText className="h-4 w-4" />
@@ -102,8 +102,8 @@ export default function ProfileImportPage() {
             Profile Import
           </div>
 
-          <h1 className="mx-auto max-w-sm text-3xl font-black leading-tight text-slate-950">Import your profile for a sharper review.</h1>
-          <p className="mx-auto mt-4 max-w-sm text-base leading-7 text-slate-600">
+          <h1 className="mx-auto max-w-sm text-left text-3xl font-black leading-tight text-slate-950">Import your profile for a sharper review.</h1>
+          <p className="mx-auto mt-4 max-w-sm text-left text-base leading-7 text-slate-600">
             Paste your LinkedIn profile URL. If that fails, upload your saved PDF instead.
           </p>
         </div>
@@ -137,10 +137,12 @@ export default function ProfileImportPage() {
             <input className="sr-only" type="file" accept="application/pdf,.pdf" onChange={onFileChange} />
           </label>
 
-          <Button className="mx-auto max-w-xs" disabled={!imported || loading || scraping} loading={loading} onClick={() => router.push("/questions")}>
-            Continue
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          <div className="mx-auto max-w-xs">
+            <Button disabled={!imported || loading || scraping} loading={loading} onClick={() => router.push("/questions")}>
+              Continue
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </section>
     </main>
