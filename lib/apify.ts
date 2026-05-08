@@ -128,14 +128,34 @@ export async function scrapeLinkedInProfile(profileUrl: string) {
 
   const client = new ApifyClient({ token });
   let run;
-
-  try {
-    run = await client.actor(actorId).call({
+  const inputs = [
+    {
       urls: [profileUrl],
       scrapeCompany: false
-    });
-  } catch (error) {
-    console.error("Apify actor failed", { actorId, error });
+    },
+    {
+      urls: [{ url: profileUrl }],
+      scrapeCompany: false
+    }
+  ];
+  let lastError: unknown;
+
+  for (const input of inputs) {
+    try {
+      run = await client.actor(actorId).call(input);
+      break;
+    } catch (error) {
+      lastError = error;
+      console.error("Apify actor attempt failed", {
+        actorId,
+        inputShape: Array.isArray(input.urls) && typeof input.urls[0] === "string" ? "string_urls" : "object_urls",
+        error
+      });
+    }
+  }
+
+  if (!run) {
+    console.error("Apify actor failed", { actorId, error: lastError });
     throw new ProfileImportError("Apify actor failed", "actor_failed");
   }
 
