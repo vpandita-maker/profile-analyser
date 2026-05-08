@@ -6,6 +6,15 @@ type ApifyProfile = Record<string, unknown>;
 const noCookieActorId = "yZnhB5JewWf9xSmoM";
 const cookieActorId = "PEgClm7RgRD7YO94b";
 
+export class ProfileImportError extends Error {
+  constructor(
+    message: string,
+    public readonly code: "missing_token" | "empty_result" | "actor_failed"
+  ) {
+    super(message);
+  }
+}
+
 function getActorId() {
   const configuredActorId = process.env.APIFY_ACTOR_ID?.trim();
 
@@ -114,20 +123,27 @@ export async function scrapeLinkedInProfile(profileUrl: string) {
   const actorId = getActorId();
 
   if (!token) {
-    throw new Error("Apify is not configured");
+    throw new ProfileImportError("Apify token is missing", "missing_token");
   }
 
   const client = new ApifyClient({ token });
-  const run = await client.actor(actorId).call({
-    urls: [profileUrl],
-    scrapeCompany: false
-  });
+  let run;
+
+  try {
+    run = await client.actor(actorId).call({
+      urls: [profileUrl],
+      scrapeCompany: false
+    });
+  } catch (error) {
+    console.error("Apify actor failed", { actorId, error });
+    throw new ProfileImportError("Apify actor failed", "actor_failed");
+  }
 
   const { items } = await client.dataset(run.defaultDatasetId).listItems();
   const firstItem = items[0] as ApifyProfile | undefined;
 
   if (!firstItem) {
-    throw new Error("Apify returned no profile data");
+    throw new ProfileImportError("Apify returned no profile data", "empty_result");
   }
 
   return mapApifyProfile(firstItem, profileUrl);

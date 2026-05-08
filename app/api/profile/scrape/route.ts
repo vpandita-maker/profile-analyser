@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { scrapeLinkedInProfile } from "@/lib/apify";
+import { ProfileImportError, scrapeLinkedInProfile } from "@/lib/apify";
 
 const scrapeSchema = z.object({
   profileUrl: z
@@ -21,6 +21,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ profile });
   } catch (error) {
     console.error("LinkedIn scrape failed", error);
+
+    if (error instanceof ProfileImportError) {
+      const message =
+        error.code === "missing_token"
+          ? "Profile import is not connected yet. Add APIFY_TOKEN in Vercel and redeploy."
+          : "Profile import failed at the scraper. Check your Apify run logs or try the saved PDF upload.";
+
+      return NextResponse.json({ error: message, code: error.code }, { status: 502 });
+    }
+
     return NextResponse.json(
       {
         error: "Could not import this profile automatically. Upload your saved PDF instead."
