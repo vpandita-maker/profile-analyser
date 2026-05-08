@@ -3,6 +3,19 @@ import type { LinkedInProfile } from "@/lib/types";
 
 type ApifyProfile = Record<string, unknown>;
 
+const noCookieActorId = "yZnhB5JewWf9xSmoM";
+const cookieActorId = "PEgClm7RgRD7YO94b";
+
+function getActorId() {
+  const configuredActorId = process.env.APIFY_ACTOR_ID?.trim();
+
+  if (!configuredActorId || configuredActorId === cookieActorId || configuredActorId.startsWith("apify_api_")) {
+    return noCookieActorId;
+  }
+
+  return configuredActorId;
+}
+
 function formatPeriod(period: unknown): string {
   if (!period || typeof period !== "object") return "";
 
@@ -98,7 +111,7 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
 
 export async function scrapeLinkedInProfile(profileUrl: string) {
   const token = process.env.APIFY_TOKEN;
-  const actorId = process.env.APIFY_ACTOR_ID || "yZnhB5JewWf9xSmoM";
+  const actorId = getActorId();
 
   if (!token) {
     throw new Error("Apify is not configured");
