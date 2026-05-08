@@ -3,6 +3,9 @@ import type { LinkedInProfile } from "@/lib/types";
 
 type ApifyProfile = Record<string, unknown>;
 
+const defaultUserAgent =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
 function formatPeriod(period: unknown): string {
   if (!period || typeof period !== "object") return "";
 
@@ -108,6 +111,7 @@ export async function scrapeLinkedInProfile(profileUrl: string) {
   const client = new ApifyClient({ token });
   const run = await client.actor(actorId).call({
     cookie,
+    userAgent: process.env.APIFY_LINKEDIN_USER_AGENT || defaultUserAgent,
     profileUrls: [profileUrl],
     urls: [profileUrl],
     minDelay: 15,
