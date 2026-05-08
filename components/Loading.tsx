@@ -14,7 +14,7 @@ const businessFacts = [
   "The S&P 500 tracks 500 large public companies listed in the United States.",
   "Amazon started as an online bookstore before expanding into almost every category.",
   "Airbnb's founders first rented out air mattresses during a design conference.",
-  "Coca-Cola was first sold at a pharmacy soda fountain in Atlanta."
+  "Coca Cola was first sold at a pharmacy soda fountain in Atlanta."
 ];
 
 export function Loading({ label = "Loading" }: { label?: string }) {

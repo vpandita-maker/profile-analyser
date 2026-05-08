@@ -44,16 +44,16 @@ function HomeContent() {
             <Trophy className="h-5 w-5 text-teal-600" />
           </div>
 
-          <h1 className="text-4xl font-black leading-tight text-slate-950">Align your LinkedIn to your goals—and actually get noticed.</h1>
+          <h1 className="text-4xl font-black leading-tight text-slate-950">Align your LinkedIn to your goals, and actually get noticed.</h1>
           <p className="mt-4 text-base leading-7 text-slate-600">
-            Connect your LinkedIn profile, tell us your career goals, and get a personalized analysis with specific fixes—no generic advice, just what actually matters for your path.
+            Connect your LinkedIn profile, tell us your career goals, and get a personalized analysis with specific fixes. No generic advice, just what actually matters for your path.
           </p>
         </div>
 
         <div className="space-y-3">
           {authError ? (
             <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">
-              Sign-in could not finish. Please try again after confirming the redirect URL is saved in the developer portal.
+              Sign in could not finish. Please try again after confirming the redirect URL is saved in the developer portal.
             </Card>
           ) : null}
           <Card className="bg-white">

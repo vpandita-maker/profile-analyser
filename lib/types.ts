@@ -1,6 +1,6 @@
 export type CareerGoal = "Recruiting" | "Fundraising" | "Hiring" | "Personal Brand" | "Job Search";
-export type Seniority = "Entry-level" | "Mid-level" | "Senior" | "Executive" | "Student";
-export type Timeline = "Urgent" | "Near-term" | "Flexible";
+export type Seniority = "Entry level" | "Mid level" | "Senior" | "Executive" | "Student";
+export type Timeline = "Urgent" | "Near term" | "Flexible";
 export type Geography = "India" | "US" | "Other";
 
 export interface LinkedInProfile {

@@ -14,7 +14,7 @@ import type { LeaderboardEntry } from "@/lib/types";
 const filterOptions = {
   goal: ["", "Recruiting", "Fundraising", "Hiring", "Personal Brand", "Job Search"],
   geography: ["", "India", "US", "Other"],
-  seniority: ["", "Entry-level", "Mid-level", "Senior", "Executive", "Student"]
+  seniority: ["", "Entry level", "Mid level", "Senior", "Executive", "Student"]
 };
 
 export default function LeaderboardPage() {
@@ -121,7 +121,7 @@ export default function LeaderboardPage() {
             </div>
             <Card className="bg-slate-50">
               <p className="text-sm font-bold text-slate-950">Anonymized snapshot</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">Strong profile clarity with room to improve proof density and audience-specific positioning.</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Strong profile clarity with room to improve proof density and audience specific positioning.</p>
             </Card>
           </div>
         ) : null}

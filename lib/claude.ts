@@ -5,22 +5,23 @@ import { compactList } from "@/lib/utils";
 export const LINKEDIN_ANALYSIS_SYSTEM_PROMPT = `You are a LinkedIn profile optimization expert. Analyze the user's profile based on their stated goal, geography, seniority, industry, profile fields, and questionnaire answers.
 
 Return a JSON object with:
-- overallScore (1-100)
-- categoryScores (headline, about, experience, skills, positioning - each 1-10)
-- strengths (3-5 items: title, score 1-10, explanation)
-- weaknesses (3-5 items: title, score 1-10, explanation)
-- topFixes (3 items: title, current text, recommended text, why it matters, difficulty)
-- secondaryFixes (2-3 items: same structure)
+overallScore from 1 to 100
+categoryScores for headline, about, experience, skills, and positioning, each from 1 to 10
+strengths with 3 to 5 items, each with title, score from 1 to 10, and explanation
+weaknesses with 3 to 5 items, each with title, score from 1 to 10, and explanation
+topFixes with 3 items, each with title, current text, recommended text, why it matters, and difficulty
+secondaryFixes with 2 to 3 items using the same structure
 
 Writing rules:
-- Always write directly to the user in second person: "you", "your", "you should".
-- Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
-- Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, companies, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
-- Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
-- If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
-- Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
-- Recommended text should be ready to paste into a profile where possible.
-- Be specific, honest, and actionable. Consider geography (India vs US), goal context (recruiting vs fundraising signals), seniority benchmarks, and industry norms.
+Always write directly to the user in second person: "you", "your", "you should".
+Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
+Do not use dash punctuation in any written explanation, title, current text, recommended text, or why it matters. Avoid hyphens, en dashes, and em dashes. Use commas, periods, or separate sentences instead.
+Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, companies, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
+Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
+If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
+Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
+Recommended text should be ready to paste into a profile where possible.
+Be specific, honest, and actionable. Consider geography (India vs US), goal context (recruiting vs fundraising signals), seniority benchmarks, and industry norms.
 
 Output ONLY valid JSON, no markdown or preamble.`;
 
@@ -97,35 +98,36 @@ const analysisTool = {
 
 export function buildAnalysisUserMessage(profile: LinkedInProfile, context: ContextAnswers) {
   return `Profile Data:
-- Name: ${profile.name}
-- Headline: ${profile.headline || "Not provided"}
-- About: ${profile.about || "Not provided"}
-- Experience: ${compactList(profile.experience)}
-- Skills: ${compactList(profile.skills)}
-- Education: ${compactList(profile.education)}
-- Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0, 8000) : "Not provided"}
-- Import Source: ${profile.importSource || "oauth"}
+Name: ${profile.name}
+Headline: ${profile.headline || "Not provided"}
+About: ${profile.about || "Not provided"}
+Experience: ${compactList(profile.experience)}
+Skills: ${compactList(profile.skills)}
+Education: ${compactList(profile.education)}
+Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0, 8000) : "Not provided"}
+Import Source: ${profile.importSource || "oauth"}
 
 Context:
-- Goal: ${context.goal || "Not specified"}
-- Seniority: ${context.seniority || "Not specified"}
-- Industry: ${context.industry || "Not specified"}
-- Target Role: ${context.targetRole || "Not specified"}
-- Geography: ${context.geography || "Not specified"}
-- City: ${context.city || "Not specified"}
-- Timeline: ${context.timeline || "Not specified"}
-- Challenges: ${compactList(context.challenges)}
-- Target Companies: ${context.targetCompanies || "Not specified"}
-- Ideal Outcome: ${context.outcome || "Not specified"}
-- Network Size: ${context.networkSize || "Not specified"}
-- Open To Relocation: ${context.relocation === null ? "Not specified" : context.relocation ? "Yes" : "No"}
-- Market Benchmarking: Use the target role, seniority, geography, industry, and broadly available market benchmarks. Do not use or ask for desired salary.
-- Recent Wins: ${context.wins || "Not specified"}
+Goal: ${context.goal || "Not specified"}
+Seniority: ${context.seniority || "Not specified"}
+Industry: ${context.industry || "Not specified"}
+Target Role: ${context.targetRole || "Not specified"}
+Geography: ${context.geography || "Not specified"}
+City: ${context.city || "Not specified"}
+Timeline: ${context.timeline || "Not specified"}
+Challenges: ${compactList(context.challenges)}
+Target Companies: ${context.targetCompanies || "Not specified"}
+Ideal Outcome: ${context.outcome || "Not specified"}
+Network Size: ${context.networkSize || "Not specified"}
+Open To Relocation: ${context.relocation === null ? "Not specified" : context.relocation ? "Yes" : "No"}
+Market Benchmarking: Use the target role, seniority, geography, industry, and broadly available market benchmarks. Do not use or ask for desired salary.
+Recent Wins: ${context.wins || "Not specified"}
 
 Important output style:
-- Address the reader as "you" and "your" in every explanation and recommendation.
-- Do not refer to ${profile.name} in third person.
-- Personalize the analysis using the profile data and context above.`;
+Address the reader as "you" and "your" in every explanation and recommendation.
+Do not refer to ${profile.name} in third person.
+Do not use dash punctuation in the returned copy.
+Personalize the analysis using the profile data and context above.`;
 }
 
 export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswers): AnalysisResult {
@@ -148,14 +150,14 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
         explanation: `You have enough signal to begin positioning around ${goal.toLowerCase()}, especially if you sharpen your role narrative for ${role}.`
       },
       {
-        title: "Context-aware targeting",
+        title: "Context aware targeting",
         score: 8,
         explanation: `Your answers make the intended audience more specific, which helps tune headline, about, and experience sections for ${role}.`
       },
       {
         title: "Readable professional baseline",
         score: 7,
-        explanation: "You can upgrade your current profile quickly by adding sharper proof points and more audience-specific keywords."
+        explanation: "You can upgrade your current profile quickly by adding sharper proof points and more audience specific keywords."
       }
     ],
     weaknesses: [
@@ -180,13 +182,13 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
         title: "Rewrite the headline",
         current: profile.headline || "No headline provided",
         recommended: `${role} | ${context.industry || "Industry"} | Helping teams create measurable business outcomes`,
-        whyMatters: "The headline is the highest-visibility conversion surface on LinkedIn search, comments, and profile visits.",
+        whyMatters: "The headline is the highest visibility conversion surface on LinkedIn search, comments, and profile visits.",
         difficulty: "Easy"
       },
       {
-        title: "Add a proof-led About opener",
+        title: "Add a proof led About opener",
         current: profile.about || "No About section provided",
-        recommended: `I help ${context.industry || "teams"} solve high-value problems as a ${role}, with a focus on measurable outcomes, clear execution, and market-aware positioning.`,
+        recommended: `I help ${context.industry || "teams"} solve high value problems as a ${role}, with a focus on measurable outcomes, clear execution, and market aware positioning.`,
         whyMatters: "The first two lines decide whether a visitor expands the section or leaves.",
         difficulty: "Medium"
       },
