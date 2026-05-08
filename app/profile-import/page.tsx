@@ -63,16 +63,16 @@ export default function ProfileImportPage() {
   return (
     <main className="safe-bottom min-h-dvh bg-slate-50 px-4 py-5">
       <section className="mx-auto flex min-h-[calc(100dvh-48px)] max-w-md flex-col justify-between">
-        <div>
-          <div className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-950">
+        <div className="text-center">
+          <div className="mb-8 flex items-center justify-center gap-2 text-sm font-bold text-slate-950">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
               <FileText className="h-4 w-4" />
             </span>
             Profile Import
           </div>
 
-          <h1 className="text-3xl font-black leading-tight text-slate-950">Add your profile PDF for a sharper review.</h1>
-          <p className="mt-4 text-base leading-7 text-slate-600">
+          <h1 className="mx-auto max-w-sm text-3xl font-black leading-tight text-slate-950">Add your profile PDF for a sharper review.</h1>
+          <p className="mx-auto mt-4 max-w-sm text-base leading-7 text-slate-600">
             On your LinkedIn profile, open Resources and choose Save to PDF. Upload that PDF here.
           </p>
         </div>
@@ -85,8 +85,8 @@ export default function ProfileImportPage() {
             </Card>
           ) : null}
 
-          <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 text-center active:scale-[0.99]">
-            <Upload className="mb-2 h-6 w-6 text-teal-600" />
+          <label className="group flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 text-center shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:border-teal-500 hover:bg-teal-50 hover:shadow-lg hover:shadow-teal-900/10 active:translate-y-0 active:scale-[0.99]">
+            <Upload className="mb-2 h-6 w-6 text-teal-600 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:scale-110" />
             <span className="text-sm font-bold text-slate-950">{fileName || "Upload LinkedIn PDF"}</span>
             <span className="mt-1 text-xs leading-5 text-slate-500">PDF only, under 8MB</span>
             <input className="sr-only" type="file" accept="application/pdf,.pdf" onChange={onFileChange} />
