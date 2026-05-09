@@ -28,7 +28,10 @@ Do not use dash punctuation in any written explanation, title, current text, rec
 Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, target employers, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
 For each topFix, use the related weakness as the source. Do not give a fix unless it clearly improves recruiter fit, internship fit, search visibility, proof of impact, or conversion to interviews.
 Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
-If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
+If a profile field is not returned by the profile import, do not claim that section is absent from the actual LinkedIn profile. Say the import did not return enough data to verify that section, then recommend what the user should verify or improve based on the evidence you do have.
+Only say a section is blank, empty, or missing when the provided data explicitly proves it is blank.
+Do not make weakness titles that start with No Headline, No About Section, No Experience Section, or No Skills Section unless the profile evidence explicitly proves that section is blank.
+Do not assign a 1 out of 10 score solely because a URL import did not return a field.
 Treat imported profile text as profile evidence. If headline, about, experience, education, or skills appear in the imported profile text, do not describe that section as missing.
 Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
 Recommended text should be ready to paste into a profile where possible.
@@ -113,29 +116,37 @@ export function buildAnalysisUserMessage(profile: LinkedInProfile, context: Cont
   const hasExperience = Boolean(profile.experience?.length);
   const hasEducation = Boolean(profile.education?.length);
   const hasSkills = Boolean(profile.skills?.length);
+  const isProfileImport = profile.importSource === "scrape";
+  const unavailable = (label: string) =>
+    isProfileImport ? `${label} was not returned by the profile import` : `${label} was not provided`;
+  const textField = (value: string | undefined, label: string) => value?.trim() || unavailable(label);
+  const listField = (values: string[] | undefined, label: string) =>
+    values?.length ? compactList(values) : unavailable(label);
+  const availability = (hasValue: boolean) =>
+    hasValue ? "Available" : isProfileImport ? "Not returned by the profile import" : "Not provided";
 
   return `Profile Data:
 Name: ${profile.name}
-Profile URL: ${profile.profileUrl || "Not provided"}
-Headline: ${profile.headline || "Not provided"}
-About: ${profile.about || "Not provided"}
-Experience: ${compactList(profile.experience)}
-Skills: ${compactList(profile.skills)}
-Education: ${compactList(profile.education)}
-Location: ${profile.location || "Not provided"}
-Country: ${profile.country || "Not provided"}
-Current Role: ${profile.currentRole || "Not provided"}
-Current Company: ${profile.currentCompany || "Not provided"}
-Profile Industry: ${profile.industry || "Not provided"}
-Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0, 8000) : "Not provided"}
+Profile URL: ${textField(profile.profileUrl, "Profile URL")}
+Headline: ${textField(profile.headline, "Headline")}
+About: ${textField(profile.about, "About")}
+Experience: ${listField(profile.experience, "Experience")}
+Skills: ${listField(profile.skills, "Skills")}
+Education: ${listField(profile.education, "Education")}
+Location: ${textField(profile.location, "Location")}
+Country: ${textField(profile.country, "Country")}
+Current Role: ${textField(profile.currentRole, "Current Role")}
+Current Company: ${textField(profile.currentCompany, "Current Company")}
+Profile Industry: ${textField(profile.industry, "Profile Industry")}
+Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0, 8000) : unavailable("Imported Profile Text")}
 Import Source: ${profile.importSource || "oauth"}
 
 Section availability:
-Headline present: ${hasHeadline ? "Yes" : "No"}
-About present: ${hasAbout ? "Yes" : "No"}
-Experience present: ${hasExperience ? "Yes" : "No"}
-Education present: ${hasEducation ? "Yes" : "No"}
-Skills present: ${hasSkills ? "Yes" : "No"}
+Headline: ${availability(hasHeadline)}
+About: ${availability(hasAbout)}
+Experience: ${availability(hasExperience)}
+Education: ${availability(hasEducation)}
+Skills: ${availability(hasSkills)}
 
 Context:
 Opportunity Type: ${context.goal || "Job Search"}
@@ -157,7 +168,7 @@ Important output style:
 Address the reader as "you" and "your" in every explanation and recommendation.
 Do not refer to ${profile.name} in third person.
 Do not use dash punctuation in the returned copy.
-Do not call any section missing when section availability says Yes. If a present section is weak, critique the content quality instead of saying it does not exist.
+Do not call any section missing when section availability says Available or Not returned by the profile import. If a present section is weak, critique the content quality instead of saying it does not exist. If the profile import did not return a section, say the import did not return enough data to verify it.
 Personalize the analysis using the profile data and context above.`;
 }
 
@@ -165,14 +176,17 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
   const role = context.targetRole || "your target role";
   const opportunity = context.goal || "Job Search";
   const audience = opportunity === "Internship Search" ? "internship recruiters and hiring teams" : "recruiters and hiring managers";
+  const isProfileImport = profile.importSource === "scrape";
+  const headlineCurrent = profile.headline || (isProfileImport ? "Headline was not returned by the profile import" : "No headline provided");
+  const aboutCurrent = profile.about || (isProfileImport ? "About text was not returned by the profile import" : "No About section provided");
 
   return {
     overallScore: 72,
     categoryScores: {
-      headline: profile.headline ? 7 : 4,
-      about: profile.about ? 7 : 4,
-      experience: profile.experience?.length ? 7 : 5,
-      skills: profile.skills?.length ? 7 : 5,
+      headline: profile.headline ? 7 : isProfileImport ? 5 : 4,
+      about: profile.about ? 7 : isProfileImport ? 5 : 4,
+      experience: profile.experience?.length ? 7 : isProfileImport ? 5 : 5,
+      skills: profile.skills?.length ? 7 : isProfileImport ? 5 : 5,
       positioning: 6
     },
     strengths: [
@@ -195,8 +209,10 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
     weaknesses: [
       {
         title: "Headline needs stronger positioning",
-        score: profile.headline ? 5 : 3,
-        explanation: `Your headline should state the role you want, the domain you fit, and the proof that makes you credible for ${role}.`
+        score: profile.headline ? 5 : isProfileImport ? 5 : 3,
+        explanation: profile.headline
+          ? `Your headline should state the role you want, the domain you fit, and the proof that makes you credible for ${role}.`
+          : `The profile import did not return a headline, so verify that your headline is public and make sure it states the role you want, the domain you fit, and the proof that makes you credible for ${role}.`
       },
       {
         title: "Missing measurable proof",
@@ -212,14 +228,14 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
     topFixes: [
       {
         title: "Rewrite the headline",
-        current: profile.headline || "No headline provided",
+        current: headlineCurrent,
         recommended: `${role} | ${context.industry || "Target industry"} | Projects, tools, and outcomes aligned to hiring needs`,
         whyMatters: "The headline is the highest visibility surface for recruiter search, profile visits, and referral checks.",
         difficulty: "Easy"
       },
       {
         title: "Add a proof led About opener",
-        current: profile.about || "No About section provided",
+        current: aboutCurrent,
         recommended: `I am targeting ${role} opportunities in ${context.industry || "my target industry"}. I bring hands on experience with relevant projects, tools, and measurable outcomes that match what hiring teams screen for.`,
         whyMatters: "The first two lines decide whether a recruiter understands your fit before moving to experience.",
         difficulty: "Medium"
