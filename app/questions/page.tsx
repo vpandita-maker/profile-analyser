@@ -46,7 +46,7 @@ export default function QuestionsPage() {
       return;
     }
 
-    if (!linkedinData.rawProfileText && linkedinData.importSource !== "pdf" && linkedinData.importSource !== "scrape") {
+    if (!linkedinData.rawProfileText && linkedinData.importSource !== "scrape") {
       router.replace("/profile-import");
     }
   }, [linkedinData, router]);
@@ -62,7 +62,7 @@ export default function QuestionsPage() {
         about: "",
         experience: [],
         skills: [],
-        importSource: "oauth"
+        importSource: "scrape"
       } as const);
     setLinkedinData(profile);
     clearAnalysis();
