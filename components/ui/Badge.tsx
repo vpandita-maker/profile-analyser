@@ -26,10 +26,7 @@ export function Badge({ className, tone = "gray", ...props }: BadgeProps) {
 export function ScoreBadge({ score, className }: { score: number; className?: string }) {
   return (
     <div className={cn("grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br shadow-soft", scoreTone(score), className)}>
-      <span className="flex flex-col items-center leading-none">
-        <span className="text-2xl font-black">{score}</span>
-        <span className="mt-1 text-[10px] font-bold opacity-80">/100</span>
-      </span>
+      <span className="text-3xl font-black leading-none">{score}</span>
     </div>
   );
 }

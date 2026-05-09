@@ -46,13 +46,55 @@ function asText(value: unknown): string {
   return "";
 }
 
+function normalizeKey(key: string) {
+  return key.replace(/[\s_-]/g, "").toLowerCase();
+}
+
 function firstText(item: ApifyProfile, keys: string[]) {
+  const targets = new Set(keys.map(normalizeKey));
+
+  for (const [key, value] of Object.entries(item)) {
+    if (targets.has(normalizeKey(key))) {
+      const text = asText(value);
+      if (text) return text;
+    }
+  }
+
+  return "";
+}
+
+function deepText(value: unknown, keys: string[], depth = 0): string {
+  if (depth > 5 || !value) return "";
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const text = deepText(item, keys, depth + 1);
+      if (text) return text;
+    }
+    return "";
+  }
+
+  if (typeof value !== "object") return "";
+
+  const record = value as ApifyProfile;
+  const direct = firstText(record, keys);
+  if (direct) return direct;
+
+  for (const entryValue of Object.values(record)) {
+    const text = deepText(entryValue, keys, depth + 1);
+    if (text) return text;
+  }
+
+  return "";
+}
+
+function firstDeepText(item: ApifyProfile, keys: string[]) {
   for (const key of keys) {
     const value = asText(item[key]);
     if (value) return value;
   }
 
-  return "";
+  return deepText(item, keys);
 }
 
 function listText(value: unknown, keys: string[] = []) {
@@ -84,17 +126,23 @@ function firstArray(item: ApifyProfile, keys: string[]) {
 
 export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial<LinkedInProfile> {
   const name =
-    firstText(item, ["fullName", "name", "title"]) ||
-    [firstText(item, ["firstName", "first_name"]), firstText(item, ["lastName", "last_name"])].filter(Boolean).join(" ");
+    firstText(item, ["fullName", "full name", "profileName", "profile name", "displayName", "display name", "name"]) ||
+    firstDeepText(item, ["fullName", "full name", "profileName", "profile name", "displayName", "display name"]) ||
+    [
+      firstDeepText(item, ["firstName", "first name", "first_name", "givenName", "given name"]),
+      firstDeepText(item, ["lastName", "last name", "last_name", "familyName", "family name"])
+    ]
+      .filter(Boolean)
+      .join(" ");
 
-  const headline = firstText(item, ["headline", "occupation", "subTitle", "subtitle", "currentPosition", "jobTitle"]);
-  const about = firstText(item, ["about", "summary", "bio", "description"]);
-  const photo = firstText(item, ["pictureUrl", "profilePicture", "profilePic", "profilePicUrl", "profileImage", "image"]);
-  const location = firstText(item, ["geoLocationName", "locationName", "location", "address", "geoLocation"]);
-  const country = firstText(item, ["geoCountryName", "countryName", "country", "countryCode"]);
-  const industry = firstText(item, ["industryName", "industry", "industryLabel"]);
-  const currentRole = firstText(item, ["jobTitle", "currentRole", "currentPosition", "title"]);
-  const currentCompany = firstText(item, ["companyName", "currentCompanyName", "company"]);
+  const headline = firstDeepText(item, ["headline", "occupation", "subTitle", "subtitle", "currentPosition", "current position", "jobTitle", "job title"]);
+  const about = firstDeepText(item, ["about", "summary", "bio", "description"]);
+  const photo = firstDeepText(item, ["pictureUrl", "picture url", "profilePicture", "profile picture", "profilePic", "profilePicUrl", "profile pic url", "profileImage", "profile image", "image"]);
+  const location = firstDeepText(item, ["geoLocationName", "geo location name", "locationName", "location name", "location", "address", "geoLocation", "geo location"]);
+  const country = firstDeepText(item, ["geoCountryName", "geo country name", "countryName", "country name", "country", "countryCode", "country code"]);
+  const industry = firstDeepText(item, ["industryName", "industry name", "industry", "industryLabel", "industry label"]);
+  const currentRole = firstDeepText(item, ["jobTitle", "job title", "currentRole", "current role", "currentPosition", "current position", "title"]);
+  const currentCompany = firstDeepText(item, ["companyName", "company name", "currentCompanyName", "current company name", "company"]);
   const experience = listText(firstArray(item, ["positions", "experience", "experiences", "positionHistory"]), [
     "title",
     "jobTitle",
