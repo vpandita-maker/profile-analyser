@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { normalizeAnalysis } from "@/lib/analysis";
 import { analyzeLinkedInProfile } from "@/lib/claude";
+import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { ContextAnswers, LinkedInProfile } from "@/lib/types";
 
@@ -29,7 +30,7 @@ const analyzeSchema = z.object({
 
 export async function POST(request: Request) {
   const body = analyzeSchema.parse(await request.json());
-  const profile: LinkedInProfile = {
+  const profile = normalizeLinkedInProfile({
     linkedinId: body.linkedinId,
     name: body.name,
     headline: body.headline,
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
     isStudent: body.isStudent,
     rawProfileText: body.rawProfileText,
     importSource: body.importSource
-  };
+  } satisfies LinkedInProfile) as LinkedInProfile;
   const contextAnswers = body.contextAnswers as unknown as ContextAnswers;
   if (!["Job Search", "Internship Search"].includes(contextAnswers.goal)) {
     contextAnswers.goal = "Job Search";

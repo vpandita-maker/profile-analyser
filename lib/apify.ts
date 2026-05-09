@@ -1,4 +1,5 @@
 import { ApifyClient } from "apify-client";
+import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import type { LinkedInProfile } from "@/lib/types";
 
 type ApifyProfile = Record<string, unknown>;
@@ -125,6 +126,7 @@ function firstArray(item: ApifyProfile, keys: string[]) {
 }
 
 export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial<LinkedInProfile> {
+  const linkedinId = firstText(item, ["profileId", "profile id", "publicIdentifier", "public identifier", "id"]) || profileUrl;
   const name =
     firstText(item, ["fullName", "full name", "profileName", "profile name", "displayName", "display name", "name"]) ||
     firstDeepText(item, ["fullName", "full name", "profileName", "profile name", "displayName", "display name"]) ||
@@ -158,7 +160,8 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
   const education = listText(firstArray(item, ["education", "educations"]), ["schoolName", "school", "degreeName", "degree", "fieldOfStudy", "dateRange"]);
   const skills = listText(firstArray(item, ["skills", "topSkills"]), ["name", "title", "text"]);
 
-  return {
+  const profile: LinkedInProfile = {
+    linkedinId,
     name: name || "LinkedIn Member",
     headline,
     photo,
@@ -176,6 +179,8 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
     rawProfileText: JSON.stringify({ profileUrl, ...item }).slice(0, 12000),
     importSource: "scrape"
   };
+
+  return normalizeLinkedInProfile(profile) || profile;
 }
 
 export async function scrapeLinkedInProfile(profileUrl: string) {

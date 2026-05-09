@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { AnalysisResult, ContextAnswers, LinkedInProfile } from "@/lib/types";
 import { compactList } from "@/lib/utils";
+import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 
 export const LINKEDIN_ANALYSIS_SYSTEM_PROMPT = `You are a LinkedIn profile optimization expert for job seekers and internship seekers only. Analyze the user's profile based on their target opportunity, geography, seniority, industry, profile fields, and questionnaire answers.
 
@@ -28,6 +29,7 @@ Make every strength, weakness, and fix specific to the provided profile data and
 For each topFix, use the related weakness as the source. Do not give a fix unless it clearly improves recruiter fit, internship fit, search visibility, proof of impact, or conversion to interviews.
 Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
 If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
+Treat imported profile text as profile evidence. If headline, about, experience, education, or skills appear in the imported profile text, do not describe that section as missing.
 Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
 Recommended text should be ready to paste into a profile where possible.
 Be specific, honest, and actionable. Consider geography, job market expectations, internship market expectations, seniority benchmarks, role keywords, proof of impact, and industry norms.
@@ -251,8 +253,10 @@ function parseClaudeJson(text: string): AnalysisResult {
 }
 
 export async function analyzeLinkedInProfile(profile: LinkedInProfile, context: ContextAnswers): Promise<AnalysisResult> {
+  const preparedProfile = normalizeLinkedInProfile(profile) || profile;
+
   if (!process.env.CLAUDE_API_KEY) {
-    return fallbackAnalysis(profile, context);
+    return fallbackAnalysis(preparedProfile, context);
   }
 
   try {
@@ -263,7 +267,7 @@ export async function analyzeLinkedInProfile(profile: LinkedInProfile, context: 
       system: LINKEDIN_ANALYSIS_SYSTEM_PROMPT,
       tools: [analysisTool],
       tool_choice: { type: "tool", name: "return_analysis" },
-      messages: [{ role: "user", content: buildAnalysisUserMessage(profile, context) }]
+      messages: [{ role: "user", content: buildAnalysisUserMessage(preparedProfile, context) }]
     });
 
     const toolBlock = response.content.find((block) => block.type === "tool_use" && block.name === "return_analysis");
@@ -273,12 +277,12 @@ export async function analyzeLinkedInProfile(profile: LinkedInProfile, context: 
 
     const textBlock = response.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
-      return fallbackAnalysis(profile, context);
+      return fallbackAnalysis(preparedProfile, context);
     }
 
     return parseClaudeJson(textBlock.text);
   } catch (error) {
     console.error("Claude analysis failed", error);
-    return fallbackAnalysis(profile, context);
+    return fallbackAnalysis(preparedProfile, context);
   }
 }
