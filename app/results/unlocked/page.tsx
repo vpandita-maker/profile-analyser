@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FixCard } from "@/components/FixCard";
 import { Loading } from "@/components/Loading";
-import { ProfileCard } from "@/components/ProfileCard";
 import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { normalizeAnalysis } from "@/lib/analysis";
@@ -90,7 +89,6 @@ export default function UnlockedResultsPage() {
   return (
     <main className="safe-bottom min-h-dvh bg-slate-50">
       <div className="mx-auto max-w-md">
-        <ProfileCard profile={profile} />
         <div className="px-4 py-5">
           <section className="mb-5 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <div>

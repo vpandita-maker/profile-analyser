@@ -3,7 +3,6 @@
 import { LockKeyhole, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ProfileCard } from "@/components/ProfileCard";
 import { ShareModal } from "@/components/ShareModal";
 import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
@@ -15,7 +14,6 @@ import { useAnalyzerStore } from "@/lib/store";
 export default function ResultsPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const router = useRouter();
-  const profile = useAnalyzerStore((state) => state.linkedinData);
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
   const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
@@ -34,7 +32,6 @@ export default function ResultsPage() {
   return (
     <main className="safe-bottom min-h-dvh bg-slate-50">
       <div className="mx-auto max-w-md">
-        <ProfileCard profile={profile} />
         <div className="px-4 py-5">
           <section className="mb-6 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <div>
