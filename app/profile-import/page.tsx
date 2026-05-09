@@ -13,6 +13,8 @@ import type { LinkedInProfile } from "@/lib/types";
 export default function ProfileImportPage() {
   const router = useRouter();
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
+  const resetContext = useAnalyzerStore((state) => state.resetContext);
+  const clearAnalysis = useAnalyzerStore((state) => state.clearAnalysis);
   const [profileUrl, setProfileUrl] = useState("");
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +44,8 @@ export default function ProfileImportPage() {
       importSource: "scrape"
     } satisfies LinkedInProfile);
 
+    resetContext();
+    clearAnalysis();
     setLinkedinData(importedProfile || ({
       ...data.profile,
       linkedinId: data.profile.linkedinId || "profile-user",

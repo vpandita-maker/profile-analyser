@@ -27,54 +27,6 @@ const screenChecks: Array<(answers: ContextAnswers) => boolean> = [
   () => true
 ];
 
-function inferGeography(country?: string, location?: string): ContextAnswers["geography"] {
-  const value = `${country || ""} ${location || ""}`.toLowerCase();
-  if (/\bindia\b|\bin\b/.test(value)) return "India";
-  if (/\bunited states\b|\busa\b|\bus\b|\bu\.s\.\b/.test(value)) return "US";
-  return value.trim() ? "Other" : "";
-}
-
-function rawProfileFields(rawProfileText?: string) {
-  if (!rawProfileText) return {};
-
-  try {
-    const raw = JSON.parse(rawProfileText) as Record<string, unknown>;
-    const text = (key: string) => {
-      const value = raw[key];
-      return typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
-    };
-
-    return {
-      country: text("geoCountryName") || text("countryName") || text("country") || text("countryCode"),
-      location: text("geoLocationName") || text("locationName") || text("location"),
-      industry: text("industryName") || text("industry"),
-      currentRole: text("jobTitle") || text("currentRole") || text("currentPosition"),
-      isStudent: raw.student === true
-    };
-  } catch {
-    return {};
-  }
-}
-
-function profileDefaults(profile: NonNullable<ReturnType<typeof useAnalyzerStore.getState>["linkedinData"]>, answers: ContextAnswers) {
-  const raw = rawProfileFields(profile.rawProfileText);
-  const country = profile.country || raw.country;
-  const location = profile.location || raw.location;
-  const industry = profile.industry || raw.industry;
-  const currentRole = profile.currentRole || raw.currentRole;
-  const isStudent = profile.isStudent || raw.isStudent;
-  const geographyValue = inferGeography(country, location);
-  const defaults: Partial<ContextAnswers> = {};
-
-  if (!answers.geography && geographyValue) defaults.geography = geographyValue;
-  if (!answers.city && (profile.city || location)) defaults.city = profile.city || location || "";
-  if (!answers.industry && industry) defaults.industry = industry;
-  if (!answers.targetRole && currentRole) defaults.targetRole = currentRole;
-  if (!answers.seniority && isStudent) defaults.seniority = "Student";
-
-  return defaults;
-}
-
 export default function QuestionsPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -103,10 +55,6 @@ export default function QuestionsPage() {
       return;
     }
 
-    const defaults = profileDefaults(linkedinData, answers);
-    if (Object.keys(defaults).length) {
-      setAnswers(defaults);
-    }
   }, [answers, linkedinData, router, setAnswers]);
 
   async function submit() {
