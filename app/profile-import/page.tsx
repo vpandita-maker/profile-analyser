@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { useAnalyzerStore } from "@/lib/store";
-import { useEffect } from "react";
 
 export default function ProfileImportPage() {
   const router = useRouter();
@@ -19,12 +18,6 @@ export default function ProfileImportPage() {
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
   const [imported, setImported] = useState(false);
-
-  useEffect(() => {
-    if (!linkedinData) {
-      router.replace("/");
-    }
-  }, [linkedinData, router]);
 
   async function importProfile(file?: File) {
     setError("");
@@ -47,10 +40,10 @@ export default function ProfileImportPage() {
 
     mergeLinkedinData({
       ...data.profile,
-      linkedinId: linkedinData?.linkedinId || "profile-user",
-      name: linkedinData?.name || "Profile Member",
-      photo: linkedinData?.photo,
-      email: linkedinData?.email,
+      linkedinId: data.profile.linkedinId || linkedinData?.linkedinId || "profile-user",
+      name: data.profile.name || linkedinData?.name || "Profile Member",
+      photo: data.profile.photo || linkedinData?.photo,
+      email: data.profile.email || linkedinData?.email,
       importSource: "pdf"
     });
     setImported(true);
@@ -75,10 +68,10 @@ export default function ProfileImportPage() {
 
     mergeLinkedinData({
       ...data.profile,
-      linkedinId: linkedinData?.linkedinId || "profile-user",
+      linkedinId: data.profile.linkedinId || linkedinData?.linkedinId || "profile-user",
       name: data.profile.name || linkedinData?.name || "Profile Member",
       photo: data.profile.photo || linkedinData?.photo,
-      email: linkedinData?.email,
+      email: data.profile.email || linkedinData?.email,
       importSource: "scrape"
     });
     setImported(true);

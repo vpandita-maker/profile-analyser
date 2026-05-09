@@ -1,8 +1,6 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { analyzeLinkedInProfile } from "@/lib/claude";
-import { authOptions } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { ContextAnswers, LinkedInProfile } from "@/lib/types";
 
@@ -20,7 +18,6 @@ const analyzeSchema = z.object({
 
 export async function POST(request: Request) {
   const body = analyzeSchema.parse(await request.json());
-  const session = await getServerSession(authOptions);
   const profile: LinkedInProfile = {
     linkedinId: body.linkedinId,
     name: body.name,
@@ -34,7 +31,7 @@ export async function POST(request: Request) {
   const contextAnswers = body.contextAnswers as unknown as ContextAnswers;
   const analysis = await analyzeLinkedInProfile(profile, contextAnswers);
   const supabase = getSupabaseAdmin();
-  const userId = session?.user.id || profile.linkedinId;
+  const userId = profile.linkedinId;
   let analysisId = crypto.randomUUID();
 
   if (supabase) {

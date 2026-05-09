@@ -1,7 +1,5 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { isEmail } from "@/lib/utils";
 
@@ -40,9 +38,8 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
   const { searchParams } = new URL(request.url);
-  const email = (session?.user.email || searchParams.get("email") || "").toLowerCase();
+  const email = (searchParams.get("email") || "").toLowerCase();
   const analysisId = searchParams.get("analysisId");
 
   if (!email || !isEmail(email)) {
