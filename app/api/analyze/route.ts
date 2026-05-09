@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { normalizeAnalysis } from "@/lib/analysis";
 import { analyzeLinkedInProfile } from "@/lib/claude";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { ContextAnswers, LinkedInProfile } from "@/lib/types";
@@ -52,7 +53,8 @@ export async function POST(request: Request) {
   if (!["Job Search", "Internship Search"].includes(contextAnswers.goal)) {
     contextAnswers.goal = "Job Search";
   }
-  const analysis = await analyzeLinkedInProfile(profile, contextAnswers);
+  const rawAnalysis = await analyzeLinkedInProfile(profile, contextAnswers);
+  const analysis = normalizeAnalysis(rawAnalysis) || rawAnalysis;
   const supabase = getSupabaseAdmin();
   const userId = profile.linkedinId;
   let analysisId = crypto.randomUUID();

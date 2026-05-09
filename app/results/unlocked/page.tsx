@@ -14,6 +14,7 @@ import { useAnalyzerStore } from "@/lib/store";
 export default function UnlockedResultsPage() {
   const router = useRouter();
   const startedFixRefresh = useRef(false);
+  const [introLoading, setIntroLoading] = useState(false);
   const [refreshingFixes, setRefreshingFixes] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
   const profile = useAnalyzerStore((state) => state.linkedinData);
@@ -24,6 +25,19 @@ export default function UnlockedResultsPage() {
   const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
 
   const hasFixes = Boolean(analysis?.topFixes.length);
+
+  useEffect(() => {
+    if (window.location.search.includes("preparing=1")) {
+      setIntroLoading(true);
+      window.history.replaceState(null, "", "/results/unlocked");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!introLoading) return;
+    const timeout = window.setTimeout(() => setIntroLoading(false), 1600);
+    return () => window.clearTimeout(timeout);
+  }, [introLoading]);
 
   useEffect(() => {
     if (!analysis || !isUnlocked || hasFixes || !profile || startedFixRefresh.current) return;
@@ -65,7 +79,7 @@ export default function UnlockedResultsPage() {
     );
   }
 
-  if (refreshingFixes) {
+  if (introLoading || refreshingFixes) {
     return <Loading label="Preparing your personalized fixes" />;
   }
 

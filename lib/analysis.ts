@@ -37,9 +37,49 @@ function cleanFixes(values: unknown, fallbackTitle: string) {
   return Array.isArray(values) ? values.map((value, index) => cleanFix(value, `${fallbackTitle} ${index + 1}`)) : [];
 }
 
+function fixFromWeakness(item: AnalysisItem, index: number): FixItem {
+  const focus = item.title.toLowerCase();
+  return {
+    title: `Fix ${item.title}`,
+    current: item.explanation,
+    recommended: `Rewrite this part of your profile so it directly addresses ${focus} with clearer job or internship keywords, proof of work, measurable outcomes, and a stronger recruiter signal.`,
+    whyMatters: `This matters because ${item.explanation}`,
+    difficulty: index === 0 ? "Easy" : "Medium"
+  };
+}
+
+const defaultFixes: FixItem[] = [
+  {
+    title: "Fix your headline",
+    current: "Your headline does not give recruiters enough signal yet.",
+    recommended: "Write a headline that names your target job or internship, the function you fit, and one proof point that makes you credible.",
+    whyMatters: "Recruiters use the headline to decide whether your profile matches the search they are running.",
+    difficulty: "Easy"
+  },
+  {
+    title: "Fix your About section",
+    current: "Your About section needs a sharper opening pitch.",
+    recommended: "Open with your target role, your strongest relevant experience, the tools or domains you know, and the outcome you want next.",
+    whyMatters: "The first two lines should make your fit obvious before someone scans your experience.",
+    difficulty: "Medium"
+  },
+  {
+    title: "Fix your experience proof",
+    current: "Your experience needs clearer evidence of impact.",
+    recommended: "Rewrite bullets with the action you took, the scope of work, the tool or method used, and the measurable result.",
+    whyMatters: "Hiring teams need proof that you can do the work, not just a list of responsibilities.",
+    difficulty: "Medium"
+  }
+];
+
 export function normalizeAnalysis(value: AnalysisResult | null): AnalysisResult | null {
   if (!isRecord(value)) return null;
   const categoryScores: Record<string, unknown> = isRecord(value.categoryScores) ? value.categoryScores : {};
+  const strengths = cleanItems(value.strengths, "Strength");
+  const weaknesses = cleanItems(value.weaknesses, "Opportunity");
+  const topFixes = cleanFixes(value.topFixes, "Fix");
+  const secondaryFixes = cleanFixes(value.secondaryFixes, "Secondary fix");
+  const generatedFixes = weaknesses.length ? weaknesses.map((item, index) => fixFromWeakness(item, index)) : defaultFixes;
 
   return {
     overallScore: cleanScore(value.overallScore, 70, 100),
@@ -50,9 +90,9 @@ export function normalizeAnalysis(value: AnalysisResult | null): AnalysisResult 
       skills: cleanScore(categoryScores.skills, 5, 10),
       positioning: cleanScore(categoryScores.positioning, 5, 10)
     },
-    strengths: cleanItems(value.strengths, "Strength"),
-    weaknesses: cleanItems(value.weaknesses, "Opportunity"),
-    topFixes: cleanFixes(value.topFixes, "Fix"),
-    secondaryFixes: cleanFixes(value.secondaryFixes, "Secondary fix")
+    strengths,
+    weaknesses,
+    topFixes: topFixes.length ? topFixes : generatedFixes.slice(0, 3),
+    secondaryFixes: secondaryFixes.length ? secondaryFixes : generatedFixes.slice(3, 6)
   };
 }

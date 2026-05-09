@@ -39,7 +39,7 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
       setUnlocked(true);
       window.setTimeout(() => {
         onClose();
-        router.push("/results/unlocked");
+        router.push("/results/unlocked?preparing=1");
       }, 700);
     } catch {
       setError("Invite could not be sent. Please try again.");

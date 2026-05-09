@@ -17,12 +17,15 @@ strengths with 3 to 5 items, each with title, score from 1 to 10, and explanatio
 weaknesses with 3 to 5 items, each with title, score from 1 to 10, and explanation
 topFixes with 3 items, each with title, current text, recommended text, why it matters, and difficulty
 secondaryFixes with 2 to 3 items using the same structure
+The topFixes must be based on the most important weaknesses. Every topFix must directly repair something that is not working in the profile.
+The secondaryFixes must address lower priority issues or missing profile signals.
 
 Writing rules:
 Always write directly to the user in second person: "you", "your", "you should".
 Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
 Do not use dash punctuation in any written explanation, title, current text, recommended text, or why it matters. Avoid hyphens, en dashes, and em dashes. Use commas, periods, or separate sentences instead.
 Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, target employers, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
+For each topFix, use the related weakness as the source. Do not give a fix unless it clearly improves recruiter fit, internship fit, search visibility, proof of impact, or conversion to interviews.
 Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
 If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
 Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
