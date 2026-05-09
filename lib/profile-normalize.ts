@@ -35,6 +35,13 @@ function textValue(value: unknown): string {
   return "";
 }
 
+function splitListText(value: string) {
+  return value
+    .split(/\n|,|;|\u2022/g)
+    .map((item) => item.replace(/^\s*[-\u2013\u2014]\s*/, "").trim())
+    .filter((item) => item.length > 1);
+}
+
 export function parseRawProfileText(rawProfileText?: string) {
   if (!rawProfileText) return null;
 
@@ -87,6 +94,7 @@ function arrayValue(value: unknown) {
   if (Array.isArray(value)) return value;
   if (isRecord(value) && Array.isArray(value.elements)) return value.elements;
   if (isRecord(value) && Array.isArray(value.items)) return value.items;
+  if (isRecord(value) && Array.isArray(value.values)) return value.values;
   return [];
 }
 
@@ -132,6 +140,8 @@ function formatPeriod(period: unknown) {
 }
 
 export function listText(value: unknown, keys: string[] = []) {
+  if (typeof value === "string") return splitListText(value).slice(0, 40);
+
   const values = arrayValue(value);
 
   return values
@@ -163,6 +173,7 @@ function nameFromRaw(rawProfile: unknown) {
       "fullName",
       "full name",
       "full_name",
+      "full_name_normalized",
       "profileName",
       "profile name",
       "profile_name",
@@ -344,17 +355,26 @@ export function normalizeLinkedInProfile(profile: LinkedInProfile | null): Linke
   const rawProfileUrl = directText(rawProfile, ["profileUrl", "profile url", "url", "linkedinUrl", "linkedin url"]) || profile.profileUrl;
   const rawExperience = firstArrayDeep(rawProfile, [
     "positions",
+    "position",
     "positionHistory",
     "position history",
+    "currentPositions",
+    "current positions",
+    "pastPositions",
+    "past positions",
     "experiences",
     "experience",
     "workExperience",
     "work experience",
+    "workExperienceDetails",
+    "work experience details",
     "workHistory",
-    "work history"
+    "work history",
+    "employmentHistory",
+    "employment history"
   ]);
-  const rawEducation = firstArrayDeep(rawProfile, ["education", "educations", "educationHistory", "education history", "schools", "school"]);
-  const rawSkills = firstArrayDeep(rawProfile, ["skills", "topSkills", "top skills", "skill", "skillSet", "skill set"]);
+  const rawEducation = firstArrayDeep(rawProfile, ["education", "educations", "educationHistory", "education history", "schools", "school", "educationDetails", "education details"]);
+  const rawSkills = firstArrayDeep(rawProfile, ["skills", "topSkills", "top skills", "skill", "skillSet", "skill set", "skillCategories", "skill categories"]);
   const rawPublicIdentifier = directText(rawProfile, ["publicIdentifier", "public identifier", "profileSlug", "profile slug", "username"]);
   const rawName = nameFromRaw(rawProfile);
   const rawHeadline = headlineFromRaw(rawProfile);
@@ -382,11 +402,40 @@ export function normalizeLinkedInProfile(profile: LinkedInProfile | null): Linke
     experience:
       profile.experience?.length
         ? profile.experience
-        : listText(rawExperience, ["title", "jobTitle", "companyName", "company", "locationName", "location", "timePeriod", "dateRange", "duration", "description", "summary"]),
+        : listText(rawExperience, [
+            "title",
+            "position",
+            "jobTitle",
+            "companyName",
+            "company",
+            "organization",
+            "locationName",
+            "location",
+            "timePeriod",
+            "dateRange",
+            "dates",
+            "duration",
+            "description",
+            "summary",
+            "subComponents"
+          ]),
     education: profile.education?.length
       ? profile.education
-      : listText(rawEducation, ["schoolName", "school", "degreeName", "degree", "fieldOfStudy", "dateRange", "timePeriod", "description"]),
-    skills: profile.skills?.length ? profile.skills : listText(rawSkills, ["name", "title", "text", "skillName", "skill"]),
+      : listText(rawEducation, [
+          "schoolName",
+          "school",
+          "title",
+          "degreeName",
+          "degree",
+          "fieldOfStudy",
+          "field",
+          "major",
+          "dateRange",
+          "timePeriod",
+          "dates",
+          "description"
+        ]),
+    skills: profile.skills?.length ? profile.skills : listText(rawSkills.length ? rawSkills : deepText(rawProfile, ["skills", "topSkills", "top skills"]), ["name", "title", "text", "skillName", "skill"]),
     location: profile.location || rawLocation,
     country: profile.country || rawCountry,
     city: profile.city || profile.location || rawLocation,
