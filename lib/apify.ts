@@ -90,6 +90,11 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
   const headline = firstText(item, ["headline", "occupation", "subTitle", "subtitle", "currentPosition", "jobTitle"]);
   const about = firstText(item, ["about", "summary", "bio", "description"]);
   const photo = firstText(item, ["pictureUrl", "profilePicture", "profilePic", "profilePicUrl", "profileImage", "image"]);
+  const location = firstText(item, ["geoLocationName", "locationName", "location", "address", "geoLocation"]);
+  const country = firstText(item, ["geoCountryName", "countryName", "country", "countryCode"]);
+  const industry = firstText(item, ["industryName", "industry", "industryLabel"]);
+  const currentRole = firstText(item, ["jobTitle", "currentRole", "currentPosition", "title"]);
+  const currentCompany = firstText(item, ["companyName", "currentCompanyName", "company"]);
   const experience = listText(firstArray(item, ["positions", "experience", "experiences", "positionHistory"]), [
     "title",
     "jobTitle",
@@ -113,6 +118,13 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
     experience,
     education,
     skills,
+    location,
+    country,
+    city: location,
+    industry,
+    currentRole,
+    currentCompany,
+    isStudent: Boolean(item.student),
     rawProfileText: JSON.stringify({ profileUrl, ...item }).slice(0, 12000),
     importSource: "scrape"
   };

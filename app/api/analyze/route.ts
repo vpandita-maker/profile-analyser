@@ -13,6 +13,16 @@ const analyzeSchema = z.object({
   about: z.string().optional(),
   experience: z.array(z.string()).optional(),
   skills: z.array(z.string()).optional(),
+  education: z.array(z.string()).optional(),
+  location: z.string().optional(),
+  country: z.string().optional(),
+  city: z.string().optional(),
+  industry: z.string().optional(),
+  currentRole: z.string().optional(),
+  currentCompany: z.string().optional(),
+  isStudent: z.boolean().optional(),
+  rawProfileText: z.string().optional(),
+  importSource: z.literal("scrape").optional(),
   contextAnswers: z.record(z.unknown())
 });
 
@@ -26,7 +36,17 @@ export async function POST(request: Request) {
     email: body.email,
     about: body.about,
     experience: body.experience,
-    skills: body.skills
+    skills: body.skills,
+    education: body.education,
+    location: body.location,
+    country: body.country,
+    city: body.city,
+    industry: body.industry,
+    currentRole: body.currentRole,
+    currentCompany: body.currentCompany,
+    isStudent: body.isStudent,
+    rawProfileText: body.rawProfileText,
+    importSource: body.importSource
   };
   const contextAnswers = body.contextAnswers as unknown as ContextAnswers;
   if (!["Job Search", "Internship Search"].includes(contextAnswers.goal)) {

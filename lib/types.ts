@@ -13,6 +13,13 @@ export interface LinkedInProfile {
   experience?: string[];
   skills?: string[];
   education?: string[];
+  location?: string;
+  country?: string;
+  city?: string;
+  industry?: string;
+  currentRole?: string;
+  currentCompany?: string;
+  isStudent?: boolean;
   rawProfileText?: string;
   importSource?: "scrape";
 }

@@ -110,6 +110,11 @@ About: ${profile.about || "Not provided"}
 Experience: ${compactList(profile.experience)}
 Skills: ${compactList(profile.skills)}
 Education: ${compactList(profile.education)}
+Location: ${profile.location || "Not provided"}
+Country: ${profile.country || "Not provided"}
+Current Role: ${profile.currentRole || "Not provided"}
+Current Company: ${profile.currentCompany || "Not provided"}
+Profile Industry: ${profile.industry || "Not provided"}
 Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0, 8000) : "Not provided"}
 Import Source: ${profile.importSource || "oauth"}
 
