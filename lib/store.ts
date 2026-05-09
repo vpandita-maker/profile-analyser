@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { isFallbackHeadline, isFallbackName, normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import type { AnalysisResult, ContextAnswers, LinkedInProfile } from "@/lib/types";
 
 const emptyContext: ContextAnswers = {
@@ -36,6 +37,16 @@ interface AnalyzerState {
   resetContext: () => void;
 }
 
+function normalized(profile: LinkedInProfile | null) {
+  return normalizeLinkedInProfile(profile) || profile;
+}
+
+function chooseText(incoming?: string, existing?: string, fallback?: string, isFallback?: (value?: string) => boolean) {
+  if (incoming && !isFallback?.(incoming)) return incoming;
+  if (existing && !isFallback?.(existing)) return existing;
+  return incoming || existing || fallback || "";
+}
+
 export const useAnalyzerStore = create<AnalyzerState>()(
   persist(
     (set) => ({
@@ -57,15 +68,22 @@ export const useAnalyzerStore = create<AnalyzerState>()(
             }
           };
         }),
-      setLinkedinData: (profile) => set({ linkedinData: profile }),
+      setLinkedinData: (profile) => set({ linkedinData: normalized(profile) }),
       mergeLinkedinData: (profile) =>
         set((state) => ({
-          linkedinData: {
-            linkedinId: state.linkedinData?.linkedinId || profile.linkedinId || "profile-user",
-            name: state.linkedinData?.name || profile.name || "Profile Member",
+          linkedinData: normalized({
+            linkedinId: profile.linkedinId || state.linkedinData?.linkedinId || "profile-user",
             ...state.linkedinData,
-            ...profile
-          }
+            ...profile,
+            name: chooseText(profile.name, state.linkedinData?.name, "LinkedIn Member", isFallbackName),
+            headline: chooseText(profile.headline, state.linkedinData?.headline, "", isFallbackHeadline),
+            photo: profile.photo || state.linkedinData?.photo,
+            about: profile.about || state.linkedinData?.about,
+            experience: profile.experience?.length ? profile.experience : state.linkedinData?.experience,
+            education: profile.education?.length ? profile.education : state.linkedinData?.education,
+            skills: profile.skills?.length ? profile.skills : state.linkedinData?.skills,
+            rawProfileText: profile.rawProfileText || state.linkedinData?.rawProfileText
+          } as LinkedInProfile)
         })),
       setAnalysis: (analysis, analysisId) => set({ analysis, analysisId }),
       clearAnalysis: () => set({ analysis: null, analysisId: null, isUnlocked: false }),

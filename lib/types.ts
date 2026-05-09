@@ -5,6 +5,7 @@ export type Geography = "India" | "US" | "Other";
 
 export interface LinkedInProfile {
   linkedinId: string;
+  profileUrl?: string;
   name: string;
   headline?: string;
   photo?: string;

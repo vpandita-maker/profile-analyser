@@ -108,8 +108,15 @@ const analysisTool = {
 } as const;
 
 export function buildAnalysisUserMessage(profile: LinkedInProfile, context: ContextAnswers) {
+  const hasHeadline = Boolean(profile.headline?.trim());
+  const hasAbout = Boolean(profile.about?.trim());
+  const hasExperience = Boolean(profile.experience?.length);
+  const hasEducation = Boolean(profile.education?.length);
+  const hasSkills = Boolean(profile.skills?.length);
+
   return `Profile Data:
 Name: ${profile.name}
+Profile URL: ${profile.profileUrl || "Not provided"}
 Headline: ${profile.headline || "Not provided"}
 About: ${profile.about || "Not provided"}
 Experience: ${compactList(profile.experience)}
@@ -122,6 +129,13 @@ Current Company: ${profile.currentCompany || "Not provided"}
 Profile Industry: ${profile.industry || "Not provided"}
 Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0, 8000) : "Not provided"}
 Import Source: ${profile.importSource || "oauth"}
+
+Section availability:
+Headline present: ${hasHeadline ? "Yes" : "No"}
+About present: ${hasAbout ? "Yes" : "No"}
+Experience present: ${hasExperience ? "Yes" : "No"}
+Education present: ${hasEducation ? "Yes" : "No"}
+Skills present: ${hasSkills ? "Yes" : "No"}
 
 Context:
 Opportunity Type: ${context.goal || "Job Search"}
@@ -143,6 +157,7 @@ Important output style:
 Address the reader as "you" and "your" in every explanation and recommendation.
 Do not refer to ${profile.name} in third person.
 Do not use dash punctuation in the returned copy.
+Do not call any section missing when section availability says Yes. If a present section is weak, critique the content quality instead of saying it does not exist.
 Personalize the analysis using the profile data and context above.`;
 }
 

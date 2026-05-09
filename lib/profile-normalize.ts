@@ -17,10 +17,21 @@ function cleanText(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function titleCase(value: string) {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
 function textValue(value: unknown): string {
   if (typeof value === "string") return cleanText(value);
   if (typeof value === "number") return String(value);
+  if (Array.isArray(value)) return value.map(textValue).filter(Boolean).join(", ");
   if (isRecord(value) && "text" in value) return textValue(value.text);
+  if (isRecord(value) && "name" in value) return textValue(value.name);
+  if (isRecord(value) && "value" in value) return textValue(value.value);
   return "";
 }
 
@@ -49,7 +60,7 @@ export function directText(value: unknown, keys: string[]) {
 }
 
 export function deepText(value: unknown, keys: string[], depth = 0): string {
-  if (depth > 5 || !value) return "";
+  if (depth > 8 || !value) return "";
 
   const direct = directText(value, keys);
   if (direct) return direct;
@@ -80,7 +91,7 @@ function arrayValue(value: unknown) {
 }
 
 export function firstArrayDeep(value: unknown, keys: string[], depth = 0): unknown[] {
-  if (depth > 5 || !value) return [];
+  if (depth > 8 || !value) return [];
 
   if (Array.isArray(value)) {
     for (const item of value) {
@@ -138,18 +149,51 @@ export function listText(value: unknown, keys: string[] = []) {
     .slice(0, 40);
 }
 
-function isFallbackName(value?: string) {
+export function isFallbackName(value?: string) {
   return !value || fallbackNames.has(value);
 }
 
-function isFallbackHeadline(value?: string) {
+export function isFallbackHeadline(value?: string) {
   return !value || fallbackHeadlines.has(value);
 }
 
 function nameFromRaw(rawProfile: unknown) {
   const fullName =
-    directText(rawProfile, ["fullName", "full name", "profileName", "profile name", "displayName", "display name", "name"]) ||
-    deepText(rawProfile, ["fullName", "full name", "profileName", "profile name", "displayName", "display name"]);
+    directText(rawProfile, [
+      "fullName",
+      "full name",
+      "full_name",
+      "profileName",
+      "profile name",
+      "profile_name",
+      "displayName",
+      "display name",
+      "display_name",
+      "memberName",
+      "member name",
+      "personName",
+      "person name",
+      "profileFullName",
+      "profile full name",
+      "name"
+    ]) ||
+    deepText(rawProfile, [
+      "fullName",
+      "full name",
+      "full_name",
+      "profileName",
+      "profile name",
+      "profile_name",
+      "displayName",
+      "display name",
+      "display_name",
+      "memberName",
+      "member name",
+      "personName",
+      "person name",
+      "profileFullName",
+      "profile full name"
+    ]);
 
   if (fullName) return fullName;
 
@@ -160,30 +204,158 @@ function nameFromRaw(rawProfile: unknown) {
 
 function headlineFromRaw(rawProfile: unknown) {
   return (
-    directText(rawProfile, ["headline", "occupation", "subTitle", "subtitle", "currentPosition", "current position", "jobTitle", "job title"]) ||
-    deepText(rawProfile, ["headline", "occupation", "subTitle", "subtitle", "currentPosition", "current position", "jobTitle", "job title"])
+    directText(rawProfile, [
+      "headline",
+      "profileHeadline",
+      "profile headline",
+      "occupation",
+      "subTitle",
+      "subtitle",
+      "primarySubtitle",
+      "primary subtitle",
+      "currentPosition",
+      "current position",
+      "currentJobTitle",
+      "current job title",
+      "currentRole",
+      "current role",
+      "position",
+      "profileSubTitle",
+      "profile sub title",
+      "profileSubtitle",
+      "profile subtitle",
+      "tagline",
+      "jobTitle",
+      "job title",
+      "profession"
+    ]) ||
+    deepText(rawProfile, [
+      "headline",
+      "profileHeadline",
+      "profile headline",
+      "occupation",
+      "subTitle",
+      "subtitle",
+      "primarySubtitle",
+      "primary subtitle",
+      "currentPosition",
+      "current position",
+      "currentJobTitle",
+      "current job title",
+      "currentRole",
+      "current role",
+      "position",
+      "profileSubTitle",
+      "profile sub title",
+      "profileSubtitle",
+      "profile subtitle",
+      "tagline",
+      "jobTitle",
+      "job title",
+      "profession"
+    ])
   );
 }
 
 function photoFromRaw(rawProfile: unknown) {
-  return deepText(rawProfile, ["pictureUrl", "picture url", "profilePicture", "profile picture", "profilePicUrl", "profile pic url", "profileImage", "profile image", "image"]);
+  return deepText(rawProfile, [
+    "pictureUrl",
+    "picture url",
+    "profilePicture",
+    "profile picture",
+    "profilePictureUrl",
+    "profile picture url",
+    "profilePic",
+    "profile pic",
+    "profilePicUrl",
+    "profile pic url",
+    "profileImage",
+    "profile image",
+    "profileImageUrl",
+    "profile image url",
+    "photo",
+    "photoUrl",
+    "photo url",
+    "avatar",
+    "avatarUrl",
+    "avatar url",
+    "image",
+    "imageUrl",
+    "image url"
+  ]);
 }
 
 function aboutFromRaw(rawProfile: unknown) {
-  return directText(rawProfile, ["about", "summary", "bio", "description"]) || deepText(rawProfile, ["about", "summary", "bio"]);
+  return directText(rawProfile, ["about", "aboutText", "about text", "summary", "bio", "biography", "description"]) || deepText(rawProfile, ["about", "aboutText", "about text", "summary", "bio", "biography"]);
 }
 
 function profileIdFromRaw(rawProfile: unknown) {
   return directText(rawProfile, ["profileId", "profile id", "publicIdentifier", "public identifier", "linkedinId", "linkedin id", "id"]) || deepText(rawProfile, ["profileId", "profile id", "publicIdentifier", "public identifier"]);
 }
 
+function slugFromProfileUrl(value?: string) {
+  if (!value) return "";
+
+  try {
+    const url = new URL(value);
+    const parts = url.pathname.split("/").filter(Boolean);
+    const index = parts.findIndex((part) => part.toLowerCase() === "in");
+    return index >= 0 ? parts[index + 1] || "" : "";
+  } catch {
+    const match = value.match(/linkedin\.com\/in\/([^/?#]+)/i);
+    return match?.[1] || "";
+  }
+}
+
+function nameFromIdentifier(identifier?: string) {
+  if (!identifier) return "";
+
+  const withoutSuffixes = identifier
+    .replace(/\b(real|official|profile)\b/gi, "")
+    .replace(/[0-9]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[^a-zA-Z]+/g, " ")
+    .trim();
+
+  return withoutSuffixes ? titleCase(withoutSuffixes) : "";
+}
+
+function identifierFromLinkedInId(linkedinId?: string) {
+  if (!linkedinId) return "";
+  if (/^https?:\/\//i.test(linkedinId)) return slugFromProfileUrl(linkedinId);
+  if (linkedinId.startsWith("urn:")) return "";
+  if (linkedinId === "profile-user") return "";
+  return linkedinId;
+}
+
+function headlineFromAbout(about?: string) {
+  if (!about) return "";
+
+  const sentence = about.split(/[.!?]/).map(cleanText).find(Boolean);
+  if (!sentence) return "";
+
+  return sentence.length > 110 ? `${sentence.slice(0, 107).trim()}...` : sentence;
+}
+
 export function normalizeLinkedInProfile(profile: LinkedInProfile | null): LinkedInProfile | null {
   if (!profile) return null;
 
   const rawProfile = parseRawProfileText(profile.rawProfileText);
-  const rawExperience = firstArrayDeep(rawProfile, ["positions", "positionHistory", "position history", "experience", "experiences", "workExperience", "work experience"]);
-  const rawEducation = firstArrayDeep(rawProfile, ["education", "educations", "schools"]);
-  const rawSkills = firstArrayDeep(rawProfile, ["skills", "topSkills", "top skills"]);
+  const rawProfileUrl = directText(rawProfile, ["profileUrl", "profile url", "url", "linkedinUrl", "linkedin url"]) || profile.profileUrl;
+  const rawExperience = firstArrayDeep(rawProfile, [
+    "positions",
+    "positionHistory",
+    "position history",
+    "experiences",
+    "experience",
+    "workExperience",
+    "work experience",
+    "workHistory",
+    "work history"
+  ]);
+  const rawEducation = firstArrayDeep(rawProfile, ["education", "educations", "educationHistory", "education history", "schools", "school"]);
+  const rawSkills = firstArrayDeep(rawProfile, ["skills", "topSkills", "top skills", "skill", "skillSet", "skill set"]);
+  const rawPublicIdentifier = directText(rawProfile, ["publicIdentifier", "public identifier", "profileSlug", "profile slug", "username"]);
   const rawName = nameFromRaw(rawProfile);
   const rawHeadline = headlineFromRaw(rawProfile);
   const rawPhoto = photoFromRaw(rawProfile);
@@ -194,19 +366,26 @@ export function normalizeLinkedInProfile(profile: LinkedInProfile | null): Linke
   const rawCurrentRole = directText(rawProfile, ["jobTitle", "job title", "currentRole", "current role", "currentPosition", "current position", "title"]) || deepText(rawProfile, ["jobTitle", "job title", "currentRole", "current role", "currentPosition", "current position", "title"]);
   const rawCurrentCompany = directText(rawProfile, ["companyName", "company name", "currentCompanyName", "current company name", "company"]);
   const rawLinkedInId = profileIdFromRaw(rawProfile);
+  const profileSlug = slugFromProfileUrl(rawProfileUrl) || rawPublicIdentifier || identifierFromLinkedInId(profile.linkedinId);
+  const derivedName = nameFromIdentifier(profileSlug);
+  const about = profile.about || rawAbout;
+  const headline = isFallbackHeadline(profile.headline) ? rawHeadline || headlineFromAbout(about) || profile.headline : profile.headline;
 
   return {
     ...profile,
+    profileUrl: profile.profileUrl || rawProfileUrl,
     linkedinId: profile.linkedinId || rawLinkedInId || "profile-user",
-    name: isFallbackName(profile.name) ? rawName || profile.name || "LinkedIn Member" : profile.name,
-    headline: isFallbackHeadline(profile.headline) ? rawHeadline || profile.headline : profile.headline,
+    name: isFallbackName(profile.name) ? rawName || derivedName || profile.name || "LinkedIn Member" : profile.name,
+    headline,
     photo: profile.photo || rawPhoto,
-    about: profile.about || rawAbout,
+    about,
     experience:
       profile.experience?.length
         ? profile.experience
         : listText(rawExperience, ["title", "jobTitle", "companyName", "company", "locationName", "location", "timePeriod", "dateRange", "duration", "description", "summary"]),
-    education: profile.education?.length ? profile.education : listText(rawEducation, ["schoolName", "school", "degreeName", "degree", "fieldOfStudy", "dateRange", "timePeriod"]),
+    education: profile.education?.length
+      ? profile.education
+      : listText(rawEducation, ["schoolName", "school", "degreeName", "degree", "fieldOfStudy", "dateRange", "timePeriod", "description"]),
     skills: profile.skills?.length ? profile.skills : listText(rawSkills, ["name", "title", "text", "skillName", "skill"]),
     location: profile.location || rawLocation,
     country: profile.country || rawCountry,

@@ -12,6 +12,7 @@ export default function AnalysisLoadingPage() {
   const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const analysis = useAnalyzerStore((state) => state.analysis);
   const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
+  const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
 
   useEffect(() => {
     if (analysis) {
@@ -34,12 +35,15 @@ export default function AnalysisLoadingPage() {
         body: JSON.stringify({ ...profile, contextAnswers })
       });
       const data = await response.json();
+      if (data.profile) {
+        setLinkedinData(data.profile);
+      }
       setAnalysis(data.analysis, data.analysisId);
       router.replace("/results");
     }
 
     void runAnalysis();
-  }, [analysis, contextAnswers, profile, router, setAnalysis]);
+  }, [analysis, contextAnswers, profile, router, setAnalysis, setLinkedinData]);
 
   return <Loading label="Building your personalized profile analysis" />;
 }

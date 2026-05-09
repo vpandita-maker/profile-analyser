@@ -1,5 +1,5 @@
 import { ApifyClient } from "apify-client";
-import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
+import { firstArrayDeep, normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import type { LinkedInProfile } from "@/lib/types";
 
 type ApifyProfile = Record<string, unknown>;
@@ -43,7 +43,10 @@ function formatPeriod(period: unknown): string {
 function asText(value: unknown): string {
   if (typeof value === "string") return value.trim();
   if (typeof value === "number") return String(value);
+  if (Array.isArray(value)) return value.map(asText).filter(Boolean).join(", ");
   if (value && typeof value === "object" && "text" in value) return asText((value as { text?: unknown }).text);
+  if (value && typeof value === "object" && "name" in value) return asText((value as { name?: unknown }).name);
+  if (value && typeof value === "object" && "value" in value) return asText((value as { value?: unknown }).value);
   return "";
 }
 
@@ -65,7 +68,7 @@ function firstText(item: ApifyProfile, keys: string[]) {
 }
 
 function deepText(value: unknown, keys: string[], depth = 0): string {
-  if (depth > 5 || !value) return "";
+  if (depth > 8 || !value) return "";
 
   if (Array.isArray(value)) {
     for (const item of value) {
@@ -117,6 +120,9 @@ function listText(value: unknown, keys: string[] = []) {
 }
 
 function firstArray(item: ApifyProfile, keys: string[]) {
+  const nested = firstArrayDeep(item, keys);
+  if (nested.length) return nested;
+
   for (const key of keys) {
     const value = item[key];
     if (Array.isArray(value) && value.length) return value;
@@ -128,8 +134,41 @@ function firstArray(item: ApifyProfile, keys: string[]) {
 export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial<LinkedInProfile> {
   const linkedinId = firstText(item, ["profileId", "profile id", "publicIdentifier", "public identifier", "id"]) || profileUrl;
   const name =
-    firstText(item, ["fullName", "full name", "profileName", "profile name", "displayName", "display name", "name"]) ||
-    firstDeepText(item, ["fullName", "full name", "profileName", "profile name", "displayName", "display name"]) ||
+    firstText(item, [
+      "fullName",
+      "full name",
+      "full_name",
+      "profileName",
+      "profile name",
+      "profile_name",
+      "displayName",
+      "display name",
+      "display_name",
+      "memberName",
+      "member name",
+      "personName",
+      "person name",
+      "profileFullName",
+      "profile full name",
+      "name"
+    ]) ||
+    firstDeepText(item, [
+      "fullName",
+      "full name",
+      "full_name",
+      "profileName",
+      "profile name",
+      "profile_name",
+      "displayName",
+      "display name",
+      "display_name",
+      "memberName",
+      "member name",
+      "personName",
+      "person name",
+      "profileFullName",
+      "profile full name"
+    ]) ||
     [
       firstDeepText(item, ["firstName", "first name", "first_name", "givenName", "given name"]),
       firstDeepText(item, ["lastName", "last name", "last_name", "familyName", "family name"])
@@ -137,9 +176,54 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
       .filter(Boolean)
       .join(" ");
 
-  const headline = firstDeepText(item, ["headline", "occupation", "subTitle", "subtitle", "currentPosition", "current position", "jobTitle", "job title"]);
-  const about = firstDeepText(item, ["about", "summary", "bio", "description"]);
-  const photo = firstDeepText(item, ["pictureUrl", "picture url", "profilePicture", "profile picture", "profilePic", "profilePicUrl", "profile pic url", "profileImage", "profile image", "image"]);
+  const headline = firstDeepText(item, [
+    "headline",
+    "occupation",
+    "subTitle",
+    "subtitle",
+    "primarySubtitle",
+    "primary subtitle",
+    "profileSubTitle",
+    "profile sub title",
+    "profileSubtitle",
+    "profile subtitle",
+    "currentPosition",
+    "current position",
+    "currentJobTitle",
+    "current job title",
+    "currentRole",
+    "current role",
+    "position",
+    "jobTitle",
+    "job title",
+    "profession",
+    "tagline"
+  ]);
+  const about = firstDeepText(item, ["about", "aboutText", "about text", "summary", "bio", "biography", "description"]);
+  const photo = firstDeepText(item, [
+    "pictureUrl",
+    "picture url",
+    "profilePicture",
+    "profile picture",
+    "profilePictureUrl",
+    "profile picture url",
+    "profilePic",
+    "profilePicUrl",
+    "profile pic url",
+    "profileImage",
+    "profile image",
+    "profileImageUrl",
+    "profile image url",
+    "photo",
+    "photoUrl",
+    "photo url",
+    "avatar",
+    "avatarUrl",
+    "avatar url",
+    "image",
+    "imageUrl",
+    "image url"
+  ]);
   const location = firstDeepText(item, ["geoLocationName", "geo location name", "locationName", "location name", "location", "address", "geoLocation", "geo location"]);
   const country = firstDeepText(item, ["geoCountryName", "geo country name", "countryName", "country name", "country", "countryCode", "country code"]);
   const industry = firstDeepText(item, ["industryName", "industry name", "industry", "industryLabel", "industry label"]);
@@ -157,11 +241,21 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
     "duration",
     "description"
   ]);
-  const education = listText(firstArray(item, ["education", "educations"]), ["schoolName", "school", "degreeName", "degree", "fieldOfStudy", "dateRange"]);
-  const skills = listText(firstArray(item, ["skills", "topSkills"]), ["name", "title", "text"]);
+  const education = listText(firstArray(item, ["education", "educations", "educationHistory", "education history", "schools", "school"]), [
+    "schoolName",
+    "school",
+    "degreeName",
+    "degree",
+    "fieldOfStudy",
+    "dateRange",
+    "timePeriod",
+    "description"
+  ]);
+  const skills = listText(firstArray(item, ["skills", "topSkills", "top skills", "skillSet", "skill set"]), ["name", "title", "text", "skillName", "skill"]);
 
   const profile: LinkedInProfile = {
     linkedinId,
+    profileUrl,
     name: name || "LinkedIn Member",
     headline,
     photo,
@@ -176,7 +270,7 @@ export function mapApifyProfile(item: ApifyProfile, profileUrl: string): Partial
     currentRole,
     currentCompany,
     isStudent: Boolean(item.student),
-    rawProfileText: JSON.stringify({ profileUrl, ...item }).slice(0, 12000),
+    rawProfileText: JSON.stringify({ profileUrl, ...item }).slice(0, 50000),
     importSource: "scrape"
   };
 

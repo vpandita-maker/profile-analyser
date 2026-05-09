@@ -8,6 +8,7 @@ import type { ContextAnswers, LinkedInProfile } from "@/lib/types";
 
 const analyzeSchema = z.object({
   linkedinId: z.string().min(1),
+  profileUrl: z.string().optional(),
   name: z.string().min(1),
   headline: z.string().optional(),
   photo: z.string().optional(),
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
   const body = analyzeSchema.parse(await request.json());
   const profile = normalizeLinkedInProfile({
     linkedinId: body.linkedinId,
+    profileUrl: body.profileUrl,
     name: body.name,
     headline: body.headline,
     photo: body.photo,
@@ -83,5 +85,5 @@ export async function POST(request: Request) {
 
   }
 
-  return NextResponse.json({ analysis, analysisId });
+  return NextResponse.json({ analysis, analysisId, profile });
 }

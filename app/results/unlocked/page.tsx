@@ -23,6 +23,7 @@ export default function UnlockedResultsPage() {
   const analysis = normalizeAnalysis(storedAnalysis);
   const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
   const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
+  const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
 
   const hasFixes = Boolean(analysis?.topFixes.length);
 
@@ -57,6 +58,9 @@ export default function UnlockedResultsPage() {
           return;
         }
         const data = await response.json();
+        if (data.profile) {
+          setLinkedinData(data.profile);
+        }
         setAnalysis(data.analysis, data.analysisId);
       } catch {
         setRefreshFailed(true);
@@ -66,7 +70,7 @@ export default function UnlockedResultsPage() {
     }
 
     void refreshFixes();
-  }, [analysis, contextAnswers, hasFixes, isUnlocked, profile, setAnalysis]);
+  }, [analysis, contextAnswers, hasFixes, isUnlocked, profile, setAnalysis, setLinkedinData]);
 
   if (!analysis || !isUnlocked) {
     return (

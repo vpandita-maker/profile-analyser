@@ -6,12 +6,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
+import type { LinkedInProfile } from "@/lib/types";
 
 export default function ProfileImportPage() {
   const router = useRouter();
-  const linkedinData = useAnalyzerStore((state) => state.linkedinData);
-  const mergeLinkedinData = useAnalyzerStore((state) => state.mergeLinkedinData);
+  const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
   const [profileUrl, setProfileUrl] = useState("");
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
@@ -33,14 +34,21 @@ export default function ProfileImportPage() {
       return;
     }
 
-    mergeLinkedinData({
+    const importedProfile = normalizeLinkedInProfile({
       ...data.profile,
-      linkedinId: data.profile.linkedinId || linkedinData?.linkedinId || "profile-user",
-      name: data.profile.name || linkedinData?.name || "Profile Member",
-      photo: data.profile.photo || linkedinData?.photo,
-      email: data.profile.email || linkedinData?.email,
+      linkedinId: data.profile.linkedinId || "profile-user",
+      profileUrl: data.profile.profileUrl || profileUrl,
+      name: data.profile.name || "LinkedIn Member",
       importSource: "scrape"
-    });
+    } satisfies LinkedInProfile);
+
+    setLinkedinData(importedProfile || ({
+      ...data.profile,
+      linkedinId: data.profile.linkedinId || "profile-user",
+      profileUrl,
+      name: data.profile.name || "LinkedIn Member",
+      importSource: "scrape"
+    } satisfies LinkedInProfile));
     router.push("/questions");
   }
 
