@@ -12,7 +12,7 @@ import { useLeaderboardStore } from "@/lib/store";
 import type { LeaderboardEntry } from "@/lib/types";
 
 const filterOptions = {
-  goal: ["", "Recruiting", "Fundraising", "Hiring", "Personal Brand", "Job Search"],
+  goal: ["", "Job Search", "Internship Search"],
   geography: ["", "India", "US", "Other"],
   seniority: ["", "Entry level", "Mid level", "Senior", "Executive", "Student"]
 };
@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
             <Select value={filters.goal} onChange={(event) => setFilters({ goal: event.target.value })}>
               {filterOptions.goal.map((item) => (
                 <option key={item} value={item}>
-                  {item || "Goal: All"}
+                  {item || "Opportunity: All"}
                 </option>
               ))}
             </Select>
@@ -80,7 +80,7 @@ export default function LeaderboardPage() {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-sm font-black text-slate-950">Add Your Profile to Leaderboard?</h2>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">Public ranking helps compare your score by goal and market.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">Public ranking helps compare your score by opportunity type and market.</p>
                 </div>
                 <Button fullWidth={false} className="h-10 min-h-10 px-4" onClick={() => setOptedIn(true)}>
                   Add

@@ -10,7 +10,7 @@ import { useAnalyzerStore } from "@/lib/store";
 import type { ContextAnswers } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const goals = ["Recruiting", "Fundraising", "Hiring", "Personal Brand", "Job Search"];
+const goals = ["Job Search", "Internship Search"];
 const seniority = ["Entry level", "Mid level", "Senior", "Executive", "Student"];
 const geography = ["India", "US", "Other"];
 const timeline = ["Urgent", "Near term", "Flexible"];
@@ -49,7 +49,11 @@ export default function QuestionsPage() {
     if (!linkedinData.rawProfileText && linkedinData.importSource !== "scrape") {
       router.replace("/profile-import");
     }
-  }, [linkedinData, router]);
+
+    if (answers.goal && !goals.includes(answers.goal)) {
+      setAnswers({ goal: "" });
+    }
+  }, [answers.goal, linkedinData, router, setAnswers]);
 
   async function submit() {
     setLoading(true);
@@ -95,9 +99,9 @@ export default function QuestionsPage() {
           <div className="animate-[fade-in_180ms_ease-out] space-y-5" key={step}>
             {step === 0 ? (
               <>
-                <Field label="What is your primary LinkedIn goal?">
+                <Field label="What opportunity are you targeting?">
                   <Select value={answers.goal} onChange={(event) => setAnswers({ goal: event.target.value as ContextAnswers["goal"] })}>
-                    <option value="">Select goal</option>
+                    <option value="">Select opportunity type</option>
                     {goals.map((item) => (
                       <option key={item}>{item}</option>
                     ))}
@@ -117,10 +121,10 @@ export default function QuestionsPage() {
             {step === 1 ? (
               <>
                 <Field label="What industry or sector are you targeting?">
-                  <Input value={answers.industry} onChange={(event) => setAnswers({ industry: event.target.value })} placeholder="Fintech, SaaS, climate, automation" />
+                  <Input value={answers.industry} onChange={(event) => setAnswers({ industry: event.target.value })} placeholder="Fintech, SaaS, consulting, healthcare" />
                 </Field>
                 <Field label="What specific role are you targeting?">
-                  <Input value={answers.targetRole} onChange={(event) => setAnswers({ targetRole: event.target.value })} placeholder="Product Lead, Founder, VP Sales" />
+                  <Input value={answers.targetRole} onChange={(event) => setAnswers({ targetRole: event.target.value })} placeholder="Business Analyst, Product Manager, Software Engineer" />
                 </Field>
               </>
             ) : null}
@@ -173,11 +177,11 @@ export default function QuestionsPage() {
 
             {step === 4 ? (
               <>
-                <Field label="Target companies or investors?">
-                  <Input value={answers.targetCompanies} onChange={(event) => setAnswers({ targetCompanies: event.target.value })} placeholder="Sequoia, Google, Stripe" />
+                <Field label="Target companies or employers?">
+                  <Input value={answers.targetCompanies} onChange={(event) => setAnswers({ targetCompanies: event.target.value })} placeholder="Google, Deloitte, Salesforce" />
                 </Field>
                 <Field label="Ideal outcome in 6 months?">
-                  <Textarea value={answers.outcome} onChange={(event) => setAnswers({ outcome: event.target.value })} placeholder="Describe the opportunity you want LinkedIn to create." />
+                  <Textarea value={answers.outcome} onChange={(event) => setAnswers({ outcome: event.target.value })} placeholder="Describe the job or internship outcome you want." />
                 </Field>
               </>
             ) : null}

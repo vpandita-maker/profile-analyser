@@ -2,7 +2,13 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { AnalysisResult, ContextAnswers, LinkedInProfile } from "@/lib/types";
 import { compactList } from "@/lib/utils";
 
-export const LINKEDIN_ANALYSIS_SYSTEM_PROMPT = `You are a LinkedIn profile optimization expert. Analyze the user's profile based on their stated goal, geography, seniority, industry, profile fields, and questionnaire answers.
+export const LINKEDIN_ANALYSIS_SYSTEM_PROMPT = `You are a LinkedIn profile optimization expert for job seekers and internship seekers only. Analyze the user's profile based on their target opportunity, geography, seniority, industry, profile fields, and questionnaire answers.
+
+Scope rules:
+Only optimize for full time job search and internship search.
+Do not optimize for personal branding, fundraising, hiring, creator growth, investing, selling, or general networking.
+If the user gives broad context, translate it into what a recruiter, hiring manager, internship coordinator, or applicant tracking system needs to see.
+Every recommendation should help the user get interviews, internship conversations, referrals, recruiter replies, or stronger application conversion.
 
 Return a JSON object with:
 overallScore from 1 to 100
@@ -16,12 +22,12 @@ Writing rules:
 Always write directly to the user in second person: "you", "your", "you should".
 Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
 Do not use dash punctuation in any written explanation, title, current text, recommended text, or why it matters. Avoid hyphens, en dashes, and em dashes. Use commas, periods, or separate sentences instead.
-Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, companies, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
+Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, target employers, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
 Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
 If a profile field is missing or sparse, say exactly what is missing and what the user should add. Do not invent experience, skills, employers, metrics, or credentials.
 Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
 Recommended text should be ready to paste into a profile where possible.
-Be specific, honest, and actionable. Consider geography (India vs US), goal context (recruiting vs fundraising signals), seniority benchmarks, and industry norms.
+Be specific, honest, and actionable. Consider geography, job market expectations, internship market expectations, seniority benchmarks, role keywords, proof of impact, and industry norms.
 
 Output ONLY valid JSON, no markdown or preamble.`;
 
@@ -108,7 +114,7 @@ Imported Profile Text: ${profile.rawProfileText ? profile.rawProfileText.slice(0
 Import Source: ${profile.importSource || "oauth"}
 
 Context:
-Goal: ${context.goal || "Not specified"}
+Opportunity Type: ${context.goal || "Job Search"}
 Seniority: ${context.seniority || "Not specified"}
 Industry: ${context.industry || "Not specified"}
 Target Role: ${context.targetRole || "Not specified"}
@@ -116,7 +122,7 @@ Geography: ${context.geography || "Not specified"}
 City: ${context.city || "Not specified"}
 Timeline: ${context.timeline || "Not specified"}
 Challenges: ${compactList(context.challenges)}
-Target Companies: ${context.targetCompanies || "Not specified"}
+Target Employers: ${context.targetCompanies || "Not specified"}
 Ideal Outcome: ${context.outcome || "Not specified"}
 Network Size: ${context.networkSize || "Not specified"}
 Open To Relocation: ${context.relocation === null ? "Not specified" : context.relocation ? "Yes" : "No"}
@@ -132,7 +138,8 @@ Personalize the analysis using the profile data and context above.`;
 
 export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswers): AnalysisResult {
   const role = context.targetRole || "your target role";
-  const goal = context.goal || "your goal";
+  const opportunity = context.goal || "Job Search";
+  const audience = opportunity === "Internship Search" ? "internship recruiters and hiring teams" : "recruiters and hiring managers";
 
   return {
     overallScore: 72,
@@ -147,12 +154,12 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       {
         title: "Clear starting point",
         score: 7,
-        explanation: `You have enough signal to begin positioning around ${goal.toLowerCase()}, especially if you sharpen your role narrative for ${role}.`
+        explanation: `You have enough signal to begin positioning for ${opportunity.toLowerCase()}, especially if you sharpen your role narrative for ${role}.`
       },
       {
-        title: "Context aware targeting",
+        title: "Role aware targeting",
         score: 8,
-        explanation: `Your answers make the intended audience more specific, which helps tune headline, about, and experience sections for ${role}.`
+        explanation: `Your answers make your target role clearer, which helps tune your headline, about, and experience sections for ${audience}.`
       },
       {
         title: "Readable professional baseline",
@@ -164,39 +171,39 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       {
         title: "Headline needs stronger positioning",
         score: profile.headline ? 5 : 3,
-        explanation: "Your headline should state who you help, what you do, and the proof or niche that makes you credible."
+        explanation: `Your headline should state the role you want, the domain you fit, and the proof that makes you credible for ${role}.`
       },
       {
         title: "Missing measurable proof",
         score: 5,
-        explanation: "Recruiters, hiring teams, and investors scan for outcomes. Add metrics, scope, and named domains wherever possible."
+        explanation: "Recruiters and hiring teams scan for outcomes. Add metrics, scope, tools, projects, and named domains wherever possible."
       },
       {
         title: "Audience fit can be tighter",
         score: 6,
-        explanation: `Your profile should speak directly to ${context.geography || "your market"} expectations and ${context.seniority || "your"} seniority benchmarks.`
+        explanation: `Your profile should speak directly to ${context.geography || "your market"} expectations, ${context.seniority || "your"} seniority benchmarks, and the skills needed for ${role}.`
       }
     ],
     topFixes: [
       {
         title: "Rewrite the headline",
         current: profile.headline || "No headline provided",
-        recommended: `${role} | ${context.industry || "Industry"} | Helping teams create measurable business outcomes`,
-        whyMatters: "The headline is the highest visibility conversion surface on LinkedIn search, comments, and profile visits.",
+        recommended: `${role} | ${context.industry || "Target industry"} | Projects, tools, and outcomes aligned to hiring needs`,
+        whyMatters: "The headline is the highest visibility surface for recruiter search, profile visits, and referral checks.",
         difficulty: "Easy"
       },
       {
         title: "Add a proof led About opener",
         current: profile.about || "No About section provided",
-        recommended: `I help ${context.industry || "teams"} solve high value problems as a ${role}, with a focus on measurable outcomes, clear execution, and market aware positioning.`,
-        whyMatters: "The first two lines decide whether a visitor expands the section or leaves.",
+        recommended: `I am targeting ${role} opportunities in ${context.industry || "my target industry"}. I bring hands on experience with relevant projects, tools, and measurable outcomes that match what hiring teams screen for.`,
+        whyMatters: "The first two lines decide whether a recruiter understands your fit before moving to experience.",
         difficulty: "Medium"
       },
       {
         title: "Turn experience into outcomes",
         current: "Experience reads like responsibilities.",
         recommended: "Use bullets that combine action, scale, metric, and business result.",
-        whyMatters: "Outcome bullets make seniority and impact obvious without asking the reader to infer it.",
+        whyMatters: "Outcome bullets make role fit and impact obvious without asking the recruiter to infer it.",
         difficulty: "Medium"
       }
     ],
@@ -204,15 +211,15 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       {
         title: "Reorder skills for search intent",
         current: compactList(profile.skills),
-        recommended: `Prioritize skills tied to ${role}, ${context.industry || "your target industry"}, and ${goal}.`,
-        whyMatters: "Skill ordering influences profile scanning and keyword matching.",
+        recommended: `Prioritize skills tied to ${role}, ${context.industry || "your target industry"}, and the job descriptions you want to match.`,
+        whyMatters: "Skill ordering influences profile scanning, recruiter search, and keyword matching.",
         difficulty: "Easy"
       },
       {
         title: "Add credibility markers",
         current: "Credibility signals are not prominent enough.",
-        recommended: "Surface awards, shipped projects, publications, funding, revenue, hiring scale, or logos where relevant.",
-        whyMatters: "Specific credibility markers reduce trust friction for new visitors.",
+        recommended: "Surface awards, shipped projects, coursework, certifications, tools, business outcomes, or employer names where relevant.",
+        whyMatters: "Specific credibility markers reduce trust friction for recruiters and referral partners.",
         difficulty: "Easy"
       }
     ]

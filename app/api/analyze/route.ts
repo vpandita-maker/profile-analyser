@@ -29,6 +29,9 @@ export async function POST(request: Request) {
     skills: body.skills
   };
   const contextAnswers = body.contextAnswers as unknown as ContextAnswers;
+  if (!["Job Search", "Internship Search"].includes(contextAnswers.goal)) {
+    contextAnswers.goal = "Job Search";
+  }
   const analysis = await analyzeLinkedInProfile(profile, contextAnswers);
   const supabase = getSupabaseAdmin();
   const userId = profile.linkedinId;

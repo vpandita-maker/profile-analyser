@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const steps = ["Reading profile sections", "Mapping goals to signals", "Scoring profile strength", "Preparing fixes"];
+const steps = ["Reading profile sections", "Mapping role targets to signals", "Scoring recruiter fit", "Preparing fixes"];
 
 const businessFacts = [
   "The first barcode scanned in a store was on a pack of Wrigley's gum in 1974.",

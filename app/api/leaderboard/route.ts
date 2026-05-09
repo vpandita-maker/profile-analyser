@@ -5,16 +5,16 @@ import type { LeaderboardEntry } from "@/lib/types";
 export const revalidate = 60;
 
 const demoEntries: LeaderboardEntry[] = [
-  { id: "1", rank: 1, name: "Aarav Mehta", headline: "Product Leader | B2B SaaS | Former founder", overallScore: 94, goal: "Hiring", geography: "India", seniority: "Executive" },
-  { id: "2", rank: 2, name: "Maya Rao", headline: "Growth marketer scaling fintech products", overallScore: 91, goal: "Personal Brand", geography: "India", seniority: "Senior" },
-  { id: "3", rank: 3, name: "Rohan Shah", headline: "Engineering manager building platform teams", overallScore: 88, goal: "Recruiting", geography: "US", seniority: "Senior" },
-  { id: "4", rank: 4, name: "Nina Kapoor", headline: "Founder raising seed for climate intelligence", overallScore: 86, goal: "Fundraising", geography: "US", seniority: "Executive" },
-  { id: "5", rank: 5, name: "Dev Iyer", headline: "Data analyst targeting product analytics roles", overallScore: 83, goal: "Job Search", geography: "India", seniority: "Mid level" },
-  { id: "6", rank: 6, name: "Sara Thomas", headline: "People leader hiring GTM teams", overallScore: 81, goal: "Hiring", geography: "Other", seniority: "Executive" },
-  { id: "7", rank: 7, name: "Kabir Sethi", headline: "Student builder focused on ML systems", overallScore: 79, goal: "Job Search", geography: "India", seniority: "Student" },
-  { id: "8", rank: 8, name: "Isha Menon", headline: "Brand strategist for founder led companies", overallScore: 77, goal: "Personal Brand", geography: "US", seniority: "Senior" },
-  { id: "9", rank: 9, name: "Ankit Bose", headline: "Sales leader opening enterprise accounts", overallScore: 75, goal: "Recruiting", geography: "India", seniority: "Senior" },
-  { id: "10", rank: 10, name: "Leah Kim", headline: "Operator investing in early stage teams", overallScore: 73, goal: "Fundraising", geography: "Other", seniority: "Executive" }
+  { id: "1", rank: 1, name: "Aarav Mehta", headline: "Product Manager candidate | B2B SaaS | Analytics projects", overallScore: 94, goal: "Job Search", geography: "India", seniority: "Mid level" },
+  { id: "2", rank: 2, name: "Maya Rao", headline: "Data Analyst candidate | SQL | Python | Fintech dashboards", overallScore: 91, goal: "Job Search", geography: "India", seniority: "Entry level" },
+  { id: "3", rank: 3, name: "Rohan Shah", headline: "Software Engineering intern candidate | React | Node | ML systems", overallScore: 88, goal: "Internship Search", geography: "US", seniority: "Student" },
+  { id: "4", rank: 4, name: "Nina Kapoor", headline: "Consulting internship candidate | Market research | Strategy cases", overallScore: 86, goal: "Internship Search", geography: "US", seniority: "Student" },
+  { id: "5", rank: 5, name: "Dev Iyer", headline: "Business Analyst candidate | Product analytics | CRM reporting", overallScore: 83, goal: "Job Search", geography: "India", seniority: "Mid level" },
+  { id: "6", rank: 6, name: "Sara Thomas", headline: "Marketing intern candidate | Campaign analytics | Content ops", overallScore: 81, goal: "Internship Search", geography: "Other", seniority: "Student" },
+  { id: "7", rank: 7, name: "Kabir Sethi", headline: "ML intern candidate | Python | Model evaluation | Research projects", overallScore: 79, goal: "Internship Search", geography: "India", seniority: "Student" },
+  { id: "8", rank: 8, name: "Isha Menon", headline: "UX Research candidate | User interviews | SaaS case studies", overallScore: 77, goal: "Job Search", geography: "US", seniority: "Entry level" },
+  { id: "9", rank: 9, name: "Ankit Bose", headline: "Sales Development candidate | Pipeline research | CRM hygiene", overallScore: 75, goal: "Job Search", geography: "India", seniority: "Entry level" },
+  { id: "10", rank: 10, name: "Leah Kim", headline: "Operations internship candidate | Process improvement | Excel", overallScore: 73, goal: "Internship Search", geography: "Other", seniority: "Student" }
 ];
 
 export async function GET(request: Request) {
