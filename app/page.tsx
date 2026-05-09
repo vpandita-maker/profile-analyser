@@ -24,7 +24,7 @@ export default function HomePage() {
 
           <h1 className="text-4xl font-black leading-tight text-slate-950">Align your LinkedIn to your goals, and actually get noticed.</h1>
           <p className="mt-4 text-base leading-7 text-slate-600">
-            Import your LinkedIn profile, tell us your career goals, and get a personalized analysis with specific fixes. No generic advice, just what actually matters for your path.
+            Add your LinkedIn profile URL, tell us your career goals, and get a personalized analysis with specific fixes. No generic advice, just what actually matters for your path.
           </p>
         </div>
 

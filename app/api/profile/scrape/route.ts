@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     if (error instanceof ProfileImportError) {
       const message =
         error.code === "missing_token"
-          ? "Profile import is not connected yet. Add APIFY_TOKEN in Vercel and redeploy."
+          ? "Profile URL import is not set up yet. Add APIFY_TOKEN in Vercel and redeploy."
           : "Profile import failed at the scraper. Check your Apify run logs or try the saved PDF upload.";
 
       return NextResponse.json({ error: message, code: error.code }, { status: 502 });

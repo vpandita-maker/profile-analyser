@@ -95,9 +95,9 @@ export default function ProfileImportPage() {
             Profile Import
           </div>
 
-          <h1 className="mx-auto max-w-sm text-left text-3xl font-black leading-tight text-slate-950">Import your profile for a sharper review.</h1>
+          <h1 className="mx-auto max-w-sm text-left text-3xl font-black leading-tight text-slate-950">Add your LinkedIn profile URL.</h1>
           <p className="mx-auto mt-4 max-w-sm text-left text-base leading-7 text-slate-600">
-            Paste your LinkedIn profile URL. If that fails, upload your saved PDF instead.
+            Paste the URL to your profile. That is all we need to start your review. If URL import fails, upload your saved PDF instead.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export default function ProfileImportPage() {
               value={profileUrl}
             />
             <Button disabled={!profileUrl.trim() || loading} loading={scraping} onClick={importFromUrl}>
-              Import from LinkedIn
+              Use Profile URL
             </Button>
           </div>
 
