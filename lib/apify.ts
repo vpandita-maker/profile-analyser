@@ -20,16 +20,21 @@ export class ProfileImportError extends Error {
 
 function getActorIds() {
   const configuredActorId = process.env.APIFY_ACTOR_ID?.trim();
-  const candidates = [
-    configuredActorId,
-    richNoCookieActorId,
-    fullSectionsNoCookieActorId,
-    legacyNoCookieActorId
-  ].filter((actorId): actorId is string => Boolean(actorId));
+  const configuredActorIsUsable =
+    Boolean(configuredActorId) &&
+    configuredActorId !== cookieActorId &&
+    configuredActorId !== legacyNoCookieActorId &&
+    !configuredActorId?.startsWith("apify_api_");
+  const candidates = configuredActorIsUsable
+    ? [configuredActorId, richNoCookieActorId, fullSectionsNoCookieActorId, legacyNoCookieActorId]
+    : [richNoCookieActorId, fullSectionsNoCookieActorId, legacyNoCookieActorId];
 
   return Array.from(
     new Set(
-      candidates.filter((actorId) => actorId !== cookieActorId && !actorId.startsWith("apify_api_"))
+      candidates.filter(
+        (actorId): actorId is string =>
+          typeof actorId === "string" && actorId !== cookieActorId && !actorId.startsWith("apify_api_")
+      )
     )
   );
 }
