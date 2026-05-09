@@ -18,25 +18,34 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
   const setUnlocked = useAnalyzerStore((state) => state.setUnlocked);
 
   async function sendInvite() {
-    if (!analysisId || !isEmail(email)) return;
+    if (!isEmail(email)) return;
+    if (!analysisId) {
+      setError("Run your analysis again before sending an invite.");
+      return;
+    }
     setError("");
     setLoading(true);
-    const response = await fetch("/api/invites", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ analysisId, friendEmail: email })
-    });
-    if (response.ok) {
+    try {
+      const response = await fetch("/api/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analysisId, friendEmail: email })
+      });
+      if (!response.ok) {
+        setError("Invite could not be sent. Please try again.");
+        return;
+      }
       setSent(true);
       setUnlocked(true);
       window.setTimeout(() => {
         onClose();
         router.push("/results/unlocked");
       }, 700);
-    } else {
+    } catch {
       setError("Invite could not be sent. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

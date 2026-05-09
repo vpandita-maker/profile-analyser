@@ -6,12 +6,14 @@ import { FixCard } from "@/components/FixCard";
 import { ProfileCard } from "@/components/ProfileCard";
 import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
 
 export default function UnlockedResultsPage() {
   const router = useRouter();
   const profile = useAnalyzerStore((state) => state.linkedinData);
-  const analysis = useAnalyzerStore((state) => state.analysis);
+  const storedAnalysis = useAnalyzerStore((state) => state.analysis);
+  const analysis = normalizeAnalysis(storedAnalysis);
   const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
 
   if (!analysis || !isUnlocked) {
@@ -40,19 +42,25 @@ export default function UnlockedResultsPage() {
           </section>
 
           <div className="mb-5 space-y-3">
-            {analysis.topFixes.map((fix, index) => (
-              <FixCard key={fix.title} fix={fix} defaultOpen={index === 0} />
-            ))}
+            {analysis.topFixes.length ? (
+              analysis.topFixes.map((fix, index) => <FixCard key={fix.title} fix={fix} defaultOpen={index === 0} />)
+            ) : (
+              <div className="rounded-lg bg-white p-4 text-sm font-semibold leading-6 text-slate-600 shadow-sm ring-1 ring-slate-200">
+                Your personalized fixes are still being prepared. Please run the analysis again.
+              </div>
+            )}
           </div>
 
-          <details className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
-            <summary className="cursor-pointer text-sm font-black text-slate-950">Secondary Fixes</summary>
-            <div className="mt-4 space-y-3">
-              {analysis.secondaryFixes.map((fix) => (
-                <FixCard key={fix.title} fix={fix} />
-              ))}
-            </div>
-          </details>
+          {analysis.secondaryFixes.length ? (
+            <details className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+              <summary className="cursor-pointer text-sm font-black text-slate-950">Secondary Fixes</summary>
+              <div className="mt-4 space-y-3">
+                {analysis.secondaryFixes.map((fix) => (
+                  <FixCard key={fix.title} fix={fix} />
+                ))}
+              </div>
+            </details>
+          ) : null}
 
           <div className="space-y-3">
             <Button variant="secondary" onClick={() => router.push("/leaderboard")}>

@@ -9,13 +9,15 @@ import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
 import { ScoreBadge } from "@/components/ui/Badge";
+import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
 
 export default function ResultsPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const router = useRouter();
   const profile = useAnalyzerStore((state) => state.linkedinData);
-  const analysis = useAnalyzerStore((state) => state.analysis);
+  const storedAnalysis = useAnalyzerStore((state) => state.analysis);
+  const analysis = normalizeAnalysis(storedAnalysis);
   const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
 
   if (!analysis) {
