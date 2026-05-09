@@ -68,17 +68,3 @@ export interface AnalysisResult {
   topFixes: FixItem[];
   secondaryFixes: FixItem[];
 }
-
-export interface LeaderboardEntry {
-  id: string;
-  rank: number;
-  name: string;
-  headline: string;
-  profilePhotoUrl?: string;
-  overallScore: number;
-  goal: string;
-  geography: string;
-  seniority: string;
-  strengths?: AnalysisItem[];
-  weaknesses?: AnalysisItem[];
-}

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Trophy } from "lucide-react";
+import { FileText, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -19,7 +19,7 @@ export default function HomePage() {
               </span>
               Profile Analyzer
             </div>
-            <Trophy className="h-5 w-5 text-teal-600" />
+            <Sparkles className="h-5 w-5 text-teal-600" />
           </div>
 
           <h1 className="text-4xl font-black leading-tight text-slate-950">Align your LinkedIn to the job or internship you want.</h1>
@@ -40,8 +40,8 @@ export default function HomePage() {
                 <p className="text-xs text-slate-500">Review</p>
               </div>
               <div>
-                <p className="text-lg font-black text-slate-950">Top 10</p>
-                <p className="text-xs text-slate-500">Rankings</p>
+                <p className="text-lg font-black text-slate-950">Fixes</p>
+                <p className="text-xs text-slate-500">Ready</p>
               </div>
             </div>
           </Card>

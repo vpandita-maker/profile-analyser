@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { AnalysisResult, ContextAnswers, LinkedInProfile, LeaderboardEntry } from "@/lib/types";
+import type { AnalysisResult, ContextAnswers, LinkedInProfile } from "@/lib/types";
 
 const emptyContext: ContextAnswers = {
   goal: "",
@@ -34,14 +34,6 @@ interface AnalyzerState {
   clearAnalysis: () => void;
   setUnlocked: (value: boolean) => void;
   resetContext: () => void;
-}
-
-interface LeaderboardState {
-  filters: { goal: string; geography: string; seniority: string };
-  data: LeaderboardEntry[];
-  userRank: number | null;
-  setFilters: (filters: Partial<LeaderboardState["filters"]>) => void;
-  setData: (data: LeaderboardEntry[], userRank?: number | null) => void;
 }
 
 export const useAnalyzerStore = create<AnalyzerState>()(
@@ -81,18 +73,5 @@ export const useAnalyzerStore = create<AnalyzerState>()(
       resetContext: () => set({ contextAnswers: emptyContext })
     }),
     { name: "linkedin-analyzer-store" }
-  )
-);
-
-export const useLeaderboardStore = create<LeaderboardState>()(
-  persist(
-    (set) => ({
-      filters: { goal: "", geography: "", seniority: "" },
-      data: [],
-      userRank: null,
-      setFilters: (filters) => set((state) => ({ filters: { ...state.filters, ...filters } })),
-      setData: (data, userRank = null) => set({ data, userRank })
-    }),
-    { name: "linkedin-analyzer-leaderboard" }
   )
 );

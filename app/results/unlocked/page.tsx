@@ -1,8 +1,10 @@
 "use client";
 
-import { Share2, Trophy } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { FixCard } from "@/components/FixCard";
+import { Loading } from "@/components/Loading";
 import { ProfileCard } from "@/components/ProfileCard";
 import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -11,10 +13,46 @@ import { useAnalyzerStore } from "@/lib/store";
 
 export default function UnlockedResultsPage() {
   const router = useRouter();
+  const startedFixRefresh = useRef(false);
+  const [refreshingFixes, setRefreshingFixes] = useState(false);
+  const [refreshFailed, setRefreshFailed] = useState(false);
   const profile = useAnalyzerStore((state) => state.linkedinData);
+  const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
   const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
+  const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
+
+  const hasFixes = Boolean(analysis?.topFixes.length);
+
+  useEffect(() => {
+    if (!analysis || !isUnlocked || hasFixes || !profile || startedFixRefresh.current) return;
+    startedFixRefresh.current = true;
+    setRefreshingFixes(true);
+    setRefreshFailed(false);
+
+    async function refreshFixes() {
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...profile, contextAnswers })
+        });
+        if (!response.ok) {
+          setRefreshFailed(true);
+          return;
+        }
+        const data = await response.json();
+        setAnalysis(data.analysis, data.analysisId);
+      } catch {
+        setRefreshFailed(true);
+      } finally {
+        setRefreshingFixes(false);
+      }
+    }
+
+    void refreshFixes();
+  }, [analysis, contextAnswers, hasFixes, isUnlocked, profile, setAnalysis]);
 
   if (!analysis || !isUnlocked) {
     return (
@@ -25,6 +63,10 @@ export default function UnlockedResultsPage() {
         </div>
       </main>
     );
+  }
+
+  if (refreshingFixes) {
+    return <Loading label="Preparing your personalized fixes" />;
   }
 
   return (
@@ -42,11 +84,11 @@ export default function UnlockedResultsPage() {
           </section>
 
           <div className="mb-5 space-y-3">
-            {analysis.topFixes.length ? (
+            {hasFixes ? (
               analysis.topFixes.map((fix, index) => <FixCard key={fix.title} fix={fix} defaultOpen={index === 0} />)
             ) : (
               <div className="rounded-lg bg-white p-4 text-sm font-semibold leading-6 text-slate-600 shadow-sm ring-1 ring-slate-200">
-                Your personalized fixes are still being prepared. Please run the analysis again.
+                {refreshFailed ? "Your personalized fixes could not be prepared. Please run the analysis again." : "Your personalized fixes are being prepared."}
               </div>
             )}
           </div>
@@ -63,10 +105,6 @@ export default function UnlockedResultsPage() {
           ) : null}
 
           <div className="space-y-3">
-            <Button variant="secondary" onClick={() => router.push("/leaderboard")}>
-              <Trophy className="h-4 w-4" />
-              View Leaderboard
-            </Button>
             <Button variant="secondary" onClick={() => router.push("/results")}>
               <Share2 className="h-4 w-4" />
               Share Again

@@ -78,21 +78,6 @@ export async function POST(request: Request) {
       analysisId = data.id;
     }
 
-    await supabase.from("leaderboard").upsert(
-      {
-        user_id: userId,
-        linkedin_id: profile.linkedinId,
-        name: profile.name,
-        headline: profile.headline || "",
-        profile_photo_url: profile.photo || "",
-        overall_score: analysis.overallScore,
-        goal: contextAnswers.goal,
-        geography: contextAnswers.geography,
-        seniority: contextAnswers.seniority,
-        is_public: false
-      },
-      { onConflict: "user_id" }
-    );
   }
 
   return NextResponse.json({ analysis, analysisId });
