@@ -20,6 +20,20 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8W3KVJSV" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-RJ8W3KVJSV');
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>
