@@ -100,12 +100,21 @@ export default function QuestionsPage() {
             {step === 0 ? (
               <>
                 <Field label="What opportunity are you targeting?">
-                  <Select value={answers.goal} onChange={(event) => setAnswers({ goal: event.target.value as ContextAnswers["goal"] })}>
-                    <option value="">Select opportunity type</option>
+                  <div className="grid grid-cols-1 gap-2">
                     {goals.map((item) => (
-                      <option key={item}>{item}</option>
+                      <button
+                        className={cn(
+                          "flex min-h-12 items-center justify-center rounded-lg border px-3 text-center text-sm font-black transition active:scale-[0.98]",
+                          answers.goal === item ? "border-teal-600 bg-teal-50 text-teal-800" : "border-slate-200 bg-white text-slate-700"
+                        )}
+                        key={item}
+                        onClick={() => setAnswers({ goal: item as ContextAnswers["goal"] })}
+                        type="button"
+                      >
+                        {item}
+                      </button>
                     ))}
-                  </Select>
+                  </div>
                 </Field>
                 <Field label="What is your current career stage?">
                   <Select value={answers.seniority} onChange={(event) => setAnswers({ seniority: event.target.value as ContextAnswers["seniority"] })}>
