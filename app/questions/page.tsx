@@ -14,7 +14,7 @@ const goals = ["Job Search", "Internship Search"];
 const seniority = ["Entry level", "Mid level", "Senior", "Executive", "Student"];
 const geography = ["India", "US", "Other"];
 const timeline = ["Urgent", "Near term", "Flexible"];
-const networkSizes = ["Under 500", "500 to 2K", "2K to 5K", "5K to 10K", "10K plus"];
+const networkSizes = ["Under 500", "500 to 2K", "2K to 5K", "5K to 10K", "10K+"];
 const challenges = ["Unclear value prop", "Low engagement", "Few recommendations", "Weak headline", "Unfocused experience", "Missing proof", "Wrong audience"];
 
 const screenChecks: Array<(answers: ContextAnswers) => boolean> = [
