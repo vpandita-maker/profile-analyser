@@ -106,24 +106,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div>
-          <Card className="bg-white">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div>
-                <p className="text-lg font-black text-slate-950">2 min</p>
-                <p className="text-xs text-slate-500">Questions</p>
-              </div>
-              <div>
-                <p className="text-lg font-black text-slate-950">Expert</p>
-                <p className="text-xs text-slate-500">Review</p>
-              </div>
-              <div>
-                <p className="text-lg font-black text-slate-950">Fixes</p>
-                <p className="text-xs text-slate-500">Ready</p>
-              </div>
-            </div>
-          </Card>
-        </div>
       </section>
     </main>
   );
