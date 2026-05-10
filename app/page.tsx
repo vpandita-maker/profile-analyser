@@ -7,7 +7,7 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Input, Textarea } from "@/components/ui/Input";
 import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,7 @@ export default function HomePage() {
   const [dreamCompany, setDreamCompany] = useState("");
   const [locationPreference, setLocationPreference] = useState("");
   const [workPreference, setWorkPreference] = useState<WorkPreference | "">("");
+  const [wins, setWins] = useState("");
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
 
@@ -109,7 +110,7 @@ export default function HomePage() {
         networkSize: "",
         relocation: null,
         workPreference,
-        wins: ""
+        wins: wins.trim()
       });
       setLinkedinData(importedProfile || ({
         ...data.profile,
@@ -217,6 +218,13 @@ export default function HomePage() {
                   </button>
                 ))}
               </div>
+            </Field>
+            <Field label="Anything you wish your LinkedIn highlighted better? (optional)">
+              <Textarea
+                onChange={(event) => setWins(event.target.value)}
+                placeholder="Recent projects, awards, internships, coursework, or achievements that are relevant to the role you want but not well represented on your profile"
+                value={wins}
+              />
             </Field>
             <Button disabled={!canSubmit || scraping} loading={scraping} onClick={analyzeProfile}>
               Analyze My Profile
