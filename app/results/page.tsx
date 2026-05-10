@@ -20,7 +20,7 @@ export default function ResultsPage() {
 
   if (!analysis) {
     return (
-      <main className="grid min-h-dvh place-items-center bg-slate-50 px-4">
+      <main className="app-screen grid place-items-center px-4">
         <div className="max-w-sm text-center">
           <p className="mb-4 text-sm text-slate-600">No analysis found on this device.</p>
           <Button onClick={() => router.push("/questions")}>Start Analysis</Button>
@@ -30,9 +30,9 @@ export default function ResultsPage() {
   }
 
   return (
-    <main className="safe-bottom min-h-dvh bg-slate-50">
-      <div className="mx-auto max-w-md">
-        <div className="px-4 py-5">
+    <main className="app-screen safe-bottom">
+      <div className="app-container">
+        <div className="py-5">
           <section className="mb-6 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <div>
               <p className="text-sm font-semibold text-slate-500">Overall score out of 100</p>

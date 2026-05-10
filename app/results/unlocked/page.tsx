@@ -73,7 +73,7 @@ export default function UnlockedResultsPage() {
 
   if (!analysis || !isUnlocked) {
     return (
-      <main className="grid min-h-dvh place-items-center bg-slate-50 px-4">
+      <main className="app-screen grid place-items-center px-4">
         <div className="max-w-sm text-center">
           <p className="mb-4 text-sm text-slate-600">Personalized fixes are locked until you send an invite.</p>
           <Button onClick={() => router.push("/results")}>Back to Results</Button>
@@ -87,9 +87,9 @@ export default function UnlockedResultsPage() {
   }
 
   return (
-    <main className="safe-bottom min-h-dvh bg-slate-50">
-      <div className="mx-auto max-w-md">
-        <div className="px-4 py-5">
+    <main className="app-screen safe-bottom">
+      <div className="app-container">
+        <div className="py-5">
           <section className="mb-5 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <div>
               <Badge tone="teal">Fixes Unlocked</Badge>

@@ -68,8 +68,8 @@ export default function HomePage() {
   }
 
   return (
-    <main className="safe-bottom min-h-dvh bg-slate-50 px-4 py-5">
-      <section className="mx-auto flex min-h-[calc(100dvh-48px)] max-w-md flex-col justify-between">
+    <main className="app-screen safe-bottom">
+      <section className="app-container app-flow">
         <div>
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
@@ -86,7 +86,7 @@ export default function HomePage() {
             Add your LinkedIn profile URL, tell us the role you are targeting, and get a personalized analysis with specific fixes for recruiters, referrals, and applications.
           </p>
 
-          <div className="mt-8 space-y-3">
+          <div className="app-form-stack space-y-3">
             {error ? <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">{error}</Card> : null}
             <Input
               inputMode="url"
@@ -106,7 +106,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div>
           <Card className="bg-white">
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>

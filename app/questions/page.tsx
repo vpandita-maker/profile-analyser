@@ -85,8 +85,8 @@ export default function QuestionsPage() {
   }
 
   return (
-    <main className="safe-bottom min-h-dvh bg-slate-50 px-4 py-5">
-      <div className="mx-auto max-w-md">
+    <main className="app-screen safe-bottom">
+      <div className="app-container py-5">
         <div className="mb-5">
           <div className="mb-2 flex items-center justify-between text-sm font-bold text-slate-600">
             <span>{step + 1}/7</span>
@@ -97,7 +97,7 @@ export default function QuestionsPage() {
           </div>
         </div>
 
-        <Card className="min-h-[520px]">
+        <Card className="min-h-[min(520px,calc(100dvh-190px))]">
           <div className="animate-[fade-in_180ms_ease-out] space-y-5" key={step}>
             {step === 0 ? (
               <>
@@ -240,7 +240,7 @@ export default function QuestionsPage() {
           </div>
         </Card>
 
-        <div className="mt-5 flex gap-3">
+        <div className="sticky bottom-0 -mx-4 mt-5 flex gap-3 bg-slate-50/95 px-4 pb-[max(0px,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
           <Button variant="secondary" fullWidth={false} className="w-14 px-0" disabled={step === 0 || loading} onClick={() => setStep((value) => value - 1)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>

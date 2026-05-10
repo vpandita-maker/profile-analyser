@@ -57,8 +57,8 @@ export default function ProfileImportPage() {
   }
 
   return (
-    <main className="safe-bottom min-h-dvh bg-slate-50 px-4 py-5">
-      <section className="mx-auto flex min-h-[calc(100dvh-48px)] max-w-md flex-col justify-between">
+    <main className="app-screen safe-bottom">
+      <section className="app-container app-flow">
         <div>
           <div className="mb-8 flex items-center justify-center gap-2 text-sm font-bold text-slate-950">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
@@ -67,16 +67,16 @@ export default function ProfileImportPage() {
             Profile Import
           </div>
 
-          <h1 className="mx-auto max-w-sm text-left text-3xl font-black leading-tight text-slate-950">Add your LinkedIn profile URL.</h1>
-          <p className="mx-auto mt-4 max-w-sm text-left text-base leading-7 text-slate-600">
+          <h1 className="text-left text-3xl font-black leading-tight text-slate-950">Add your LinkedIn profile URL.</h1>
+          <p className="mt-4 text-left text-base leading-7 text-slate-600">
             Paste the URL to your profile. That is all we need to start your review.
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="app-form-stack space-y-3">
           {error ? <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">{error}</Card> : null}
 
-          <div className="mx-auto max-w-xs space-y-2">
+          <div className="space-y-2">
             <Input
               inputMode="url"
               onChange={(event) => setProfileUrl(event.target.value)}
