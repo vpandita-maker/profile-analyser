@@ -125,7 +125,7 @@ export default function HomePage() {
     <main className="app-screen safe-bottom">
       <section className="app-container app-flow">
         <div>
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
                 <FileText className="h-4 w-4" />
@@ -135,9 +135,9 @@ export default function HomePage() {
             <Sparkles className="h-5 w-5 text-teal-600" />
           </div>
 
-          <h1 className="text-4xl font-black leading-tight text-slate-950">Align your LinkedIn to the job or internship you want.</h1>
+          <h1 className="text-[2.55rem] font-black leading-[1.06] text-slate-950">Get Recruited, Don&apos;t Just Apply.</h1>
           <p className="mt-4 text-base leading-7 text-slate-600">
-            Add your LinkedIn profile URL and a few career targets. Get a personalized analysis with specific fixes for recruiters, referrals, and applications.
+            Every recruiter sees dozens of profiles, most get skipped. Align your LinkedIn to the exact role you want, get a personalized roadmap of what to fix, and watch your inbound offers increase.
           </p>
 
           <div className="app-form-stack space-y-4">

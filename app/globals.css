@@ -55,12 +55,12 @@ textarea {
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  gap: 28px;
-  padding-block: max(20px, env(safe-area-inset-top)) max(32px, env(safe-area-inset-bottom));
+  gap: clamp(18px, 4dvh, 28px);
+  padding-block: max(16px, env(safe-area-inset-top)) max(28px, env(safe-area-inset-bottom));
 }
 
 .app-form-stack {
-  margin-top: clamp(28px, 8dvh, 72px);
+  margin-top: clamp(18px, 4dvh, 32px);
 }
 
 * {
