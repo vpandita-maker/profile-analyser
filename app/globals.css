@@ -67,19 +67,6 @@ textarea {
   -webkit-tap-highlight-color: transparent;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.topbar-float {
-  animation: float 3.5s ease-in-out infinite;
-}
-
 .try-now-btn:hover {
   box-shadow: 0 8px 24px rgba(13, 148, 136, 0.45);
 }

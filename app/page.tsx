@@ -130,7 +130,7 @@ export default function HomePage() {
     <main className="app-screen safe-bottom">
       <section className="app-container app-flow">
         <div>
-          <div className="topbar-float sticky top-3 z-20 mb-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/90 p-2 pl-3 shadow-lg shadow-slate-200/60 backdrop-blur">
+          <div className="sticky top-3 z-20 mb-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/90 p-2 pl-3 shadow-lg shadow-slate-200/60 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/80">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
                 <FileText className="h-4 w-4" />
