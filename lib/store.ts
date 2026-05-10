@@ -18,6 +18,7 @@ const emptyContext: ContextAnswers = {
   outcome: "",
   networkSize: "",
   relocation: null,
+  workPreference: "",
   wins: ""
 };
 

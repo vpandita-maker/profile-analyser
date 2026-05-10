@@ -30,7 +30,7 @@ Experience proof and relevance, 25 points. Score whether experience entries show
 Skills and keyword coverage, 15 points. Score whether skills match recruiter search terms, applicant tracking filters, job descriptions, tools, industry keywords, and target employer expectations.
 Education and credential signal, 8 points. Score whether school, degree, coursework, certifications, awards, and academic proof support the target opportunity.
 Target role alignment, 12 points. Score whether the profile as a whole clearly points toward the stated job or internship target instead of looking scattered.
-Geography and market fit, 5 points. Score whether the profile fits the user's target market, city, country, relocation stance, seniority, and timeline.
+Geography and market fit, 5 points. Score whether the profile fits the user's target market, city, country, location preference, work style preference, seniority, and timeline.
 Credibility and social proof, 5 points. Score whether the profile has proof signals such as wins, strong employers, projects, network scale, recommendations, publications, leadership, or portfolio evidence.
 Add these component scores mentally and set overallScore to the total. Do not default to 62, 52, 38, 34, 30, 70, or any other repeated score unless the weighted evidence genuinely lands there.
 Use the full 1 to 100 range. A nearly empty or unverifiable profile should usually be below 35. A partially built student or early career profile should usually be 35 to 60. A good but improvable profile should usually be 61 to 78. A strong profile with clear proof, keywords, and alignment should usually be 79 to 90. Reserve 91 to 100 for exceptional profiles with obvious recruiter fit and strong proof across nearly every section.
@@ -41,7 +41,7 @@ Writing rules:
 Always write directly to the user in second person: "you", "your", "you should".
 Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
 Do not use dash punctuation in any written explanation, title, current text, recommended text, or why it matters. Avoid hyphens, en dashes, and em dashes. Use commas, periods, or separate sentences instead.
-Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, timeline, challenges, target employers, outcomes, network size, relocation preference, market benchmarks, or recent wins when relevant.
+Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, location preference, work style preference, target employers, outcomes, market benchmarks, or recent wins when relevant.
 For each topFix, use the related weakness as the source. Do not give a fix unless it clearly improves recruiter fit, internship fit, search visibility, proof of impact, or conversion to interviews.
 Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
 If a profile field is not returned by the profile import, do not claim that section is absent from the actual LinkedIn profile. Say the import did not return enough data to verify that section, then recommend what the user should verify or improve based on the evidence you do have.
@@ -177,6 +177,7 @@ Target Employers: ${context.targetCompanies || "Not specified"}
 Ideal Outcome: ${context.outcome || "Not specified"}
 Network Size: ${context.networkSize || "Not specified"}
 Open To Relocation: ${context.relocation === null ? "Not specified" : context.relocation ? "Yes" : "No"}
+Work Style Preference: ${context.workPreference || "Not specified"}
 Market Benchmarking: Use the target role, seniority, geography, industry, and broadly available market benchmarks. Do not use or ask for desired salary.
 Recent Wins: ${context.wins || "Not specified"}
 

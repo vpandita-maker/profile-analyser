@@ -2,6 +2,7 @@ export type CareerGoal = "Job Search" | "Internship Search";
 export type Seniority = "Entry level" | "Mid level" | "Senior" | "Executive" | "Student";
 export type Timeline = "Urgent" | "Near term" | "Flexible";
 export type Geography = "India" | "US" | "Other";
+export type WorkPreference = "Remote" | "Hybrid" | "In office";
 
 export interface LinkedInProfile {
   linkedinId: string;
@@ -38,6 +39,7 @@ export interface ContextAnswers {
   outcome: string;
   networkSize: string;
   relocation: boolean | null;
+  workPreference: WorkPreference | "";
   wins: string;
 }
 
