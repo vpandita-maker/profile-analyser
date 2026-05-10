@@ -21,6 +21,12 @@ body {
   overscroll-behavior-y: contain;
 }
 
+.phone-shell {
+  min-height: 100dvh;
+  width: 100%;
+  background: #f8fafc;
+}
+
 button,
 input,
 select,
@@ -97,20 +103,29 @@ textarea {
 }
 
 @media (min-width: 640px) {
+  html {
+    background: #e5e7eb;
+  }
+
   body {
     display: flex;
     justify-content: center;
     align-items: stretch;
+    background:
+      radial-gradient(circle at top, rgba(15, 23, 42, 0.08), transparent 34rem),
+      #e5e7eb;
   }
 
-  body > div,
-  main {
+  .phone-shell {
+    min-height: 100dvh;
     width: min(100vw, 430px);
+    overflow-x: hidden;
+    border-inline: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06), 0 24px 80px rgba(15, 23, 42, 0.22);
   }
 
   main {
     min-height: 100dvh;
-    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 24px 80px rgba(15, 23, 42, 0.18);
   }
 }
 

@@ -35,7 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <div className="phone-shell">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   );
