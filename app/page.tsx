@@ -45,6 +45,10 @@ export default function HomePage() {
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
 
+  function scrollToForm() {
+    document.getElementById("profile-intake")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   const canSubmit = Boolean(
     profileUrl.trim() &&
       targetRole.trim() &&
@@ -126,14 +130,21 @@ export default function HomePage() {
     <main className="app-screen safe-bottom">
       <section className="app-container app-flow">
         <div>
-          <div className="mb-6 flex items-center justify-between">
+          <div className="sticky top-3 z-20 mb-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/90 p-2 pl-3 shadow-lg shadow-slate-200/60 backdrop-blur">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
                 <FileText className="h-4 w-4" />
               </span>
               Profile Analyzer
             </div>
-            <Sparkles className="h-5 w-5 text-teal-600" />
+            <button
+              className="inline-flex h-9 items-center gap-1 rounded-full bg-slate-950 px-4 text-sm font-black text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-teal-700 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+              onClick={scrollToForm}
+              type="button"
+            >
+              Try Now
+              <Sparkles className="h-3.5 w-3.5" />
+            </button>
           </div>
 
           <div className="group mb-6 w-full overflow-hidden rounded-2xl border-2 border-slate-200 bg-slate-900 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-100">
@@ -152,7 +163,7 @@ export default function HomePage() {
             Every recruiter sees dozens of profiles, most get skipped. Align your LinkedIn to the exact role you want, get a personalized roadmap of what to fix, and watch your inbound offers increase.
           </p>
 
-          <div className="app-form-stack space-y-4">
+          <div className="app-form-stack scroll-mt-24 space-y-4" id="profile-intake">
             {error ? <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">{error}</Card> : null}
             <Field label="Your LinkedIn profile URL">
               <Input
