@@ -1,0 +1,46 @@
+<svg width="492" height="454" viewBox="0 0 492 454" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="492" y2="454" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22172c"/>
+      <stop offset="0.48" stop-color="#30243a"/>
+      <stop offset="1" stop-color="#4b243e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(342 346) rotate(149) scale(271 205)">
+      <stop stop-color="#d08ae2" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#1c1425" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <rect width="492" height="454" fill="url(#bg)"/>
+  <rect width="492" height="454" fill="url(#glow)"/>
+  <g opacity="0.35" filter="url(#soft)">
+    <circle cx="128" cy="148" r="52" fill="#654060"/>
+    <circle cx="274" cy="210" r="70" fill="#503a52"/>
+    <circle cx="401" cy="130" r="84" fill="#67324d"/>
+    <circle cx="175" cy="327" r="96" fill="#352f45"/>
+  </g>
+  <text x="246" y="104" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="35" font-weight="800" fill="#ffffff" stroke="#111018" stroke-width="6" paint-order="stroke" filter="url(#shadow)">The big leagues</text>
+  <g opacity="0.92" fill="#ffffff">
+    <g transform="translate(109 238)">
+      <circle cx="0" cy="0" r="9"/>
+      <path d="M-14 8C-14 -10 14 -10 14 8" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+      <rect x="-12" y="-19" width="6" height="14" rx="3"/>
+      <rect x="6" y="-19" width="6" height="14" rx="3"/>
+      <rect x="-4" y="-25" width="8" height="14" rx="4"/>
+    </g>
+    <path d="M363 220C363 207.85 375.55 198 391.04 198C406.54 198 419.09 207.85 419.09 220C419.09 232.15 406.54 242 391.04 242C387.19 242 383.51 241.4 380.16 240.3L366.48 246.9L370.48 235.1C365.84 231.12 363 225.86 363 220Z"/>
+  </g>
+  <text x="107" y="292" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#e9e6ee" opacity="0.9">Remind Me</text>
+  <text x="390" y="292" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#e9e6ee" opacity="0.9">Message</text>
+  <g filter="url(#shadow)">
+    <rect x="61" y="356" width="370" height="84" rx="42" fill="#d996df"/>
+    <rect x="67" y="362" width="72" height="72" rx="36" fill="#f3f3f0"/>
+    <path d="M96.86 389.88C102.48 404.7 112.73 415.06 126.38 420.58C130.07 422.08 134.28 419.64 135.15 415.74L136.05 411.73C136.54 409.55 135.45 407.31 133.46 406.28L121.06 399.83C119.08 398.8 116.65 399.27 115.18 400.95L111.97 404.61C107.85 401.55 104.69 397.39 102.27 391.84L106.91 389.74C108.89 388.84 110.05 386.74 109.71 384.6L107.59 371.22C107.24 368.97 105.3 367.31 103.03 367.31H98.69C94.69 367.31 91.62 370.95 92.45 374.87C93.53 379.98 94.88 384.98 96.86 389.88Z" fill="#3fd36a"/>
+    <text x="249" y="407" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="500" fill="#3e2341" opacity="0.86">slide to answer</text>
+  </g>
+</svg>

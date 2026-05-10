@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, FileText, Sparkles } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ReactNode } from "react";
@@ -133,6 +134,17 @@ export default function HomePage() {
               Profile Analyzer
             </div>
             <Sparkles className="h-5 w-5 text-teal-600" />
+          </div>
+
+          <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-xl">
+            <Image
+              alt="The big leagues"
+              className="h-auto w-full object-cover"
+              height={454}
+              priority
+              src="/big-leagues.svg"
+              width={492}
+            />
           </div>
 
           <h1 className="text-[2.55rem] font-black leading-[1.06] text-slate-950">Get Recruited, Don&apos;t Just Apply.</h1>
