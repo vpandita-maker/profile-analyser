@@ -1,12 +1,71 @@
 "use client";
 
-import { FileText, Sparkles } from "lucide-react";
+import { ArrowRight, FileText, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
+import { useAnalyzerStore } from "@/lib/store";
+import type { LinkedInProfile } from "@/lib/types";
 
 export default function HomePage() {
   const router = useRouter();
+  const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
+  const resetContext = useAnalyzerStore((state) => state.resetContext);
+  const clearAnalysis = useAnalyzerStore((state) => state.clearAnalysis);
+  const [profileUrl, setProfileUrl] = useState("");
+  const [scraping, setScraping] = useState(false);
+  const [error, setError] = useState("");
+
+  async function analyzeProfile() {
+    const trimmedUrl = profileUrl.trim();
+
+    if (!trimmedUrl) {
+      return;
+    }
+
+    setError("");
+    setScraping(true);
+
+    try {
+      const response = await fetch("/api/profile/scrape", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileUrl: trimmedUrl })
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Could not import this profile automatically.");
+        return;
+      }
+
+      const importedProfile = normalizeLinkedInProfile({
+        ...data.profile,
+        linkedinId: data.profile.linkedinId || "profile-user",
+        profileUrl: data.profile.profileUrl || trimmedUrl,
+        name: data.profile.name || "LinkedIn Member",
+        importSource: "scrape"
+      } satisfies LinkedInProfile);
+
+      resetContext();
+      clearAnalysis();
+      setLinkedinData(importedProfile || ({
+        ...data.profile,
+        linkedinId: data.profile.linkedinId || "profile-user",
+        profileUrl: trimmedUrl,
+        name: data.profile.name || "LinkedIn Member",
+        importSource: "scrape"
+      } satisfies LinkedInProfile));
+      router.push("/questions");
+    } catch {
+      setError("Could not import this profile automatically. Please check the URL and try again.");
+    } finally {
+      setScraping(false);
+    }
+  }
 
   return (
     <main className="safe-bottom min-h-dvh bg-slate-50 px-4 py-5">
@@ -26,6 +85,25 @@ export default function HomePage() {
           <p className="mt-4 text-base leading-7 text-slate-600">
             Add your LinkedIn profile URL, tell us the role you are targeting, and get a personalized analysis with specific fixes for recruiters, referrals, and applications.
           </p>
+
+          <div className="mt-8 space-y-3">
+            {error ? <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">{error}</Card> : null}
+            <Input
+              inputMode="url"
+              onChange={(event) => setProfileUrl(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  void analyzeProfile();
+                }
+              }}
+              placeholder="Add your LinkedIn profile link here"
+              value={profileUrl}
+            />
+            <Button disabled={!profileUrl.trim() || scraping} loading={scraping} onClick={analyzeProfile}>
+              Analyze My Profile
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -45,10 +123,6 @@ export default function HomePage() {
               </div>
             </div>
           </Card>
-          <Button onClick={() => router.push("/profile-import")}>
-            <FileText className="h-5 w-5" />
-            Analyze My Profile
-          </Button>
         </div>
       </section>
     </main>
