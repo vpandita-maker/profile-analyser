@@ -136,10 +136,10 @@ export default function HomePage() {
             <Sparkles className="h-5 w-5 text-teal-600" />
           </div>
 
-          <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-xl">
+          <div className="group mx-auto mb-6 max-w-[250px] overflow-hidden rounded-2xl border-2 border-slate-200 bg-slate-900 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-100 sm:max-w-[270px]">
             <Image
               alt="The big leagues"
-              className="h-auto w-full object-cover"
+              className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
               height={454}
               priority
               src="/big-leagues.svg"
