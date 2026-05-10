@@ -130,7 +130,7 @@ export default function HomePage() {
     <main className="app-screen safe-bottom">
       <section className="app-container app-flow">
         <div>
-          <div className="sticky top-3 z-20 mb-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/90 p-2 pl-3 shadow-lg shadow-slate-200/60 backdrop-blur">
+          <div className="topbar-float sticky top-3 z-20 mb-6 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/90 p-2 pl-3 shadow-lg shadow-slate-200/60 backdrop-blur">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
                 <FileText className="h-4 w-4" />
@@ -138,7 +138,7 @@ export default function HomePage() {
               Profile Analyzer
             </div>
             <button
-              className="inline-flex h-8 items-center gap-1 rounded-lg bg-teal-600 px-3 text-xs font-black text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-teal-700 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+              className="try-now-btn inline-flex h-8 items-center gap-1 rounded-lg bg-teal-600 px-3 text-xs font-black text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-teal-700 active:translate-y-0 active:scale-[0.97]"
               onClick={scrollToForm}
               type="button"
             >
