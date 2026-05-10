@@ -138,7 +138,7 @@ export default function HomePage() {
               Profile Analyzer
             </div>
             <button
-              className="inline-flex h-9 items-center gap-1 rounded-full bg-slate-950 px-4 text-sm font-black text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-teal-700 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+              className="inline-flex h-8 items-center gap-1 rounded-lg bg-teal-600 px-3 text-xs font-black text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-teal-700 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
               onClick={scrollToForm}
               type="button"
             >
