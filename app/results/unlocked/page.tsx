@@ -166,7 +166,7 @@ export default function UnlockedResultsPage() {
           )}
 
           {visibleFixes.length > 0 && (
-            <div className="mb-5 space-y-3">
+            <div className="mb-2 space-y-3">
               {visibleFixes.map((fix) => (
                 <FixCard key={fix.title} fix={fix} />
               ))}
@@ -174,7 +174,7 @@ export default function UnlockedResultsPage() {
           )}
 
           {lockedFixes.length > 0 && (
-            <div className="mb-6">
+            <div className="mb-4">
               {isFullyUnlocked ? (
                 <div className="space-y-3">
                   {lockedFixes.map((fix) => (
@@ -188,7 +188,7 @@ export default function UnlockedResultsPage() {
                       <FixCard key={fix.title} fix={fix} />
                     ))}
                   </div>
-                  <div className="mt-2 rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 space-y-4">
+                  <div className="mt-1 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 space-y-3">
                     <div className="flex items-center gap-2">
                       <LockKeyhole className="h-5 w-5 text-teal-600" />
                       <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
