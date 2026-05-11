@@ -117,10 +117,8 @@ export default function UnlockedResultsPage() {
     return <Loading label="Preparing your personalized fixes" />;
   }
 
-  const visibleFixes = hasFixes
-    ? [...analysis.topFixes, ...analysis.secondaryFixes.slice(0, 1)]
-    : [];
-  const lockedFixes = hasFixes ? analysis.secondaryFixes.slice(1) : [];
+  const visibleFixes = hasFixes ? analysis.topFixes : [];
+  const lockedFixes = hasFixes ? analysis.secondaryFixes.slice(0, 2) : [];
 
   return (
     <main className="app-screen safe-bottom">
@@ -145,8 +143,8 @@ export default function UnlockedResultsPage() {
 
           {visibleFixes.length > 0 && (
             <div className="mb-5 space-y-3">
-              {visibleFixes.map((fix, index) => (
-                <FixCard key={fix.title} fix={fix} defaultOpen={index === 0} />
+              {visibleFixes.map((fix) => (
+                <FixCard key={fix.title} fix={fix} />
               ))}
             </div>
           )}

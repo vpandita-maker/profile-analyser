@@ -18,7 +18,7 @@ export function FixCard({ fix, defaultOpen = false }: { fix: FixItem; defaultOpe
   }
 
   return (
-    <article className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <article className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:ring-slate-300">
       <button className="flex w-full items-start justify-between gap-3 text-left" onClick={() => setOpen((value) => !value)}>
         <div>
           <h3 className="text-base font-bold text-slate-950">{fix.title}</h3>
