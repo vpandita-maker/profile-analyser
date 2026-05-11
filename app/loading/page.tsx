@@ -14,6 +14,7 @@ export default function AnalysisLoadingPage() {
   const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
   const setPreviousScore = useAnalyzerStore((state) => state.setPreviousScore);
+  const pushScoreHistory = useAnalyzerStore((state) => state.pushScoreHistory);
 
   useEffect(() => {
     if (analysis) {
@@ -46,12 +47,16 @@ export default function AnalysisLoadingPage() {
         setPreviousScore(data.previousScore);
       }
       setAnalysis(data.analysis, data.analysisId);
+      const newScore = data.analysis?.overallScore;
+      if (typeof newScore === "number") {
+        pushScoreHistory(newScore);
+      }
       const { userEmail } = useAnalyzerStore.getState();
       router.replace(userEmail ? "/results" : "/email-gate");
     }
 
     void runAnalysis();
-  }, [analysis, contextAnswers, profile, router, setAnalysis, setLinkedinData, setPreviousScore]);
+  }, [analysis, contextAnswers, profile, router, setAnalysis, setLinkedinData, setPreviousScore, pushScoreHistory]);
 
   return <Loading label="Building your personalized profile analysis" />;
 }

@@ -22,6 +22,11 @@ const emptyContext: ContextAnswers = {
   wins: ""
 };
 
+export interface ScoreHistoryEntry {
+  score: number;
+  date: string;
+}
+
 interface AnalyzerState {
   contextAnswers: ContextAnswers;
   linkedinData: LinkedInProfile | null;
@@ -31,6 +36,7 @@ interface AnalyzerState {
   isFullyUnlocked: boolean;
   userEmail: string | null;
   previousScore: number | null;
+  scoreHistory: ScoreHistoryEntry[];
   setContextAnswers: (answers: Partial<ContextAnswers>) => void;
   toggleChallenge: (challenge: string) => void;
   setLinkedinData: (profile: LinkedInProfile) => void;
@@ -41,6 +47,7 @@ interface AnalyzerState {
   setFullyUnlocked: (value: boolean) => void;
   setUserEmail: (email: string) => void;
   setPreviousScore: (score: number | null) => void;
+  pushScoreHistory: (score: number) => void;
   resetContext: () => void;
 }
 
@@ -65,6 +72,7 @@ export const useAnalyzerStore = create<AnalyzerState>()(
       isFullyUnlocked: false,
       userEmail: null,
       previousScore: null,
+      scoreHistory: [],
       setContextAnswers: (answers) => set((state) => ({ contextAnswers: { ...state.contextAnswers, ...answers } })),
       toggleChallenge: (challenge) =>
         set((state) => {
@@ -101,6 +109,12 @@ export const useAnalyzerStore = create<AnalyzerState>()(
       setFullyUnlocked: (value) => set({ isFullyUnlocked: value }),
       setUserEmail: (email) => set({ userEmail: email }),
       setPreviousScore: (score) => set({ previousScore: score }),
+      pushScoreHistory: (score) =>
+        set((state) => {
+          const last = state.scoreHistory[state.scoreHistory.length - 1];
+          if (last && last.score === score) return {};
+          return { scoreHistory: [...state.scoreHistory, { score, date: new Date().toISOString() }] };
+        }),
       resetContext: () => set({ contextAnswers: emptyContext })
     }),
     { name: "linkedin-analyzer-store" }

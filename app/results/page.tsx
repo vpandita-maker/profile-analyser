@@ -10,12 +10,16 @@ import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
+function formatHistoryDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default function ResultsPage() {
   const router = useRouter();
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
-  const previousScore = useAnalyzerStore((state) => state.previousScore);
-  const scoreDelta = previousScore !== null && analysis ? analysis.overallScore - previousScore : null;
+  const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
 
   if (!analysis) {
     return (
@@ -52,15 +56,37 @@ export default function ResultsPage() {
           </div>
         </div>
         <div className="py-2">
-          {scoreDelta !== null && scoreDelta !== 0 && (
-            <div
-              className={cn(
-                "mb-4 rounded-lg px-4 py-3 text-sm font-bold",
-                scoreDelta > 0 ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"
-              )}
-            >
-              {scoreDelta > 0 ? "↑" : "↓"} Score {scoreDelta > 0 ? "improved" : "changed"} from {previousScore} → {analysis.overallScore} ({scoreDelta > 0 ? "+" : ""}{scoreDelta} pts) since your last analysis
-            </div>
+          {scoreHistory.length >= 2 && (
+            <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+              <p className="mb-3 text-sm font-black text-slate-950">Your Progress</p>
+              <div className="flex items-end gap-1 overflow-x-auto pb-1">
+                {scoreHistory.map((entry, i) => {
+                  const isCurrent = i === scoreHistory.length - 1;
+                  const prev = scoreHistory[i - 1];
+                  const delta = prev ? entry.score - prev.score : null;
+                  return (
+                    <div key={entry.date} className="flex items-end gap-1">
+                      {i > 0 && (
+                        <span className={cn("mb-5 shrink-0 text-xs font-bold", delta && delta > 0 ? "text-emerald-500" : delta && delta < 0 ? "text-red-400" : "text-slate-300")}>
+                          {delta && delta > 0 ? "↗" : delta && delta < 0 ? "↘" : "→"}
+                        </span>
+                      )}
+                      <div className="flex shrink-0 flex-col items-center gap-1">
+                        <div
+                          className={cn(
+                            "flex h-10 w-10 items-center justify-center rounded-full text-sm font-black",
+                            isCurrent ? "bg-teal-600 text-white shadow-md" : "bg-slate-100 text-slate-600"
+                          )}
+                        >
+                          {entry.score}
+                        </div>
+                        <span className="text-xs text-slate-400">{formatHistoryDate(entry.date)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           )}
 
           <section className="mb-6 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">

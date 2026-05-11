@@ -53,7 +53,7 @@ export default function EmailGatePage() {
             {firstName}, your LinkedIn score is {analysis.overallScore}/100
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Enter your email to track your progress and get tips as you improve your profile.
+            Save your email so we can notify you as your score improves each time you re-analyze.
           </p>
         </div>
         <div className="space-y-3">
