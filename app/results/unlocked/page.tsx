@@ -118,6 +118,9 @@ export default function UnlockedResultsPage() {
 
   const visibleFixes = hasFixes ? analysis.topFixes : [];
   const lockedFixes = hasFixes ? analysis.secondaryFixes.slice(0, 2) : [];
+  const allFixes = [...visibleFixes, ...lockedFixes];
+  const totalBump = allFixes.reduce((sum, fix) => sum + (fix.scoreBump ?? 0), 0);
+  const projectedScore = Math.min(100, analysis.overallScore + totalBump);
 
   return (
     <main className="app-screen safe-bottom">
@@ -143,13 +146,23 @@ export default function UnlockedResultsPage() {
           </div>
         </div>
         <div className="py-5">
-          <section className="mb-5 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
-            <div>
-              <Badge tone="teal">Fixes Unlocked</Badge>
-              <h1 className="mt-2 text-2xl font-black text-slate-950">Your Personalized Fixes</h1>
-              <p className="mt-1 text-xs font-semibold text-slate-500">Overall score out of 100</p>
+          <section className="mb-5 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+            <div className="flex items-start justify-between">
+              <div>
+                <Badge tone="teal">Fixes Unlocked</Badge>
+                <h1 className="mt-2 text-2xl font-black text-slate-950">Your Personalized Fixes</h1>
+                <p className="mt-1 text-xs font-semibold text-slate-500">Current score out of 100</p>
+              </div>
+              <ScoreBadge score={analysis.overallScore} />
             </div>
-            <ScoreBadge score={analysis.overallScore} />
+            {totalBump > 0 && (
+              <div className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2">
+                <span className="text-xs font-semibold text-slate-500">Apply all fixes</span>
+                <span className="text-xs text-slate-400">→</span>
+                <span className="text-sm font-black text-emerald-700">up to {projectedScore} / 100</span>
+                <span className="ml-auto text-xs font-bold text-emerald-600">+{totalBump} pts</span>
+              </div>
+            )}
           </section>
 
           {!hasFixes && (
@@ -177,13 +190,13 @@ export default function UnlockedResultsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div>
                   <div className="pointer-events-none select-none space-y-3 opacity-30 blur-sm">
                     {lockedFixes.map((fix) => (
                       <FixCard key={fix.title} fix={fix} />
                     ))}
                   </div>
-                  <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 space-y-4">
+                  <div className="mt-2 rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 space-y-4">
                     <div className="flex items-center gap-2">
                       <LockKeyhole className="h-5 w-5 text-teal-600" />
                       <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
