@@ -135,7 +135,7 @@ export default function HomePage() {
     <main className="app-screen safe-bottom">
       <section className="app-container app-flow">
         <div>
-          <div className="sticky top-3 z-20 mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white/90 shadow-lg shadow-slate-200/60 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/80">
+          <div className="sticky top-0 z-20 mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white/90 shadow-lg shadow-slate-200/60 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/80">
             <div className="flex items-center justify-between p-2 pl-3">
               <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
@@ -143,21 +143,14 @@ export default function HomePage() {
                 </span>
                 Profile Analyzer
               </div>
-              <div className="flex items-center gap-2">
-                {progress > 0 && (
-                  <span className="text-xs font-bold tabular-nums text-teal-700">
-                    {filledCount}/6
-                  </span>
-                )}
-                <button
-                  className="try-now-btn inline-flex h-8 items-center gap-1 rounded-lg bg-teal-600 px-3 text-xs font-black text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-teal-700 active:translate-y-0 active:scale-[0.97]"
-                  onClick={scrollToForm}
-                  type="button"
-                >
-                  Try Now
-                  <Sparkles className="h-3.5 w-3.5" />
-                </button>
-              </div>
+              <button
+                className="try-now-btn inline-flex h-8 items-center gap-1 rounded-lg bg-teal-600 px-3 text-xs font-black text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-teal-700 active:translate-y-0 active:scale-[0.97]"
+                onClick={scrollToForm}
+                type="button"
+              >
+                Try Now
+                <Sparkles className="h-3.5 w-3.5" />
+              </button>
             </div>
             {progress > 0 && (
               <div className="h-1 bg-slate-100">
