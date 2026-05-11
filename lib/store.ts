@@ -47,6 +47,7 @@ interface AnalyzerState {
   setFullyUnlocked: (value: boolean) => void;
   setUserEmail: (email: string) => void;
   setPreviousScore: (score: number | null) => void;
+  setScoreHistory: (history: ScoreHistoryEntry[]) => void;
   pushScoreHistory: (score: number) => void;
   resetContext: () => void;
 }
@@ -109,6 +110,7 @@ export const useAnalyzerStore = create<AnalyzerState>()(
       setFullyUnlocked: (value) => set({ isFullyUnlocked: value }),
       setUserEmail: (email) => set({ userEmail: email }),
       setPreviousScore: (score) => set({ previousScore: score }),
+      setScoreHistory: (history) => set({ scoreHistory: history }),
       pushScoreHistory: (score) =>
         set((state) => {
           const last = state.scoreHistory[state.scoreHistory.length - 1];

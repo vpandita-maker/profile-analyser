@@ -41,6 +41,15 @@ CREATE INDEX idx_invites_analysis_id ON invites(analysis_id);
 CREATE INDEX idx_invites_friend_email ON invites(friend_email);
 CREATE INDEX idx_leaderboard_goal_geo_score ON leaderboard(goal, geography, overall_score DESC);
 
+CREATE TABLE IF NOT EXISTS score_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  linkedin_id TEXT NOT NULL,
+  score INT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_score_history_linkedin_id ON score_history(linkedin_id);
+
 -- Migrations: run these in Supabase SQL Editor if the tables already exist
 -- ALTER TABLE analyses ADD COLUMN IF NOT EXISTS user_email TEXT;
 -- ALTER TABLE leaderboard ADD COLUMN IF NOT EXISTS industry TEXT;
