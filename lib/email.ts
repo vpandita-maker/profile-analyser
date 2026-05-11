@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 interface InviteEmailInput {
   friendEmail: string;
   inviteToken: string;
+  inviterName?: string;
 }
 
 function appUrl() {
@@ -11,7 +12,7 @@ function appUrl() {
   return "https://profile-analyser.vercel.app";
 }
 
-export async function sendInviteEmail({ friendEmail, inviteToken }: InviteEmailInput) {
+export async function sendInviteEmail({ friendEmail, inviteToken, inviterName }: InviteEmailInput) {
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;
 
@@ -25,18 +26,21 @@ export async function sendInviteEmail({ friendEmail, inviteToken }: InviteEmailI
     auth: { user, pass }
   });
 
+  const sender = inviterName || "Someone";
+  const subject = `${sender} invited you to supercharge your LinkedIn`;
+
   await transporter.sendMail({
-    from: `"Profile Analyzer" <${user}>`,
+    from: `"Profile Analyser" <${user}>`,
     to: friendEmail,
-    subject: "You have been invited to try Profile Analyzer",
-    text: `You have been invited to try Profile Analyzer.\n\nOpen this link to start:\n${inviteUrl}\n\nAdd your LinkedIn profile URL, answer a few questions, and get expert profile analysis with specific fixes.`,
+    subject,
+    text: `Hi,\n\n${sender} has invited you to sign up for Profile Analyser — the free tool that helps you supercharge your LinkedIn to get hired at your dream role.\n\nTry it now:\n${inviteUrl}`,
     html: `
-      <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6;">
-        <h2 style="margin: 0 0 12px;">You have been invited to try Profile Analyzer</h2>
-        <p>Add your LinkedIn profile URL, answer a few questions, and get expert profile analysis with specific fixes.</p>
+      <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6; max-width: 480px;">
+        <p style="margin: 0 0 8px; font-size: 15px;">Hi,</p>
+        <p style="margin: 0 0 20px; font-size: 15px;"><strong>${sender}</strong> has invited you to sign up for <strong>Profile Analyser</strong> — the free tool that helps you supercharge your LinkedIn to get hired at your dream role.</p>
         <p>
-          <a href="${inviteUrl}" style="display: inline-block; background: #0f9f8f; color: white; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">
-            Start your review
+          <a href="${inviteUrl}" style="display: inline-block; background: #0d9488; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 800; font-size: 15px; letter-spacing: 0.5px;">
+            TRY NOW
           </a>
         </p>
       </div>

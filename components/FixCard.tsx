@@ -22,9 +22,14 @@ export function FixCard({ fix, defaultOpen = false }: { fix: FixItem; defaultOpe
       <button className="flex w-full items-start justify-between gap-3 text-left" onClick={() => setOpen((value) => !value)}>
         <div>
           <h3 className="text-base font-bold text-slate-950">{fix.title}</h3>
-          <Badge tone={fix.difficulty === "Easy" ? "green" : fix.difficulty === "Hard" ? "red" : "amber"} className="mt-2">
-            {fix.difficulty}
-          </Badge>
+          <div className="mt-2 flex items-center gap-2">
+            <Badge tone={fix.difficulty === "Easy" ? "green" : fix.difficulty === "Hard" ? "red" : "amber"}>
+              {fix.difficulty}
+            </Badge>
+            {fix.scoreBump ? (
+              <span className="text-xs font-bold text-emerald-600">+{fix.scoreBump} pts</span>
+            ) : null}
+          </div>
         </div>
         <ChevronDown className={cn("mt-1 h-5 w-5 shrink-0 text-slate-400 transition", open && "rotate-180")} />
       </button>

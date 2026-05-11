@@ -6,7 +6,8 @@ import { isEmail } from "@/lib/utils";
 
 const inviteSchema = z.object({
   analysisId: z.string().min(1),
-  friendEmail: z.string().email()
+  friendEmail: z.string().email(),
+  inviterName: z.string().optional()
 });
 
 export async function POST(request: Request) {
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const email = await sendInviteEmail({ friendEmail: body.friendEmail.toLowerCase(), inviteToken });
+    const email = await sendInviteEmail({ friendEmail: body.friendEmail.toLowerCase(), inviteToken, inviterName: body.inviterName });
     return NextResponse.json({ inviteId: savedInviteId, status: "sent", unlocked: true, email });
   } catch (error) {
     console.error("Invite email failed", error);

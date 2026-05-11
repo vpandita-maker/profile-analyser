@@ -28,6 +28,7 @@ interface AnalyzerState {
   analysis: AnalysisResult | null;
   analysisId: string | null;
   isUnlocked: boolean;
+  isFullyUnlocked: boolean;
   setContextAnswers: (answers: Partial<ContextAnswers>) => void;
   toggleChallenge: (challenge: string) => void;
   setLinkedinData: (profile: LinkedInProfile) => void;
@@ -35,6 +36,7 @@ interface AnalyzerState {
   setAnalysis: (analysis: AnalysisResult, analysisId: string) => void;
   clearAnalysis: () => void;
   setUnlocked: (value: boolean) => void;
+  setFullyUnlocked: (value: boolean) => void;
   resetContext: () => void;
 }
 
@@ -56,6 +58,7 @@ export const useAnalyzerStore = create<AnalyzerState>()(
       analysis: null,
       analysisId: null,
       isUnlocked: false,
+      isFullyUnlocked: false,
       setContextAnswers: (answers) => set((state) => ({ contextAnswers: { ...state.contextAnswers, ...answers } })),
       toggleChallenge: (challenge) =>
         set((state) => {
@@ -87,8 +90,9 @@ export const useAnalyzerStore = create<AnalyzerState>()(
           } as LinkedInProfile)
         })),
       setAnalysis: (analysis, analysisId) => set({ analysis, analysisId }),
-      clearAnalysis: () => set({ analysis: null, analysisId: null, isUnlocked: false }),
+      clearAnalysis: () => set({ analysis: null, analysisId: null, isUnlocked: false, isFullyUnlocked: false }),
       setUnlocked: (value) => set({ isUnlocked: value }),
+      setFullyUnlocked: (value) => set({ isFullyUnlocked: value }),
       resetContext: () => set({ contextAnswers: emptyContext })
     }),
     { name: "linkedin-analyzer-store" }

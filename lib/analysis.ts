@@ -25,7 +25,8 @@ function cleanFix(value: unknown, fallbackTitle: string): FixItem {
     current: typeof fix.current === "string" && fix.current.trim() ? fix.current : "Not enough current text was found.",
     recommended: typeof fix.recommended === "string" && fix.recommended.trim() ? fix.recommended : "Add a clearer role target, proof of impact, and keywords that match the jobs or internships you want.",
     whyMatters: typeof fix.whyMatters === "string" && fix.whyMatters.trim() ? fix.whyMatters : "Recruiters need a fast signal that your profile matches the opportunity you are targeting.",
-    difficulty: typeof fix.difficulty === "string" && fix.difficulty.trim() ? fix.difficulty : "Easy"
+    difficulty: typeof fix.difficulty === "string" && fix.difficulty.trim() ? fix.difficulty : "Easy",
+    scoreBump: typeof fix.scoreBump === "number" && fix.scoreBump > 0 ? Math.min(20, Math.round(fix.scoreBump)) : undefined
   };
 }
 

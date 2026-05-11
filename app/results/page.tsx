@@ -67,7 +67,7 @@ export default function ResultsPage() {
           ) : (
             <Button onClick={() => setShareOpen(true)}>
               <LockKeyhole className="h-4 w-4" />
-              Share to Unlock Your Fixes
+              Check Your Solutions
             </Button>
           )}
         </div>

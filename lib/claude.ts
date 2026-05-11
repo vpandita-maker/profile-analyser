@@ -16,10 +16,11 @@ overallScore from 1 to 100
 categoryScores for headline, about, experience, skills, and positioning, each from 1 to 10
 strengths with 3 to 5 items, each with title, score from 1 to 10, and explanation
 weaknesses with 3 to 5 items, each with title, score from 1 to 10, and explanation
-topFixes with 3 items, each with title, current text, recommended text, why it matters, and difficulty
-secondaryFixes with 2 to 3 items using the same structure
+topFixes with 3 items, each with title, current text, recommended text, why it matters, difficulty, and scoreBump
+secondaryFixes with exactly 3 items using the same structure
 The topFixes must be based on the most important weaknesses. Every topFix must directly repair something that is not working in the profile.
 The secondaryFixes must address lower priority issues or missing profile signals.
+scoreBump is an integer from 1 to 15 representing the estimated improvement to the overall score if the user implements that fix. Headline and About fixes typically range 6 to 12. Experience fixes typically range 5 to 10. Skills and secondary fixes typically range 2 to 6.
 
 Scoring rules:
 The overallScore must be a weighted profile readiness score, not a general impression.
@@ -107,19 +108,20 @@ const analysisTool = {
         }
       },
       topFixes: { type: "array", minItems: 3, maxItems: 3, items: { $ref: "#/$defs/fix" } },
-      secondaryFixes: { type: "array", minItems: 2, maxItems: 3, items: { $ref: "#/$defs/fix" } }
+      secondaryFixes: { type: "array", minItems: 3, maxItems: 3, items: { $ref: "#/$defs/fix" } }
     },
     $defs: {
       fix: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "current", "recommended", "whyMatters", "difficulty"],
+        required: ["title", "current", "recommended", "whyMatters", "difficulty", "scoreBump"],
         properties: {
           title: { type: "string" },
           current: { type: "string" },
           recommended: { type: "string" },
           whyMatters: { type: "string" },
-          difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] }
+          difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
+          scoreBump: { type: "integer", minimum: 1, maximum: 15 }
         }
       }
     }
@@ -248,21 +250,24 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
         current: headlineCurrent,
         recommended: `${role} | ${context.industry || "Target industry"} | Projects, tools, and outcomes aligned to hiring needs`,
         whyMatters: "The headline is the highest visibility surface for recruiter search, profile visits, and referral checks.",
-        difficulty: "Easy"
+        difficulty: "Easy",
+        scoreBump: 10
       },
       {
         title: "Add a proof led About opener",
         current: aboutCurrent,
         recommended: `I am targeting ${role} opportunities in ${context.industry || "my target industry"}. I bring hands on experience with relevant projects, tools, and measurable outcomes that match what hiring teams screen for.`,
         whyMatters: "The first two lines decide whether a recruiter understands your fit before moving to experience.",
-        difficulty: "Medium"
+        difficulty: "Medium",
+        scoreBump: 8
       },
       {
         title: "Turn experience into outcomes",
         current: "Experience reads like responsibilities.",
         recommended: "Use bullets that combine action, scale, metric, and business result.",
         whyMatters: "Outcome bullets make role fit and impact obvious without asking the recruiter to infer it.",
-        difficulty: "Medium"
+        difficulty: "Medium",
+        scoreBump: 7
       }
     ],
     secondaryFixes: [
@@ -271,14 +276,24 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
         current: compactList(profile.skills),
         recommended: `Prioritize skills tied to ${role}, ${context.industry || "your target industry"}, and the job descriptions you want to match.`,
         whyMatters: "Skill ordering influences profile scanning, recruiter search, and keyword matching.",
-        difficulty: "Easy"
+        difficulty: "Easy",
+        scoreBump: 4
       },
       {
         title: "Add credibility markers",
         current: "Credibility signals are not prominent enough.",
         recommended: "Surface awards, shipped projects, coursework, certifications, tools, business outcomes, or employer names where relevant.",
         whyMatters: "Specific credibility markers reduce trust friction for recruiters and referral partners.",
-        difficulty: "Easy"
+        difficulty: "Easy",
+        scoreBump: 3
+      },
+      {
+        title: "Strengthen education and credentials",
+        current: "Education section lacks specific proof points tied to the target role.",
+        recommended: `Add relevant coursework, academic projects, certifications, or honors that align with ${role} expectations.`,
+        whyMatters: "Education signals help recruiters validate your foundation, especially for early career and internship searches.",
+        difficulty: "Easy",
+        scoreBump: 3
       }
     ]
   };

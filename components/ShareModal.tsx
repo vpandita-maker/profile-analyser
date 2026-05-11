@@ -16,6 +16,7 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
   const [error, setError] = useState("");
   const analysisId = useAnalyzerStore((state) => state.analysisId);
   const setUnlocked = useAnalyzerStore((state) => state.setUnlocked);
+  const inviterName = useAnalyzerStore((state) => state.linkedinData?.name);
 
   async function sendInvite() {
     if (!isEmail(email)) return;
@@ -29,7 +30,7 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
       const response = await fetch("/api/invites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId, friendEmail: email })
+        body: JSON.stringify({ analysisId, friendEmail: email, inviterName })
       });
       if (!response.ok) {
         setError("Invite could not be sent. Please try again.");

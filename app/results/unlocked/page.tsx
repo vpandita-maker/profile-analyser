@@ -1,14 +1,16 @@
 "use client";
 
-import { Share2 } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FixCard } from "@/components/FixCard";
 import { Loading } from "@/components/Loading";
 import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
+import { isEmail } from "@/lib/utils";
 
 export default function UnlockedResultsPage() {
   const router = useRouter();
@@ -16,13 +18,21 @@ export default function UnlockedResultsPage() {
   const [introLoading, setIntroLoading] = useState(false);
   const [refreshingFixes, setRefreshingFixes] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
+  const [unlockEmail, setUnlockEmail] = useState("");
+  const [unlocking, setUnlocking] = useState(false);
+  const [unlockSent, setUnlockSent] = useState(false);
+  const [unlockError, setUnlockError] = useState("");
+
   const profile = useAnalyzerStore((state) => state.linkedinData);
   const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
   const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
+  const isFullyUnlocked = useAnalyzerStore((state) => state.isFullyUnlocked);
   const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
+  const setFullyUnlocked = useAnalyzerStore((state) => state.setFullyUnlocked);
+  const analysisId = useAnalyzerStore((state) => state.analysisId);
 
   const hasFixes = Boolean(analysis?.topFixes.length);
 
@@ -57,9 +67,7 @@ export default function UnlockedResultsPage() {
           return;
         }
         const data = await response.json();
-        if (data.profile) {
-          setLinkedinData(data.profile);
-        }
+        if (data.profile) setLinkedinData(data.profile);
         setAnalysis(data.analysis, data.analysisId);
       } catch {
         setRefreshFailed(true);
@@ -70,6 +78,29 @@ export default function UnlockedResultsPage() {
 
     void refreshFixes();
   }, [analysis, contextAnswers, hasFixes, isUnlocked, profile, setAnalysis, setLinkedinData]);
+
+  async function sendUnlockInvite() {
+    if (!isEmail(unlockEmail) || !analysisId) return;
+    setUnlocking(true);
+    setUnlockError("");
+    try {
+      const response = await fetch("/api/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analysisId, friendEmail: unlockEmail, inviterName: profile?.name })
+      });
+      if (!response.ok) {
+        setUnlockError("Invite could not be sent. Please try again.");
+        return;
+      }
+      setUnlockSent(true);
+      window.setTimeout(() => setFullyUnlocked(true), 600);
+    } catch {
+      setUnlockError("Invite could not be sent. Please try again.");
+    } finally {
+      setUnlocking(false);
+    }
+  }
 
   if (!analysis || !isUnlocked) {
     return (
@@ -86,6 +117,11 @@ export default function UnlockedResultsPage() {
     return <Loading label="Preparing your personalized fixes" />;
   }
 
+  const visibleFixes = hasFixes
+    ? [...analysis.topFixes, ...analysis.secondaryFixes.slice(0, 1)]
+    : [];
+  const lockedFixes = hasFixes ? analysis.secondaryFixes.slice(1) : [];
+
   return (
     <main className="app-screen safe-bottom">
       <div className="app-container">
@@ -99,33 +135,72 @@ export default function UnlockedResultsPage() {
             <ScoreBadge score={analysis.overallScore} />
           </section>
 
-          <div className="mb-5 space-y-3">
-            {hasFixes ? (
-              analysis.topFixes.map((fix, index) => <FixCard key={fix.title} fix={fix} defaultOpen={index === 0} />)
-            ) : (
-              <div className="rounded-lg bg-white p-4 text-sm font-semibold leading-6 text-slate-600 shadow-sm ring-1 ring-slate-200">
-                {refreshFailed ? "Your personalized fixes could not be prepared. Please run the analysis again." : "Your personalized fixes are being prepared."}
-              </div>
-            )}
-          </div>
+          {!hasFixes && (
+            <div className="mb-5 rounded-lg bg-white p-4 text-sm font-semibold leading-6 text-slate-600 shadow-sm ring-1 ring-slate-200">
+              {refreshFailed
+                ? "Your personalized fixes could not be prepared. Please run the analysis again."
+                : "Your personalized fixes are being prepared."}
+            </div>
+          )}
 
-          {analysis.secondaryFixes.length ? (
-            <details className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
-              <summary className="cursor-pointer text-sm font-black text-slate-950">Secondary Fixes</summary>
-              <div className="mt-4 space-y-3">
-                {analysis.secondaryFixes.map((fix) => (
-                  <FixCard key={fix.title} fix={fix} />
-                ))}
-              </div>
-            </details>
-          ) : null}
+          {visibleFixes.length > 0 && (
+            <div className="mb-5 space-y-3">
+              {visibleFixes.map((fix, index) => (
+                <FixCard key={fix.title} fix={fix} defaultOpen={index === 0} />
+              ))}
+            </div>
+          )}
 
-          <div className="space-y-3">
-            <Button variant="secondary" onClick={() => router.push("/results")}>
-              <Share2 className="h-4 w-4" />
-              Share Again
-            </Button>
-          </div>
+          {lockedFixes.length > 0 && (
+            <div className="mb-6">
+              {isFullyUnlocked ? (
+                <div className="space-y-3">
+                  {lockedFixes.map((fix) => (
+                    <FixCard key={fix.title} fix={fix} />
+                  ))}
+                </div>
+              ) : (
+                <div className="relative overflow-hidden rounded-xl">
+                  <div className="pointer-events-none select-none space-y-3 opacity-40 blur-sm">
+                    {lockedFixes.map((fix) => (
+                      <FixCard key={fix.title} fix={fix} />
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center p-4">
+                    <div className="w-full rounded-xl bg-white p-5 shadow-lg ring-1 ring-slate-200 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <LockKeyhole className="h-5 w-5 text-teal-600" />
+                        <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
+                      </div>
+                      <p className="text-sm leading-6 text-slate-600">
+                        Invite one more friend to unlock your remaining fixes instantly.
+                      </p>
+                      {unlockError && (
+                        <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{unlockError}</p>
+                      )}
+                      {unlockSent ? (
+                        <div className="rounded-lg bg-teal-50 p-3 text-sm font-semibold text-teal-800">
+                          Invite sent! Unlocking your fixes...
+                        </div>
+                      ) : (
+                        <>
+                          <Input
+                            inputMode="email"
+                            onChange={(e) => setUnlockEmail(e.target.value)}
+                            placeholder="Friend's email"
+                            value={unlockEmail}
+                          />
+                          <Button disabled={!isEmail(unlockEmail)} loading={unlocking} onClick={sendUnlockInvite}>
+                            Send Invite to Unlock
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </main>

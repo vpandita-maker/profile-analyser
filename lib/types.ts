@@ -55,6 +55,7 @@ export interface FixItem {
   recommended: string;
   whyMatters: string;
   difficulty: "Easy" | "Medium" | "Hard" | string;
+  scoreBump?: number;
 }
 
 export interface AnalysisResult {
