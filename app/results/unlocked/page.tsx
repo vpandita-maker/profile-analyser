@@ -160,42 +160,40 @@ export default function UnlockedResultsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="relative overflow-hidden rounded-xl">
-                  <div className="pointer-events-none select-none space-y-3 opacity-40 blur-sm">
+                <div className="space-y-3">
+                  <div className="pointer-events-none select-none space-y-3 opacity-30 blur-sm">
                     {lockedFixes.map((fix) => (
                       <FixCard key={fix.title} fix={fix} />
                     ))}
                   </div>
-                  <div className="absolute inset-0 flex items-center justify-center p-4">
-                    <div className="w-full rounded-xl bg-white p-5 shadow-lg ring-1 ring-slate-200 space-y-3">
-                      <div className="flex items-center gap-2">
-                        <LockKeyhole className="h-5 w-5 text-teal-600" />
-                        <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
-                      </div>
-                      <p className="text-sm leading-6 text-slate-600">
-                        Invite one more friend to unlock your remaining fixes instantly.
-                      </p>
-                      {unlockError && (
-                        <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{unlockError}</p>
-                      )}
-                      {unlockSent ? (
-                        <div className="rounded-lg bg-teal-50 p-3 text-sm font-semibold text-teal-800">
-                          Invite sent! Unlocking your fixes...
-                        </div>
-                      ) : (
-                        <>
-                          <Input
-                            inputMode="email"
-                            onChange={(e) => setUnlockEmail(e.target.value)}
-                            placeholder="Friend's email"
-                            value={unlockEmail}
-                          />
-                          <Button disabled={!isEmail(unlockEmail)} loading={unlocking} onClick={sendUnlockInvite}>
-                            Send Invite to Unlock
-                          </Button>
-                        </>
-                      )}
+                  <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <LockKeyhole className="h-5 w-5 text-teal-600" />
+                      <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
                     </div>
+                    <p className="text-sm leading-6 text-slate-600">
+                      Invite one more friend to unlock your remaining fixes instantly.
+                    </p>
+                    {unlockError && (
+                      <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{unlockError}</p>
+                    )}
+                    {unlockSent ? (
+                      <div className="rounded-lg bg-teal-50 p-3 text-sm font-semibold text-teal-800">
+                        Invite sent! Unlocking your fixes...
+                      </div>
+                    ) : (
+                      <>
+                        <Input
+                          inputMode="email"
+                          onChange={(e) => setUnlockEmail(e.target.value)}
+                          placeholder="Friend's email"
+                          value={unlockEmail}
+                        />
+                        <Button disabled={!isEmail(unlockEmail)} loading={unlocking} onClick={sendUnlockInvite}>
+                          Send Invite to Unlock
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
