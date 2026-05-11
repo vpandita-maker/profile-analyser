@@ -39,7 +39,7 @@ export default function LeaderboardPage() {
 
     const params = new URLSearchParams({
       goal: contextAnswers.goal || "Job Search",
-      geography: contextAnswers.geography || "",
+      industry: contextAnswers.industry || "",
       linkedinId: profile?.linkedinId || ""
     });
 
@@ -56,8 +56,8 @@ export default function LeaderboardPage() {
   const { entries, userRank, total } = data;
   const userLinkedinId = profile?.linkedinId;
   const goal = contextAnswers.goal || "Job Search";
-  const geography = contextAnswers.geography;
-  const geoLabel = geography && geography !== "Other" ? ` in ${geography}` : "";
+  const industry = contextAnswers.industry;
+  const industryLabel = industry && industry !== "Other" ? ` in ${industry}` : "";
   const categoryLabel = goal === "Internship Search" ? "Intern Seekers" : "Job Seekers";
 
   const rankColor = (index: number) => {
@@ -93,7 +93,7 @@ export default function LeaderboardPage() {
               <>
                 <p className="text-5xl font-black">#{userRank}</p>
                 <p className="mt-1 text-sm text-teal-100">
-                  out of {total} {categoryLabel}{geoLabel}
+                  out of {total} {categoryLabel}{industryLabel}
                 </p>
               </>
             ) : (

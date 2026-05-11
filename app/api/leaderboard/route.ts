@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const goal = searchParams.get("goal") || "Job Search";
-  const geography = searchParams.get("geography") || "";
+  const industry = searchParams.get("industry") || "";
   const linkedinId = searchParams.get("linkedinId") || "";
 
   const supabase = getSupabaseAdmin();
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ entries: [], userRank: null, total: 0 });
   }
 
-  const geoFilter = geography && geography !== "Other" ? geography : null;
+  const industryFilter = industry && industry !== "Other" ? industry : null;
 
   let entriesQuery = supabase
     .from("leaderboard")
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     .order("overall_score", { ascending: false })
     .limit(20);
 
-  if (geoFilter) entriesQuery = entriesQuery.eq("geography", geoFilter);
+  if (industryFilter) entriesQuery = entriesQuery.eq("industry", industryFilter);
 
   const { data: entries } = await entriesQuery;
 
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     .eq("is_public", true)
     .eq("goal", goal);
 
-  if (geoFilter) totalQuery = totalQuery.eq("geography", geoFilter);
+  if (industryFilter) totalQuery = totalQuery.eq("industry", industryFilter);
 
   const { count: total } = await totalQuery;
 
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
         .eq("goal", goal)
         .gt("overall_score", userEntry.overall_score);
 
-      if (geoFilter) rankQuery = rankQuery.eq("geography", geoFilter);
+      if (industryFilter) rankQuery = rankQuery.eq("industry", industryFilter);
 
       const { count: rankCount } = await rankQuery;
       userRank = (rankCount ?? 0) + 1;

@@ -107,6 +107,7 @@ export async function POST(request: Request) {
         goal: contextAnswers.goal || "Job Search",
         geography: contextAnswers.geography || "Other",
         seniority: contextAnswers.seniority || "",
+        industry: contextAnswers.industry || "",
         is_public: true
       },
       { onConflict: "user_id" }

@@ -7,13 +7,31 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input, Textarea } from "@/components/ui/Input";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { ContextAnswers, LinkedInProfile, WorkPreference } from "@/lib/types";
 
 const workPreferences: WorkPreference[] = ["Remote", "Hybrid", "In office"];
+
+const INDUSTRIES = [
+  "Technology",
+  "Finance & Banking",
+  "Consulting",
+  "Healthcare",
+  "Marketing & Advertising",
+  "E-commerce & Retail",
+  "Media & Entertainment",
+  "Education",
+  "Energy & Utilities",
+  "Manufacturing",
+  "Government & Public Sector",
+  "Legal",
+  "Real Estate",
+  "Insurance",
+  "Other"
+];
 
 function inferGoal(role: string): ContextAnswers["goal"] {
   const normalized = role.toLowerCase();
@@ -196,11 +214,15 @@ export default function HomePage() {
               />
             </Field>
             <Field label="What is your preferred industry?">
-              <Input
+              <Select
                 onChange={(event) => setPreferredIndustry(event.target.value)}
-                placeholder="Consulting, fintech, healthcare, SaaS"
                 value={preferredIndustry}
-              />
+              >
+                <option value="">Select an industry</option>
+                {INDUSTRIES.map((industry) => (
+                  <option key={industry} value={industry}>{industry}</option>
+                ))}
+              </Select>
             </Field>
             <Field label="What is your dream company?">
               <Input
