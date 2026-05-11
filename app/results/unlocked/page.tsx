@@ -118,6 +118,7 @@ export default function UnlockedResultsPage() {
 
   const visibleFixes = hasFixes ? analysis.topFixes : [];
   const lockedFixes = hasFixes ? analysis.secondaryFixes.slice(0, 2) : [];
+  const blurredPreview = lockedFixes.slice(0, 1);
   const allFixes = [...visibleFixes, ...lockedFixes];
   const bumpFor = (fix: { scoreBump?: number; difficulty: string }) =>
     fix.scoreBump ?? (fix.difficulty === "Easy" ? 4 : fix.difficulty === "Hard" ? 8 : 6);
@@ -184,7 +185,7 @@ export default function UnlockedResultsPage() {
               ) : (
                 <div>
                   <div className="pointer-events-none select-none space-y-3 opacity-30 blur-sm">
-                    {lockedFixes.map((fix) => (
+                    {blurredPreview.map((fix) => (
                       <FixCard key={fix.title} fix={fix} />
                     ))}
                   </div>
