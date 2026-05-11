@@ -123,7 +123,7 @@ textarea {
   .phone-shell {
     min-height: 100dvh;
     width: min(100vw, 430px);
-    overflow-x: hidden;
+    overflow-x: clip;
     border-inline: 1px solid rgba(15, 23, 42, 0.1);
     box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06), 0 24px 80px rgba(15, 23, 42, 0.22);
   }
