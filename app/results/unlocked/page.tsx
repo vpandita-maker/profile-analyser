@@ -148,23 +148,13 @@ export default function UnlockedResultsPage() {
           </div>
         </div>
         <div className="py-5">
-          <section className="mb-5 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
-            <div className="flex items-start justify-between">
-              <div>
-                <Badge tone="teal">Fixes Unlocked</Badge>
-                <h1 className="mt-2 text-2xl font-black text-slate-950">Your Personalized Fixes</h1>
-                <p className="mt-1 text-xs font-semibold text-slate-500">Current score out of 100</p>
-              </div>
-              <ScoreBadge score={analysis.overallScore} />
+          <section className="mb-5 flex items-start justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+            <div>
+              <Badge tone="teal">Fixes Unlocked</Badge>
+              <h1 className="mt-2 text-2xl font-black text-slate-950">Your Personalized Fixes</h1>
+              <p className="mt-1 text-xs font-semibold text-slate-500">Potential score after all fixes</p>
             </div>
-            {allFixes.length > 0 && (
-              <div className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2">
-                <span className="text-xs font-semibold text-slate-500">Apply all fixes</span>
-                <span className="text-xs text-slate-400">→</span>
-                <span className="text-sm font-black text-emerald-700">up to {projectedScore} / 100</span>
-                <span className="ml-auto text-xs font-bold text-emerald-600">+{totalBump} pts</span>
-              </div>
-            )}
+            <ScoreBadge score={projectedScore} />
           </section>
 
           {!hasFixes && (
