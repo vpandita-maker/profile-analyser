@@ -40,3 +40,6 @@ CREATE INDEX idx_analyses_user_id ON analyses(user_id);
 CREATE INDEX idx_invites_analysis_id ON invites(analysis_id);
 CREATE INDEX idx_invites_friend_email ON invites(friend_email);
 CREATE INDEX idx_leaderboard_goal_geo_score ON leaderboard(goal, geography, overall_score DESC);
+
+-- Migration: run this in Supabase SQL Editor if the table already exists
+-- ALTER TABLE analyses ADD COLUMN IF NOT EXISTS user_email TEXT;

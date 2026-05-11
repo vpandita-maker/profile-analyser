@@ -13,10 +13,14 @@ export default function AnalysisLoadingPage() {
   const analysis = useAnalyzerStore((state) => state.analysis);
   const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
+  const setPreviousScore = useAnalyzerStore((state) => state.setPreviousScore);
 
   useEffect(() => {
     if (analysis) {
-      const timeout = window.setTimeout(() => router.replace("/results"), 900);
+      const timeout = window.setTimeout(() => {
+        const { userEmail } = useAnalyzerStore.getState();
+        router.replace(userEmail ? "/results" : "/email-gate");
+      }, 900);
       return () => window.clearTimeout(timeout);
     }
 
@@ -38,12 +42,16 @@ export default function AnalysisLoadingPage() {
       if (data.profile) {
         setLinkedinData(data.profile);
       }
+      if (typeof data.previousScore === "number") {
+        setPreviousScore(data.previousScore);
+      }
       setAnalysis(data.analysis, data.analysisId);
-      router.replace("/results");
+      const { userEmail } = useAnalyzerStore.getState();
+      router.replace(userEmail ? "/results" : "/email-gate");
     }
 
     void runAnalysis();
-  }, [analysis, contextAnswers, profile, router, setAnalysis, setLinkedinData]);
+  }, [analysis, contextAnswers, profile, router, setAnalysis, setLinkedinData, setPreviousScore]);
 
   return <Loading label="Building your personalized profile analysis" />;
 }
