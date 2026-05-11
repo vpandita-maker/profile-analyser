@@ -1,9 +1,7 @@
 "use client";
 
-import { ChevronLeft, LockKeyhole, RefreshCw, Sparkles } from "lucide-react";
+import { ChevronLeft, RefreshCw, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ShareModal } from "@/components/ShareModal";
 import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
@@ -12,18 +10,16 @@ import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
 
 export default function ResultsPage() {
-  const [shareOpen, setShareOpen] = useState(false);
   const router = useRouter();
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
-  const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
 
   if (!analysis) {
     return (
       <main className="app-screen grid place-items-center px-4">
         <div className="max-w-sm text-center">
           <p className="mb-4 text-sm text-slate-600">No analysis found on this device.</p>
-          <Button onClick={() => router.push("/questions")}>Start Analysis</Button>
+          <Button onClick={() => router.push("/")}>Start Analysis</Button>
         </div>
       </main>
     );
@@ -79,20 +75,12 @@ export default function ResultsPage() {
             </div>
           </section>
 
-          {isUnlocked ? (
-            <Button onClick={() => router.push("/results/unlocked")}>
-              <Sparkles className="h-4 w-4" />
-              View Personalized Fixes
-            </Button>
-          ) : (
-            <Button onClick={() => setShareOpen(true)}>
-              <LockKeyhole className="h-4 w-4" />
-              Check Your Solutions
-            </Button>
-          )}
+          <Button onClick={() => router.push("/results/unlocked")}>
+            <Sparkles className="h-4 w-4" />
+            Check Your Solutions
+          </Button>
         </div>
       </div>
-      <ShareModal open={shareOpen} onClose={() => setShareOpen(false)} />
     </main>
   );
 }

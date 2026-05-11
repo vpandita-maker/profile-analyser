@@ -27,7 +27,6 @@ export default function UnlockedResultsPage() {
   const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
-  const isUnlocked = useAnalyzerStore((state) => state.isUnlocked);
   const isFullyUnlocked = useAnalyzerStore((state) => state.isFullyUnlocked);
   const setAnalysis = useAnalyzerStore((state) => state.setAnalysis);
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
@@ -50,7 +49,7 @@ export default function UnlockedResultsPage() {
   }, [introLoading]);
 
   useEffect(() => {
-    if (!analysis || !isUnlocked || hasFixes || !profile || startedFixRefresh.current) return;
+    if (!analysis || hasFixes || !profile || startedFixRefresh.current) return;
     startedFixRefresh.current = true;
     setRefreshingFixes(true);
     setRefreshFailed(false);
@@ -77,7 +76,7 @@ export default function UnlockedResultsPage() {
     }
 
     void refreshFixes();
-  }, [analysis, contextAnswers, hasFixes, isUnlocked, profile, setAnalysis, setLinkedinData]);
+  }, [analysis, contextAnswers, hasFixes, profile, setAnalysis, setLinkedinData]);
 
   async function sendUnlockInvite() {
     if (!isEmail(unlockEmail) || !analysisId) return;
@@ -102,12 +101,12 @@ export default function UnlockedResultsPage() {
     }
   }
 
-  if (!analysis || !isUnlocked) {
+  if (!analysis) {
     return (
       <main className="app-screen grid place-items-center px-4">
         <div className="max-w-sm text-center">
-          <p className="mb-4 text-sm text-slate-600">Personalized fixes are locked until you send an invite.</p>
-          <Button onClick={() => router.push("/results")}>Back to Results</Button>
+          <p className="mb-4 text-sm text-slate-600">No analysis found on this device.</p>
+          <Button onClick={() => router.push("/")}>Start Analysis</Button>
         </div>
       </main>
     );
