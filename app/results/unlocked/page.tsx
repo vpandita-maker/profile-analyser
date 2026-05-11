@@ -119,7 +119,9 @@ export default function UnlockedResultsPage() {
   const visibleFixes = hasFixes ? analysis.topFixes : [];
   const lockedFixes = hasFixes ? analysis.secondaryFixes.slice(0, 2) : [];
   const allFixes = [...visibleFixes, ...lockedFixes];
-  const totalBump = allFixes.reduce((sum, fix) => sum + (fix.scoreBump ?? 0), 0);
+  const bumpFor = (fix: { scoreBump?: number; difficulty: string }) =>
+    fix.scoreBump ?? (fix.difficulty === "Easy" ? 4 : fix.difficulty === "Hard" ? 8 : 6);
+  const totalBump = allFixes.reduce((sum, fix) => sum + bumpFor(fix), 0);
   const projectedScore = Math.min(100, analysis.overallScore + totalBump);
 
   return (
@@ -155,7 +157,7 @@ export default function UnlockedResultsPage() {
               </div>
               <ScoreBadge score={analysis.overallScore} />
             </div>
-            {totalBump > 0 && (
+            {allFixes.length > 0 && (
               <div className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2">
                 <span className="text-xs font-semibold text-slate-500">Apply all fixes</span>
                 <span className="text-xs text-slate-400">→</span>
