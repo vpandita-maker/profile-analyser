@@ -1,6 +1,6 @@
 "use client";
 
-import { LockKeyhole, Sparkles } from "lucide-react";
+import { ChevronLeft, LockKeyhole, RefreshCw, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ShareModal } from "@/components/ShareModal";
@@ -32,7 +32,27 @@ export default function ResultsPage() {
   return (
     <main className="app-screen safe-bottom">
       <div className="app-container">
-        <div className="py-5">
+        <div className="sticky top-0 z-20 -mx-4 mb-5 border-b border-slate-200 bg-white/90 backdrop-blur">
+          <div className="flex items-center justify-between px-4 py-2">
+            <button
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-semibold text-slate-600 transition-all duration-200 hover:-translate-x-0.5 hover:text-slate-950"
+              onClick={() => router.push("/")}
+              type="button"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Home
+            </button>
+            <button
+              className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-black text-white transition-all duration-200 hover:bg-teal-700 hover:shadow-md active:scale-[0.97]"
+              onClick={() => router.push("/")}
+              type="button"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Analyze Again
+            </button>
+          </div>
+        </div>
+        <div className="py-2">
           <section className="mb-6 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <div>
               <p className="text-sm font-semibold text-slate-500">Overall score out of 100</p>
