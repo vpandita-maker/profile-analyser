@@ -1,19 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 120" height="36" width="102">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 322 120" height="36" width="97">
   <!-- Bold "I" -->
-  <text x="4" y="100"
+  <text x="2" y="100"
     font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
     font-size="90" font-weight="900" fill="#1a1a1a">I</text>
 
-  <!-- Red heart -->
-  <path d="M136,42 C136,28 112,10 88,22 C66,34 66,58 136,108 C206,58 206,34 184,22 C160,10 136,28 136,42Z" fill="#CC1F1A"/>
+  <!-- Red heart: centered at x=112, equal ~20px gap from I and box -->
+  <path d="M112,42 C112,28 90,12 68,22 C48,34 48,58 112,108 C176,58 176,34 156,22 C134,12 112,28 112,42Z" fill="#CC1F1A"/>
 
-  <!-- LinkedIn "in" blue rounded box -->
-  <rect x="205" y="5" width="130" height="112" rx="18" fill="#0A66C2"/>
+  <!-- LinkedIn "in" box: starts at x=187, center x=252 -->
+  <rect x="187" y="5" width="130" height="112" rx="18" fill="#0A66C2"/>
 
-  <!-- "in" centered -->
+  <!-- "in" centered in box -->
   <text
-    x="270" y="61"
+    x="252" y="61"
     font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
-    font-size="56" font-weight="900" fill="white"
+    font-size="64" font-weight="900" fill="white"
     text-anchor="middle" dominant-baseline="central">in</text>
 </svg>
