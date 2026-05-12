@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronLeft, RefreshCw, Sparkles, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, Sparkles, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
@@ -12,14 +13,22 @@ import { cn } from "@/lib/utils";
 
 function formatHistoryDate(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const day = d.getDate();
+  const tens = Math.floor(day / 10);
+  const ones = day % 10;
+  const suffix = tens === 1 ? "th" : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
+  const month = d.toLocaleDateString("en-US", { month: "long" });
+  return `${day}${suffix} ${month} ${d.getFullYear()}`;
 }
+
+const PROGRESS_VISIBLE = 3;
 
 export default function ResultsPage() {
   const router = useRouter();
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
   const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
+  const [progressStart, setProgressStart] = useState(0);
 
   if (!analysis) {
     return (
@@ -56,38 +65,67 @@ export default function ResultsPage() {
           </div>
         </div>
         <div className="py-2">
-          {scoreHistory.length >= 2 && (
-            <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
-              <p className="mb-3 text-sm font-black text-slate-950">Your Progress</p>
-              <div className="flex items-end gap-1 overflow-x-auto pb-1">
-                {scoreHistory.map((entry, i) => {
-                  const isCurrent = i === scoreHistory.length - 1;
-                  const prev = scoreHistory[i - 1];
-                  const delta = prev ? entry.score - prev.score : null;
-                  return (
-                    <div key={entry.date} className="flex items-end gap-1">
-                      {i > 0 && (
-                        <span className={cn("mb-5 shrink-0 text-xs font-bold", delta && delta > 0 ? "text-emerald-500" : delta && delta < 0 ? "text-red-400" : "text-slate-300")}>
-                          {delta && delta > 0 ? "↗" : delta && delta < 0 ? "↘" : "→"}
-                        </span>
-                      )}
-                      <div className="flex shrink-0 flex-col items-center gap-1">
-                        <div
-                          className={cn(
-                            "flex h-10 w-10 items-center justify-center rounded-full text-sm font-black",
-                            isCurrent ? "bg-teal-600 text-white shadow-md" : "bg-slate-100 text-slate-600"
+          {scoreHistory.length >= 1 && (() => {
+            const canPrev = progressStart > 0;
+            const canNext = progressStart + PROGRESS_VISIBLE < scoreHistory.length;
+            const visible = scoreHistory.slice(progressStart, progressStart + PROGRESS_VISIBLE);
+            return (
+              <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200" id="progress">
+                <p className="mb-4 text-sm font-black text-slate-950">Your Progress</p>
+                <div className="flex items-center gap-1">
+                  <button
+                    className={cn("shrink-0 rounded-full p-1 transition-colors hover:bg-slate-100", !canPrev && "invisible")}
+                    disabled={!canPrev}
+                    onClick={() => setProgressStart((s) => s - 1)}
+                    type="button"
+                  >
+                    <ChevronLeft className="h-5 w-5 text-slate-500" />
+                  </button>
+
+                  <div className="flex flex-1 items-center justify-center gap-4">
+                    {visible.map((entry, relIdx) => {
+                      const absIdx = progressStart + relIdx;
+                      const isCurrent = absIdx === scoreHistory.length - 1;
+                      const prevEntry = absIdx > 0 ? scoreHistory[absIdx - 1] : null;
+                      const delta = prevEntry ? entry.score - prevEntry.score : null;
+                      return (
+                        <div key={entry.date} className="flex items-center gap-4">
+                          {relIdx > 0 && (
+                            <span className={cn(
+                              "text-base font-bold",
+                              delta && delta > 0 ? "text-emerald-500" : delta && delta < 0 ? "text-red-400" : "text-slate-300"
+                            )}>
+                              {delta && delta > 0 ? "↗" : delta && delta < 0 ? "↘" : "→"}
+                            </span>
                           )}
-                        >
-                          {entry.score}
+                          <div className="flex flex-col items-center gap-1.5">
+                            <div className={cn(
+                              "flex h-12 w-12 items-center justify-center rounded-full text-sm font-black",
+                              isCurrent ? "bg-teal-600 text-white shadow-md" : "bg-slate-100 text-slate-600"
+                            )}>
+                              {entry.score}
+                            </div>
+                            <span className="w-20 text-center text-[10px] leading-tight text-slate-400">
+                              {formatHistoryDate(entry.date)}
+                            </span>
+                          </div>
                         </div>
-                        <span className="text-xs text-slate-400">{formatHistoryDate(entry.date)}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    className={cn("shrink-0 rounded-full p-1 transition-colors hover:bg-slate-100", !canNext && "invisible")}
+                    disabled={!canNext}
+                    onClick={() => setProgressStart((s) => s + 1)}
+                    type="button"
+                  >
+                    <ChevronRight className="h-5 w-5 text-slate-500" />
+                  </button>
+                </div>
+              </section>
+            );
+          })()}
 
           <section className="mb-6 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
             <div>

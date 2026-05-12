@@ -119,9 +119,10 @@ export async function POST(request: Request) {
       .from("score_history")
       .select("score, created_at")
       .eq("linkedin_id", userId)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false })
+      .limit(5);
 
-    const scoreHistory = (historyRows || []).map((h) => ({ score: h.score as number, date: h.created_at as string }));
+    const scoreHistory = (historyRows || []).reverse().map((h) => ({ score: h.score as number, date: h.created_at as string }));
 
     return NextResponse.json({ analysis, analysisId, profile, previousScore, scoreHistory });
   }
