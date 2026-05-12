@@ -14,12 +14,13 @@ export const metadata: Metadata = {
     url: "https://iheartlinkedin.vercel.app",
     siteName: "iHeartLinkedIn",
     type: "website",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }]
+    images: [{ url: "https://iheartlinkedin.vercel.app/opengraph-image", width: 1200, height: 630 }]
   },
   twitter: {
     card: "summary_large_image",
     title: "iHeartLinkedIn | Free LinkedIn profile review",
-    description: "Transform your LinkedIn profile into a recruiter magnet. Get a personalized roadmap to maximize visibility and inbound recruiter outreach."
+    description: "Transform your LinkedIn profile into a recruiter magnet. Get a personalized roadmap to maximize visibility and inbound recruiter outreach.",
+    images: ["https://iheartlinkedin.vercel.app/opengraph-image"]
   }
 };
 
