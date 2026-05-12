@@ -143,7 +143,7 @@ export default function HomePage() {
             <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#0A66C2] text-white">
               <BarChart2 className="h-4 w-4" />
             </div>
-            <span className="text-sm font-black text-[#0A66C2]">I love LinkedIn</span>
+            <span className="text-sm font-black text-[#0A66C2]">iLoveLinkedIn</span>
           </div>
           <button
             className="try-now-btn inline-flex items-center gap-1.5 rounded-lg bg-[#0A66C2] px-4 py-2 text-xs font-black text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#004182] hover:shadow-md active:scale-[0.97]"

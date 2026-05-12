@@ -6,7 +6,7 @@ import { Providers } from "@/components/Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "I love LinkedIn",
+  title: "iLoveLinkedIn",
   description: "Agentic profile analysis trained on expert career data."
 };
 
