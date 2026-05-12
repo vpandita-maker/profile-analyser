@@ -11,16 +11,16 @@ import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
 function formatHistoryDate(iso: string) {
-  // Shift UTC to IST (UTC+5:30) by adding 330 minutes
-  const ist = new Date(new Date(iso).getTime() + 330 * 60 * 1000);
-  const day = ist.getUTCDate();
+  const d = new Date(iso);
+  const parts = new Intl.DateTimeFormat("en-US", { day: "numeric", month: "long", year: "numeric" }).formatToParts(d);
+  const day = parseInt(parts.find((p) => p.type === "day")!.value, 10);
+  const month = parts.find((p) => p.type === "month")!.value;
+  const year = parts.find((p) => p.type === "year")!.value;
   const tens = Math.floor(day / 10);
   const ones = day % 10;
   const suffix = tens === 1 ? "th" : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
-  return `${day}${suffix} ${MONTHS[ist.getUTCMonth()]} ${ist.getUTCFullYear()}`;
+  return `${day}${suffix} ${month} ${year}`;
 }
 
 function scoreLabel(score: number): { label: string; className: string } {
