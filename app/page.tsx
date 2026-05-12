@@ -213,7 +213,7 @@ export default function HomePage() {
                     className={cn(inputCls, "pl-9")}
                     inputMode="url"
                     onChange={(e) => setProfileUrl(e.target.value)}
-                    placeholder="linkedin.com/in/your-profile"
+                    placeholder="linkedin.com/in/yourname"
                     value={profileUrl}
                   />
                 </div>
@@ -223,7 +223,7 @@ export default function HomePage() {
                 <input
                   className={inputCls}
                   onChange={(e) => setTargetRole(e.target.value)}
-                  placeholder="e.g. Senior Product Manager, FinTech"
+                  placeholder="e.g. Product Manager"
                   value={targetRole}
                 />
               </Field>
@@ -245,7 +245,7 @@ export default function HomePage() {
                 <input
                   className={inputCls}
                   onChange={(e) => setDreamCompany(e.target.value)}
-                  placeholder="e.g. Netflix, Stripe, Amazon"
+                  placeholder="e.g. Google, Stripe"
                   value={dreamCompany}
                 />
               </Field>
@@ -256,7 +256,7 @@ export default function HomePage() {
                   <input
                     className={cn(inputCls, "pl-9")}
                     onChange={(e) => setLocationPreference(e.target.value)}
-                    placeholder="e.g. Austin, TX · Berlin, Germany · Remote (USA)"
+                    placeholder="e.g. Austin, TX or Remote"
                     value={locationPreference}
                   />
                 </div>
@@ -286,7 +286,7 @@ export default function HomePage() {
                 <textarea
                   className="min-h-24 w-full resize-none rounded-lg border border-[#EEEEEE] bg-white px-3 py-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0073B1]/40 focus:border-[#0073B1] focus:ring-2 focus:ring-[#0073B1]/10"
                   onChange={(e) => setWins(e.target.value)}
-                  placeholder="Recent projects, awards, internships, coursework, or achievements relevant to the role you want"
+                  placeholder="e.g. Led a team of 5, shipped X feature, won Y award"
                   value={wins}
                 />
               </Field>
