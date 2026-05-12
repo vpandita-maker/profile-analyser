@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Linkedin, RefreshCw, Sparkles, Trophy, Twitter } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
@@ -103,23 +103,23 @@ export default function ResultsPage() {
                     <ChevronLeft className="h-5 w-5 text-slate-500" />
                   </button>
 
-                  <div className="flex flex-1 items-center justify-evenly">
+                  <div className="flex flex-1 items-center">
                     {visible.map((entry, relIdx) => {
                       const absIdx = progressStart + relIdx;
                       const isCurrent = absIdx === scoreHistory.length - 1;
                       const prevEntry = absIdx > 0 ? scoreHistory[absIdx - 1] : null;
                       const delta = prevEntry ? entry.score - prevEntry.score : null;
                       return (
-                        <div key={entry.date} className="flex items-center gap-3">
+                        <Fragment key={entry.date}>
                           {relIdx > 0 && (
                             <span className={cn(
-                              "text-base font-bold",
+                              "shrink-0 px-1 text-sm font-bold",
                               delta && delta > 0 ? "text-emerald-500" : delta && delta < 0 ? "text-red-400" : "text-slate-300"
                             )}>
                               {delta && delta > 0 ? "↗" : delta && delta < 0 ? "↘" : "→"}
                             </span>
                           )}
-                          <div className="flex flex-col items-center gap-1.5">
+                          <div className="flex flex-1 flex-col items-center gap-1.5">
                             <div className={cn(
                               "flex h-12 w-12 items-center justify-center rounded-full text-sm font-black",
                               isCurrent ? "bg-teal-600 text-white shadow-md" : "bg-slate-100 text-slate-600"
@@ -130,7 +130,7 @@ export default function ResultsPage() {
                               {formatHistoryDate(entry.date)}
                             </span>
                           </div>
-                        </div>
+                        </Fragment>
                       );
                     })}
                   </div>
