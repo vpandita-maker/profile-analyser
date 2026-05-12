@@ -38,7 +38,7 @@ export default function OGImage() {
           fontSize: "56px", fontWeight: "900", color: "#ffffff",
           textAlign: "center", lineHeight: 1.1, margin: "0 0 24px 0"
         }}>
-          Get Recruited,{"\n"}Don't Just Apply.
+          Get Recruited,{"\n"}Don&apos;t Just Apply.
         </h1>
 
         <p style={{
