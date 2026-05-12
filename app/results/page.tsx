@@ -159,7 +159,8 @@ export default function ResultsPage() {
               </div>
               <ScoreBadge score={analysis.overallScore} />
             </div>
-            <div className="mt-4 border-t border-slate-100 pt-4">
+            {isGoodScore && (
+              <div className="mt-4 border-t border-slate-100 pt-4">
                 <p className="mb-2.5 text-xs font-black uppercase tracking-wide text-slate-400">Share your score</p>
                 <div className="flex gap-3">
                   <a
@@ -181,7 +182,8 @@ export default function ResultsPage() {
                     LinkedIn
                   </a>
                 </div>
-            </div>
+              </div>
+            )}
           </section>
 
           <section className="mb-6">
