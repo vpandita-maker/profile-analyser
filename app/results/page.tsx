@@ -40,9 +40,7 @@ export default function ResultsPage() {
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
   const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
-  const [progressStart, setProgressStart] = useState(
-    () => Math.max(0, scoreHistory.length - PROGRESS_VISIBLE)
-  );
+  const [offsetFromEnd, setOffsetFromEnd] = useState(0);
 
   if (!analysis) {
     return (
@@ -87,8 +85,9 @@ export default function ResultsPage() {
 
         <div className="py-2">
           {scoreHistory.length >= 1 && (() => {
+            const progressStart = Math.max(0, scoreHistory.length - PROGRESS_VISIBLE - offsetFromEnd);
             const canPrev = progressStart > 0;
-            const canNext = progressStart + PROGRESS_VISIBLE < scoreHistory.length;
+            const canNext = offsetFromEnd > 0;
             const visible = scoreHistory.slice(progressStart, progressStart + PROGRESS_VISIBLE);
             return (
               <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200" id="progress">
@@ -97,7 +96,7 @@ export default function ResultsPage() {
                   <button
                     className={cn("shrink-0 rounded-full p-1 transition-colors", canPrev ? "hover:bg-slate-100" : "cursor-default opacity-20")}
                     disabled={!canPrev}
-                    onClick={() => setProgressStart((s) => s - 1)}
+                    onClick={() => setOffsetFromEnd((o) => Math.min(o + 1, scoreHistory.length - PROGRESS_VISIBLE))}
                     type="button"
                   >
                     <ChevronLeft className="h-5 w-5 text-slate-500" />
@@ -136,9 +135,9 @@ export default function ResultsPage() {
                   </div>
 
                   <button
-                    className={cn("shrink-0 rounded-full p-1 transition-colors hover:bg-slate-100", !canNext && "invisible")}
+                    className={cn("shrink-0 rounded-full p-1 transition-colors", canNext ? "hover:bg-slate-100" : "cursor-default opacity-20")}
                     disabled={!canNext}
-                    onClick={() => setProgressStart((s) => s + 1)}
+                    onClick={() => setOffsetFromEnd((o) => Math.max(0, o - 1))}
                     type="button"
                   >
                     <ChevronRight className="h-5 w-5 text-slate-500" />
