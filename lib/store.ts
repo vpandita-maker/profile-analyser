@@ -115,7 +115,9 @@ export const useAnalyzerStore = create<AnalyzerState>()(
         set((state) => {
           const last = state.scoreHistory[state.scoreHistory.length - 1];
           if (last && last.score === score) return {};
-          const updated = [...state.scoreHistory, { score, date: new Date().toISOString() }];
+          const now = new Date();
+          const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+          const updated = [...state.scoreHistory, { score, date: localDate }];
           return { scoreHistory: updated.slice(-6) };
         }),
       resetContext: () => set({ contextAnswers: emptyContext })

@@ -11,16 +11,24 @@ import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-function formatHistoryDate(iso: string) {
-  const d = new Date(iso);
-  const parts = new Intl.DateTimeFormat("en-US", { day: "numeric", month: "long", year: "numeric" }).formatToParts(d);
-  const day = parseInt(parts.find((p) => p.type === "day")!.value, 10);
-  const month = parts.find((p) => p.type === "month")!.value;
-  const year = parts.find((p) => p.type === "year")!.value;
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function ordinal(day: number) {
   const tens = Math.floor(day / 10);
   const ones = day % 10;
   const suffix = tens === 1 ? "th" : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
-  return `${day}${suffix} ${month} ${year}`;
+  return `${day}${suffix}`;
+}
+
+function formatHistoryDate(dateStr: string) {
+  // New format: "YYYY-MM-DD" stored in local timezone — parse directly
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return `${ordinal(day)} ${MONTHS[month - 1]} ${year}`;
+  }
+  // Legacy: ISO string stored in UTC — use local Date methods
+  const d = new Date(dateStr);
+  return `${ordinal(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function scoreLabel(score: number): { label: string; className: string } {
