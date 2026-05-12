@@ -13,7 +13,8 @@ export const metadata: Metadata = {
     description: "Transform your LinkedIn profile into a recruiter magnet. Get a personalized roadmap to maximize visibility and inbound recruiter outreach.",
     url: "https://iheartlinkedin.vercel.app",
     siteName: "iHeartLinkedIn",
-    type: "website"
+    type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }]
   },
   twitter: {
     card: "summary_large_image",
