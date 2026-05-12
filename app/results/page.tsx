@@ -25,11 +25,11 @@ function formatHistoryDate(iso: string) {
 }
 
 function scoreLabel(score: number): { label: string; className: string } {
-  if (score >= 91) return { label: "Exceptional", className: "text-teal-700 bg-teal-50" };
-  if (score >= 76) return { label: "Strong", className: "text-emerald-700 bg-emerald-50" };
-  if (score >= 61) return { label: "Good", className: "text-amber-700 bg-amber-50" };
-  if (score >= 35) return { label: "Building", className: "text-orange-600 bg-orange-50" };
-  return { label: "Needs Work", className: "text-rose-600 bg-rose-50" };
+  if (score >= 91) return { label: "Recruiters are already looking at you!", className: "text-teal-700 bg-teal-50" };
+  if (score >= 76) return { label: "Strong profile, keep fine-tuning it!", className: "text-emerald-700 bg-emerald-50" };
+  if (score >= 61) return { label: "Good score, room to grow!", className: "text-amber-700 bg-amber-50" };
+  if (score >= 35) return { label: "Solid start, big gains ahead!", className: "text-orange-600 bg-orange-50" };
+  return { label: "Your profile needs some work!", className: "text-rose-600 bg-rose-50" };
 }
 
 const PROGRESS_VISIBLE = 3;
