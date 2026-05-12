@@ -125,8 +125,7 @@ export default function HomePage() {
         name: data.profile.name || "LinkedIn Member",
         importSource: "scrape"
       } satisfies LinkedInProfile));
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).gtag?.("event", "profile_analyzed", {
+      (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.("event", "profile_analyzed", {
         target_role: targetRole.trim(),
         industry: preferredIndustry.trim(),
         work_preference: workPreference,
