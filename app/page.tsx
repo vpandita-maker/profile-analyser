@@ -336,8 +336,8 @@ export default function HomePage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="w-full border-t border-[#EEEEEE] bg-white">
-        <div className="landing-container py-3 text-center text-xs text-[#AAAAAA]">
+      <footer className="w-full border-t border-[#0A66C2]/30 bg-white" style={{ boxShadow: "0 -4px 16px rgba(10,102,194,0.12)" }}>
+        <div className="landing-container py-3 text-center text-xs font-semibold text-[#666666]">
           iHeartLinkedIn by Vansh Pandita
         </div>
       </footer>
