@@ -115,7 +115,8 @@ export const useAnalyzerStore = create<AnalyzerState>()(
         set((state) => {
           const last = state.scoreHistory[state.scoreHistory.length - 1];
           if (last && last.score === score) return {};
-          return { scoreHistory: [...state.scoreHistory, { score, date: new Date().toISOString() }] };
+          const updated = [...state.scoreHistory, { score, date: new Date().toISOString() }];
+          return { scoreHistory: updated.slice(-6) };
         }),
       resetContext: () => set({ contextAnswers: emptyContext })
     }),
