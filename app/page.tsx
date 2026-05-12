@@ -31,7 +31,7 @@ const INDUSTRIES = [
 ];
 
 const inputCls =
-  "h-11 w-full rounded-lg border border-[#EEEEEE] bg-white px-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0073B1]/40 focus:border-[#0073B1] focus:ring-2 focus:ring-[#0073B1]/10";
+  "h-11 w-full rounded-lg border border-[#EEEEEE] bg-white px-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0A66C2]/40 focus:border-[#0A66C2] focus:ring-2 focus:ring-[#0A66C2]/10";
 
 function inferGoal(role: string): ContextAnswers["goal"] {
   const n = role.toLowerCase();
@@ -140,13 +140,13 @@ export default function HomePage() {
       <header className="sticky top-0 z-30 w-full border-b border-[#EEEEEE] bg-white/95 backdrop-blur">
         <div className="landing-container flex items-center justify-between py-3">
           <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#0073B1] text-white">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#0A66C2] text-white">
               <BarChart2 className="h-4 w-4" />
             </div>
-            <span className="text-sm font-black text-[#0073B1]">Profile Analyzer</span>
+            <span className="text-sm font-black text-[#0A66C2]">Profile Analyzer</span>
           </div>
           <button
-            className="try-now-btn inline-flex items-center gap-1.5 rounded-lg bg-[#0073B1] px-4 py-2 text-xs font-black text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#005f96] hover:shadow-md active:scale-[0.97]"
+            className="try-now-btn inline-flex items-center gap-1.5 rounded-lg bg-[#0A66C2] px-4 py-2 text-xs font-black text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#004182] hover:shadow-md active:scale-[0.97]"
             onClick={scrollToForm}
             type="button"
           >
@@ -156,7 +156,7 @@ export default function HomePage() {
         </div>
         {progress > 0 && (
           <div className="h-0.5 bg-[#EEEEEE]">
-            <div className="h-0.5 bg-[#0073B1] transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
+            <div className="h-0.5 bg-[#0A66C2] transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
           </div>
         )}
       </header>
@@ -179,7 +179,7 @@ export default function HomePage() {
 
       {/* ── Copy + Form ── */}
       <section className="landing-container py-8" id="profile-intake">
-          <h1 className="text-[2.4rem] font-black leading-[1.06] text-[#0073B1]">
+          <h1 className="text-[2.4rem] font-black leading-[1.06] text-[#0A66C2]">
             Get Recruited,<br />Don&apos;t Just Apply.
           </h1>
           <ul className="mt-5 mb-7 space-y-4">
@@ -189,9 +189,9 @@ export default function HomePage() {
               { label: "Results", text: "Watch inbound recruiter outreach increase." },
             ].map(({ label, text }) => (
               <li key={label} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0073B1] text-[10px] font-black text-white">→</span>
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0A66C2] text-[10px] font-black text-white">→</span>
                 <p className="text-[15px] leading-7 text-[#444444]">
-                  <span className="font-black text-[#0073B1]">{label}:</span>{" "}{text}
+                  <span className="font-black text-[#0A66C2]">{label}:</span>{" "}{text}
                 </p>
               </li>
             ))}
@@ -269,7 +269,7 @@ export default function HomePage() {
                       className={cn(
                         "flex-1 py-2.5 text-sm font-semibold transition-all duration-200",
                         workPreference === item
-                          ? "bg-[#0073B1] text-white"
+                          ? "bg-[#0A66C2] text-white"
                           : "bg-white text-[#666666] hover:bg-[#F7F9FC]"
                       )}
                       key={item}
@@ -284,7 +284,7 @@ export default function HomePage() {
 
               <Field label="Anything you wish your LinkedIn highlighted better? (optional)">
                 <textarea
-                  className="min-h-24 w-full resize-none rounded-lg border border-[#EEEEEE] bg-white px-3 py-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0073B1]/40 focus:border-[#0073B1] focus:ring-2 focus:ring-[#0073B1]/10"
+                  className="min-h-24 w-full resize-none rounded-lg border border-[#EEEEEE] bg-white px-3 py-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0A66C2]/40 focus:border-[#0A66C2] focus:ring-2 focus:ring-[#0A66C2]/10"
                   onChange={(e) => setWins(e.target.value)}
                   placeholder="e.g. Led a team of 5, shipped X feature, won Y award"
                   value={wins}
@@ -292,7 +292,7 @@ export default function HomePage() {
               </Field>
 
               <button
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0073B1] py-3.5 text-base font-black text-white transition-all hover:bg-[#005f96] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.99]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0A66C2] py-3.5 text-base font-black text-white transition-all hover:bg-[#004182] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.99]"
                 disabled={!canSubmit || scraping}
                 onClick={analyzeProfile}
                 type="button"
@@ -306,7 +306,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Trust Band ── */}
-      <section className="w-full border-y border-[#EEEEEE] bg-[#FAFAFA] py-10">
+      <section className="w-full border-y border-[#EEEEEE] bg-[#F3F2EF] py-10">
         <div className="landing-container">
           <p className="text-center text-xs font-semibold uppercase tracking-widest text-[#AAAAAA]">
             A trusted platform used for applications at
@@ -326,7 +326,7 @@ export default function HomePage() {
           Join thousands of professionals improving their LinkedIn score today.
         </p>
         <button
-          className="mt-8 inline-flex items-center gap-2 rounded-xl bg-[#0073B1] px-10 py-4 text-lg font-black text-white transition-all hover:bg-[#005f96] hover:shadow-xl active:scale-[0.98]"
+          className="mt-8 inline-flex items-center gap-2 rounded-xl bg-[#0A66C2] px-10 py-4 text-lg font-black text-white transition-all hover:bg-[#004182] hover:shadow-xl active:scale-[0.98]"
           onClick={scrollToForm}
           type="button"
         >
