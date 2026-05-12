@@ -154,7 +154,7 @@ export default function HomePage() {
             onClick={scrollToForm}
             type="button"
           >
-            Join the Pro Tier
+            Try Now
             <Sparkles className="h-3.5 w-3.5" />
           </button>
         </div>
