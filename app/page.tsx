@@ -311,10 +311,10 @@ export default function HomePage() {
           <p className="text-center text-xs font-semibold uppercase tracking-widest text-[#AAAAAA]">
             A trusted platform used for applications at
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
-            <Image alt="Google" height={52} src="/logo-google.svg" width={52} />
-            <Image alt="EY" height={72} src="/logo-ey.svg" width={90} />
-            <Image alt="Goldman Sachs" height={56} src="/logo-goldman-sachs.svg" width={148} />
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-10">
+            <img alt="Google" className="h-10 w-auto" src="/logo-google.svg" />
+            <img alt="EY" className="h-10 w-auto" src="/logo-ey.svg" />
+            <img alt="Goldman Sachs" className="h-10 w-auto" src="/logo-goldman-sachs.svg" />
           </div>
         </div>
       </section>
