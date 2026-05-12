@@ -335,6 +335,13 @@ export default function HomePage() {
         </button>
       </section>
 
+      {/* ── Footer ── */}
+      <footer className="w-full border-t border-[#EEEEEE] bg-white">
+        <div className="landing-container py-3 text-center text-xs text-[#AAAAAA]">
+          iLoveLinkedIn by Vansh Pandita
+        </div>
+      </footer>
+
     </main>
   );
 }
