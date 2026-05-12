@@ -23,11 +23,15 @@ export default function OGImage() {
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "32px" }}>
           <div style={{
             width: "56px", height: "56px", borderRadius: "12px",
-            background: "#0A66C2", border: "2px solid rgba(255,255,255,0.3)",
+            background: "rgba(255,255,255,0.2)", border: "2px solid rgba(255,255,255,0.4)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "28px"
           }}>
-            📊
+            <div style={{ display: "flex", gap: "3px", alignItems: "flex-end", height: "28px" }}>
+              <div style={{ width: "6px", height: "14px", background: "white", borderRadius: "2px" }} />
+              <div style={{ width: "6px", height: "20px", background: "white", borderRadius: "2px" }} />
+              <div style={{ width: "6px", height: "28px", background: "white", borderRadius: "2px" }} />
+              <div style={{ width: "6px", height: "18px", background: "white", borderRadius: "2px" }} />
+            </div>
           </div>
           <span style={{ fontSize: "36px", fontWeight: "900", color: "#ffffff" }}>
             iHeartLinkedIn
