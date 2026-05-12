@@ -11,15 +11,16 @@ import { normalizeAnalysis } from "@/lib/analysis";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
+const IST = "Asia/Kolkata";
+
 function formatHistoryDate(iso: string) {
   const d = new Date(iso);
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const day = parseInt(d.toLocaleDateString("en-US", { timeZone: tz, day: "numeric" }), 10);
+  const day = parseInt(d.toLocaleDateString("en-US", { timeZone: IST, day: "numeric" }), 10);
   const tens = Math.floor(day / 10);
   const ones = day % 10;
   const suffix = tens === 1 ? "th" : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
-  const month = d.toLocaleDateString("en-US", { timeZone: tz, month: "long" });
-  const year = parseInt(d.toLocaleDateString("en-US", { timeZone: tz, year: "numeric" }), 10);
+  const month = d.toLocaleDateString("en-US", { timeZone: IST, month: "long" });
+  const year = parseInt(d.toLocaleDateString("en-US", { timeZone: IST, year: "numeric" }), 10);
   return `${day}${suffix} ${month} ${year}`;
 }
 
@@ -158,6 +159,31 @@ export default function ResultsPage() {
               </div>
               <ScoreBadge score={analysis.overallScore} />
             </div>
+            {isGoodScore && (
+              <div className="mt-4 border-t border-slate-100 pt-4">
+                <p className="mb-2.5 text-xs font-black uppercase tracking-wide text-slate-400">Share your score</p>
+                <div className="flex gap-3">
+                  <a
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#1D9BF0] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#1a8cd8] hover:shadow-md active:scale-[0.98]"
+                    href={twitterUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <Twitter className="h-4 w-4" />
+                    Twitter
+                  </a>
+                  <a
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#0A66C2] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#004182] hover:shadow-md active:scale-[0.98]"
+                    href={linkedinUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <Linkedin className="h-4 w-4" />
+                    LinkedIn
+                  </a>
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="mb-6">
@@ -177,32 +203,6 @@ export default function ResultsPage() {
               ))}
             </div>
           </section>
-
-          {isGoodScore && (
-            <section className="mb-6 rounded-lg bg-slate-50 p-4 ring-1 ring-slate-200">
-              <p className="mb-3 text-sm font-black text-slate-950">Share your score</p>
-              <div className="flex gap-3">
-                <a
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#1D9BF0] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#1a8cd8] hover:shadow-md active:scale-[0.98]"
-                  href={twitterUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <Twitter className="h-4 w-4" />
-                  Twitter
-                </a>
-                <a
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#0A66C2] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#004182] hover:shadow-md active:scale-[0.98]"
-                  href={linkedinUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <Linkedin className="h-4 w-4" />
-                  LinkedIn
-                </a>
-              </div>
-            </section>
-          )}
 
           <div className="space-y-3">
             <Button onClick={() => router.push("/results/unlocked")}>
