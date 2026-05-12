@@ -125,6 +125,13 @@ export default function HomePage() {
         name: data.profile.name || "LinkedIn Member",
         importSource: "scrape"
       } satisfies LinkedInProfile));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).gtag?.("event", "profile_analyzed", {
+        target_role: targetRole.trim(),
+        industry: preferredIndustry.trim(),
+        work_preference: workPreference,
+        geography: inferGeography(locationPreference.trim()),
+      });
       router.push("/loading");
     } catch {
       setError("Could not import this profile automatically. Please check the URL and try again.");
