@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160">
-  <polygon points="12,90 200,8 200,42" fill="#FFE600"/>
-  <text x="0" y="158" font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif" font-size="100" font-weight="900" letter-spacing="-4" fill="#595959">EY</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50">
+  <polygon points="50,0 100,0 100,20" fill="#FFE600"/>
+  <text x="0" y="25" dominant-baseline="central"
+        font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
+        font-size="38" font-weight="900" letter-spacing="-1" fill="#333333">EY</text>
 </svg>

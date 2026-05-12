@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="68" viewBox="0 0 180 68">
-  <text x="0" y="32" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="bold" fill="#3B72C6">Goldman</text>
-  <text x="0" y="63" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="bold" fill="#3B72C6">Sachs</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 155 60">
+  <text font-family="Georgia,'Times New Roman',serif" font-size="22" font-weight="bold" fill="#2C5FA8">
+    <tspan x="0" y="22">Goldman</tspan>
+    <tspan x="0" dy="26">Sachs</tspan>
+  </text>
 </svg>

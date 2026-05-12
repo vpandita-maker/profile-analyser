@@ -311,7 +311,7 @@ export default function HomePage() {
           <p className="text-center text-xs font-semibold uppercase tracking-widest text-[#AAAAAA]">
             A trusted platform used for applications at
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-10">
+          <div className="mt-8 flex items-center justify-evenly">
             <img alt="Google" className="h-10 w-auto" src="/logo-google.svg" />
             <img alt="EY" className="h-10 w-auto" src="/logo-ey.svg" />
             <img alt="Goldman Sachs" className="h-10 w-auto" src="/logo-goldman-sachs.svg" />
