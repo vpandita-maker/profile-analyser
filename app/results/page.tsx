@@ -95,7 +95,7 @@ export default function ResultsPage() {
                 <p className="mb-4 text-sm font-black text-slate-950">Your Progress</p>
                 <div className="flex items-center">
                   <button
-                    className={cn("shrink-0 rounded-full p-1 transition-colors hover:bg-slate-100", !canPrev && "invisible")}
+                    className={cn("shrink-0 rounded-full p-1 transition-colors", canPrev ? "hover:bg-slate-100" : "cursor-default opacity-20")}
                     disabled={!canPrev}
                     onClick={() => setProgressStart((s) => s - 1)}
                     type="button"
