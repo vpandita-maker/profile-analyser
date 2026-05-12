@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 120">
+  <!-- Bold "I" -->
+  <text x="4" y="100"
+    font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
+    font-size="90" font-weight="900" fill="#1a1a1a">I</text>
+
+  <!-- Red heart -->
+  <path d="M136,42 C136,28 112,10 88,22 C66,34 66,58 136,108 C206,58 206,34 184,22 C160,10 136,28 136,42Z" fill="#CC1F1A"/>
+
+  <!-- LinkedIn "in" blue rounded box -->
+  <rect x="205" y="5" width="130" height="112" rx="18" fill="#0A66C2"/>
+
+  <!-- i: dot -->
+  <circle cx="244" cy="40" r="13" fill="white"/>
+  <!-- i: stem -->
+  <rect x="231" y="59" width="26" height="52" rx="4" fill="white"/>
+
+  <!-- n: left bar -->
+  <rect x="270" y="59" width="22" height="52" rx="4" fill="white"/>
+  <!-- n: arch + right bar -->
+  <path d="M292,59 C298,48 316,50 323,62 C327,70 328,80 328,90 L328,111 L306,111 L306,88 C306,79 298,76 293,84 L293,111 L270,111 L270,59 Z" fill="white"/>
+</svg>
