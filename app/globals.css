@@ -80,15 +80,8 @@ textarea {
 .landing-container {
   margin-inline: auto;
   width: 100%;
-  max-width: 480px;
-  padding-inline: 20px;
-}
-
-@media (min-width: 1024px) {
-  .landing-container {
-    max-width: 1200px;
-    padding-inline: 48px;
-  }
+  max-width: 430px;
+  padding-inline: 16px;
 }
 
 @keyframes loading-bar {
@@ -153,19 +146,6 @@ textarea {
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    background: #f0f4f8;
-  }
-
-  .phone-shell {
-    width: 100%;
-    max-width: none;
-    border-inline: none;
-    box-shadow: none;
-    overflow-x: clip;
-  }
-}
 
 @media (max-width: 380px) {
   .app-container {

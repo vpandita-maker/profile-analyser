@@ -177,33 +177,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Two-column: Copy + Form ── */}
-      <section className="landing-container py-12 lg:py-20" id="profile-intake">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start lg:gap-20">
+      {/* ── Copy + Form ── */}
+      <section className="landing-container py-8" id="profile-intake">
+          <h1 className="text-[2.4rem] font-black leading-[1.06] text-[#0073B1]">
+            Get Recruited,<br />Don&apos;t Just Apply.
+          </h1>
+          <ul className="mt-5 mb-7 space-y-4">
+            {[
+              { label: "Direct", text: "Align your LinkedIn to the exact role you're targeting." },
+              { label: "Personalized", text: "Receive a data-driven fix roadmap built around your background." },
+              { label: "Results", text: "Watch inbound recruiter outreach increase." },
+            ].map(({ label, text }) => (
+              <li key={label} className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0073B1] text-[10px] font-black text-white">→</span>
+                <p className="text-[15px] leading-7 text-[#444444]">
+                  <span className="font-black text-[#0073B1]">{label}:</span>{" "}{text}
+                </p>
+              </li>
+            ))}
+          </ul>
 
-          {/* Left: Copy */}
-          <div className="lg:sticky lg:top-28">
-            <h1 className="text-[2.6rem] font-black leading-[1.06] text-[#0073B1] lg:text-5xl lg:leading-[1.05]">
-              Get Recruited,<br />Don&apos;t Just Apply.
-            </h1>
-            <ul className="mt-8 space-y-5">
-              {[
-                { label: "Direct", text: "Align your LinkedIn to the exact role you're targeting." },
-                { label: "Personalized", text: "Receive a data-driven fix roadmap built around your background." },
-                { label: "Results", text: "Watch inbound recruiter outreach increase." },
-              ].map(({ label, text }) => (
-                <li key={label} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0073B1] text-[10px] font-black text-white">→</span>
-                  <p className="text-[15px] leading-7 text-[#444444]">
-                    <span className="font-black text-[#0073B1]">{label}:</span>{" "}{text}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right: Form */}
-          <div className="relative overflow-hidden rounded-2xl bg-white p-7 shadow-xl ring-1 ring-[#EEEEEE]">
+          {/* Form */}
+          <div className="relative overflow-hidden rounded-2xl bg-white p-5 shadow-xl ring-1 ring-[#EEEEEE]">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,115,177,0.06),transparent_55%),radial-gradient(circle_at_bottom_left,rgba(0,30,60,0.04),transparent_50%)]" />
             <div className="relative space-y-5">
 
@@ -308,7 +303,6 @@ export default function HomePage() {
 
             </div>
           </div>
-        </div>
       </section>
 
       {/* ── Trust Band ── */}
