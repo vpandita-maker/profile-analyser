@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, RefreshCw, Sparkles, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, Linkedin, RefreshCw, Sparkles, Trophy, Twitter } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { StrengthCard } from "@/components/StrengthCard";
@@ -13,22 +13,35 @@ import { cn } from "@/lib/utils";
 
 function formatHistoryDate(iso: string) {
   const d = new Date(iso);
-  const day = d.getDate();
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const day = parseInt(d.toLocaleDateString("en-US", { timeZone: tz, day: "numeric" }), 10);
   const tens = Math.floor(day / 10);
   const ones = day % 10;
   const suffix = tens === 1 ? "th" : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
-  const month = d.toLocaleDateString("en-US", { month: "long" });
-  return `${day}${suffix} ${month} ${d.getFullYear()}`;
+  const month = d.toLocaleDateString("en-US", { timeZone: tz, month: "long" });
+  const year = parseInt(d.toLocaleDateString("en-US", { timeZone: tz, year: "numeric" }), 10);
+  return `${day}${suffix} ${month} ${year}`;
+}
+
+function scoreLabel(score: number): { label: string; className: string } {
+  if (score >= 91) return { label: "Exceptional", className: "text-teal-700 bg-teal-50" };
+  if (score >= 76) return { label: "Strong", className: "text-emerald-700 bg-emerald-50" };
+  if (score >= 61) return { label: "Good", className: "text-amber-700 bg-amber-50" };
+  if (score >= 35) return { label: "Building", className: "text-orange-600 bg-orange-50" };
+  return { label: "Needs Work", className: "text-rose-600 bg-rose-50" };
 }
 
 const PROGRESS_VISIBLE = 3;
+const APP_URL = "https://iheartlinkedin.vercel.app";
 
 export default function ResultsPage() {
   const router = useRouter();
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
   const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
-  const [progressStart, setProgressStart] = useState(0);
+  const [progressStart, setProgressStart] = useState(
+    () => Math.max(0, scoreHistory.length - PROGRESS_VISIBLE)
+  );
 
   if (!analysis) {
     return (
@@ -40,6 +53,12 @@ export default function ResultsPage() {
       </main>
     );
   }
+
+  const { label: sLabel, className: sClass } = scoreLabel(analysis.overallScore);
+  const isGoodScore = analysis.overallScore >= 61;
+  const shareText = `I just scored ${analysis.overallScore}/100 on iHeartLinkedIn! Get your free LinkedIn profile review →`;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(APP_URL)}`;
+  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`;
 
   return (
     <main className="app-screen safe-bottom">
@@ -64,6 +83,7 @@ export default function ResultsPage() {
             </button>
           </div>
         </div>
+
         <div className="py-2">
           {scoreHistory.length >= 1 && (() => {
             const canPrev = progressStart > 0;
@@ -72,7 +92,7 @@ export default function ResultsPage() {
             return (
               <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200" id="progress">
                 <p className="mb-4 text-sm font-black text-slate-950">Your Progress</p>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center">
                   <button
                     className={cn("shrink-0 rounded-full p-1 transition-colors hover:bg-slate-100", !canPrev && "invisible")}
                     disabled={!canPrev}
@@ -82,14 +102,14 @@ export default function ResultsPage() {
                     <ChevronLeft className="h-5 w-5 text-slate-500" />
                   </button>
 
-                  <div className="flex flex-1 items-center justify-center gap-4">
+                  <div className="flex flex-1 items-center justify-evenly">
                     {visible.map((entry, relIdx) => {
                       const absIdx = progressStart + relIdx;
                       const isCurrent = absIdx === scoreHistory.length - 1;
                       const prevEntry = absIdx > 0 ? scoreHistory[absIdx - 1] : null;
                       const delta = prevEntry ? entry.score - prevEntry.score : null;
                       return (
-                        <div key={entry.date} className="flex items-center gap-4">
+                        <div key={entry.date} className="flex items-center gap-3">
                           {relIdx > 0 && (
                             <span className={cn(
                               "text-base font-bold",
@@ -127,12 +147,17 @@ export default function ResultsPage() {
             );
           })()}
 
-          <section className="mb-6 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
-            <div>
-              <p className="text-sm font-semibold text-slate-500">Overall score out of 100</p>
-              <h1 className="mt-1 text-2xl font-black text-slate-950">Profile analysis</h1>
+          <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-slate-500">Overall score out of 100</p>
+                <h1 className="mt-1 text-2xl font-black text-slate-950">Profile analysis</h1>
+                <span className={cn("mt-2 inline-block rounded-full px-3 py-0.5 text-xs font-black", sClass)}>
+                  {sLabel}
+                </span>
+              </div>
+              <ScoreBadge score={analysis.overallScore} />
             </div>
-            <ScoreBadge score={analysis.overallScore} />
           </section>
 
           <section className="mb-6">
@@ -152,6 +177,32 @@ export default function ResultsPage() {
               ))}
             </div>
           </section>
+
+          {isGoodScore && (
+            <section className="mb-6 rounded-lg bg-slate-50 p-4 ring-1 ring-slate-200">
+              <p className="mb-3 text-sm font-black text-slate-950">Share your score</p>
+              <div className="flex gap-3">
+                <a
+                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#1D9BF0] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#1a8cd8] hover:shadow-md active:scale-[0.98]"
+                  href={twitterUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Twitter className="h-4 w-4" />
+                  Twitter
+                </a>
+                <a
+                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#0A66C2] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#004182] hover:shadow-md active:scale-[0.98]"
+                  href={linkedinUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Linkedin className="h-4 w-4" />
+                  LinkedIn
+                </a>
+              </div>
+            </section>
+          )}
 
           <div className="space-y-3">
             <Button onClick={() => router.push("/results/unlocked")}>
