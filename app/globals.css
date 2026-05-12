@@ -68,7 +68,27 @@ textarea {
 }
 
 .try-now-btn:hover {
-  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 115, 177, 0.4);
+}
+
+.landing-screen {
+  min-height: 100dvh;
+  width: 100%;
+  background: #ffffff;
+}
+
+.landing-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 480px;
+  padding-inline: 20px;
+}
+
+@media (min-width: 1024px) {
+  .landing-container {
+    max-width: 1200px;
+    padding-inline: 48px;
+  }
 }
 
 @keyframes loading-bar {
@@ -130,6 +150,20 @@ textarea {
 
   main {
     min-height: 100dvh;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    background: #f0f4f8;
+  }
+
+  .phone-shell {
+    width: 100%;
+    max-width: none;
+    border-inline: none;
+    box-shadow: none;
+    overflow-x: clip;
   }
 }
 

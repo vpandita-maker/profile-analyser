@@ -1,13 +1,10 @@
 "use client";
 
-import { ArrowRight, FileText, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart2, MapPin, ShieldCheck, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Input, Select, Textarea } from "@/components/ui/Input";
 import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -33,18 +30,20 @@ const INDUSTRIES = [
   "Other"
 ];
 
+const inputCls =
+  "h-11 w-full rounded-lg border border-[#EEEEEE] bg-white px-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0073B1]/40 focus:border-[#0073B1] focus:ring-2 focus:ring-[#0073B1]/10";
+
 function inferGoal(role: string): ContextAnswers["goal"] {
-  const normalized = role.toLowerCase();
-  return normalized.includes("intern") || normalized.includes("summer analyst") ? "Internship Search" : "Job Search";
+  const n = role.toLowerCase();
+  return n.includes("intern") || n.includes("summer analyst") ? "Internship Search" : "Job Search";
 }
 
 function inferGeography(location: string): ContextAnswers["geography"] {
-  const normalized = location.toLowerCase();
-  const indiaSignals = ["india", "bengaluru", "bangalore", "mumbai", "delhi", "hyderabad", "pune", "chennai", "gurgaon", "noida", "ahmedabad"];
-  const usSignals = ["us", "usa", "united states", "new york", "bay area", "san francisco", "california", "boston", "chicago", "seattle", "austin"];
-
-  if (indiaSignals.some((signal) => normalized.includes(signal))) return "India";
-  if (usSignals.some((signal) => normalized.includes(signal))) return "US";
+  const n = location.toLowerCase();
+  const india = ["india","bengaluru","bangalore","mumbai","delhi","hyderabad","pune","chennai","gurgaon","noida","ahmedabad"];
+  const us = ["us","usa","united states","new york","bay area","san francisco","california","boston","chicago","seattle","austin"];
+  if (india.some((s) => n.includes(s))) return "India";
+  if (us.some((s) => n.includes(s))) return "US";
   return "Other";
 }
 
@@ -54,6 +53,7 @@ export default function HomePage() {
   const setContextAnswers = useAnalyzerStore((state) => state.setContextAnswers);
   const resetContext = useAnalyzerStore((state) => state.resetContext);
   const clearAnalysis = useAnalyzerStore((state) => state.clearAnalysis);
+
   const [profileUrl, setProfileUrl] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [preferredIndustry, setPreferredIndustry] = useState("");
@@ -61,57 +61,41 @@ export default function HomePage() {
   const [locationPreference, setLocationPreference] = useState("");
   const [workPreference, setWorkPreference] = useState<WorkPreference | "">("");
   const [wins, setWins] = useState("");
+  const [scraping, setScraping] = useState(false);
+  const [error, setError] = useState("");
 
   const requiredFields = [profileUrl, targetRole, preferredIndustry, dreamCompany, locationPreference];
   const filledCount = requiredFields.filter((f) => f.trim()).length + (workPreference ? 1 : 0);
   const progress = Math.round((filledCount / 6) * 100);
-  const [scraping, setScraping] = useState(false);
-  const [error, setError] = useState("");
+
+  const canSubmit = Boolean(
+    profileUrl.trim() && targetRole.trim() && preferredIndustry.trim() &&
+    dreamCompany.trim() && locationPreference.trim() && workPreference
+  );
 
   function scrollToForm() {
     document.getElementById("profile-intake")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const canSubmit = Boolean(
-    profileUrl.trim() &&
-      targetRole.trim() &&
-      preferredIndustry.trim() &&
-      dreamCompany.trim() &&
-      locationPreference.trim() &&
-      workPreference
-  );
-
   async function analyzeProfile() {
-    const trimmedUrl = profileUrl.trim();
-    const trimmedRole = targetRole.trim();
-    const trimmedIndustry = preferredIndustry.trim();
-    const trimmedDreamCompany = dreamCompany.trim();
-    const trimmedLocationPreference = locationPreference.trim();
-
-    if (!canSubmit) {
-      return;
-    }
-
+    if (!canSubmit) return;
     setError("");
     setScraping(true);
-
     try {
       const response = await fetch("/api/profile/scrape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profileUrl: trimmedUrl })
+        body: JSON.stringify({ profileUrl: profileUrl.trim() })
       });
       const data = await response.json();
-
       if (!response.ok) {
         setError(data.error || "Could not import this profile automatically.");
         return;
       }
-
       const importedProfile = normalizeLinkedInProfile({
         ...data.profile,
         linkedinId: data.profile.linkedinId || "profile-user",
-        profileUrl: data.profile.profileUrl || trimmedUrl,
+        profileUrl: data.profile.profileUrl || profileUrl.trim(),
         name: data.profile.name || "LinkedIn Member",
         importSource: "scrape"
       } satisfies LinkedInProfile);
@@ -119,16 +103,16 @@ export default function HomePage() {
       resetContext();
       clearAnalysis();
       setContextAnswers({
-        goal: inferGoal(trimmedRole),
+        goal: inferGoal(targetRole.trim()),
         seniority: "",
-        industry: trimmedIndustry,
-        targetRole: trimmedRole,
-        geography: inferGeography(trimmedLocationPreference),
-        city: trimmedLocationPreference,
+        industry: preferredIndustry.trim(),
+        targetRole: targetRole.trim(),
+        geography: inferGeography(locationPreference.trim()),
+        city: locationPreference.trim(),
         timeline: "",
         challenges: [],
-        targetCompanies: trimmedDreamCompany,
-        outcome: `You are targeting ${trimmedRole} roles in ${trimmedIndustry}. Your dream company is ${trimmedDreamCompany}. Your location preference is ${trimmedLocationPreference}. Your preferred work style is ${workPreference}.`,
+        targetCompanies: dreamCompany.trim(),
+        outcome: `You are targeting ${targetRole.trim()} roles in ${preferredIndustry.trim()}. Your dream company is ${dreamCompany.trim()}. Your location preference is ${locationPreference.trim()}. Your preferred work style is ${workPreference}.`,
         networkSize: "",
         relocation: null,
         workPreference,
@@ -137,7 +121,7 @@ export default function HomePage() {
       setLinkedinData(importedProfile || ({
         ...data.profile,
         linkedinId: data.profile.linkedinId || "profile-user",
-        profileUrl: trimmedUrl,
+        profileUrl: profileUrl.trim(),
         name: data.profile.name || "LinkedIn Member",
         importSource: "scrape"
       } satisfies LinkedInProfile));
@@ -150,126 +134,212 @@ export default function HomePage() {
   }
 
   return (
-    <main className="app-screen safe-bottom">
-      <section className="app-container app-flow">
-        <div>
-          <div className="sticky top-0 z-20 -mx-4 mb-6 overflow-hidden border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur">
-            <div className="flex items-center justify-between px-4 py-2">
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-600 text-white">
-                  <FileText className="h-4 w-4" />
-                </span>
-                Profile Analyzer
-              </div>
-              <button
-                className="try-now-btn inline-flex h-8 items-center gap-1 rounded-lg bg-teal-600 px-3 text-xs font-black text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-teal-700 active:translate-y-0 active:scale-[0.97]"
-                onClick={scrollToForm}
-                type="button"
-              >
-                Try Now
-                <Sparkles className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            {progress > 0 && (
-              <div className="h-1 bg-slate-100">
-                <div
-                  className="h-1 bg-teal-500 transition-all duration-500 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            )}
-          </div>
+    <main className="landing-screen">
 
-          <div className="group mb-6 w-full overflow-hidden rounded-2xl border-2 border-slate-200 bg-slate-900 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-100">
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-30 w-full border-b border-[#EEEEEE] bg-white/95 backdrop-blur">
+        <div className="landing-container flex items-center justify-between py-3">
+          <div className="flex items-center gap-2">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#0073B1] text-white">
+              <BarChart2 className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-black text-[#0073B1]">Profile Analyzer</span>
+          </div>
+          <button
+            className="try-now-btn inline-flex items-center gap-1.5 rounded-lg bg-[#0073B1] px-4 py-2 text-xs font-black text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#005f96] hover:shadow-md active:scale-[0.97]"
+            onClick={scrollToForm}
+            type="button"
+          >
+            Join the Pro Tier
+            <Sparkles className="h-3.5 w-3.5" />
+          </button>
+        </div>
+        {progress > 0 && (
+          <div className="h-0.5 bg-[#EEEEEE]">
+            <div className="h-0.5 bg-[#0073B1] transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+      </header>
+
+      {/* ── Hero ── */}
+      <section className="w-full overflow-hidden bg-gradient-to-br from-[#0d1b2e] via-[#0a2d4a] to-[#004e8a]">
+        <div className="landing-container flex justify-center py-0">
+          <div className="w-full max-w-sm overflow-hidden">
             <Image
               alt="The big leagues"
-              className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              className="h-auto w-full object-cover"
               height={454}
               priority
               src="/big-leagues.svg"
               width={492}
             />
           </div>
+        </div>
+      </section>
 
-          <h1 className="text-[2.55rem] font-black leading-[1.06] text-slate-950">Get Recruited, Don&apos;t Just Apply.</h1>
-          <p className="mt-4 text-base leading-7 text-slate-600">
-            Every recruiter sees dozens of profiles, most get skipped. Align your LinkedIn to the exact role you want, get a personalized roadmap of what to fix, and watch your inbound offers increase.
-          </p>
+      {/* ── Two-column: Copy + Form ── */}
+      <section className="landing-container py-12 lg:py-20" id="profile-intake">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start lg:gap-20">
 
-          <div className="app-form-stack scroll-mt-24 space-y-4" id="profile-intake">
-            {error ? <Card className="border border-red-200 bg-red-50 text-sm leading-6 text-red-700">{error}</Card> : null}
-            <Field label="Your LinkedIn profile URL">
-              <Input
-                inputMode="url"
-                onChange={(event) => setProfileUrl(event.target.value)}
-                placeholder="Add your LinkedIn profile link here"
-                value={profileUrl}
-              />
-            </Field>
-            <Field label="What role are you targeting?">
-              <Input
-                onChange={(event) => setTargetRole(event.target.value)}
-                placeholder="Business analyst intern, product manager, software engineer"
-                value={targetRole}
-              />
-            </Field>
-            <Field label="What is your preferred industry?">
-              <Select
-                onChange={(event) => setPreferredIndustry(event.target.value)}
-                value={preferredIndustry}
+          {/* Left: Copy */}
+          <div className="lg:sticky lg:top-28">
+            <h1 className="text-[2.6rem] font-black leading-[1.06] text-[#0073B1] lg:text-5xl lg:leading-[1.05]">
+              Get Recruited,<br />Don&apos;t Just Apply.
+            </h1>
+            <ul className="mt-8 space-y-5">
+              {[
+                { label: "Direct", text: "Align your LinkedIn to the exact role you're targeting." },
+                { label: "Personalized", text: "Receive a data-driven fix roadmap built around your background." },
+                { label: "Results", text: "Watch inbound recruiter outreach increase." },
+              ].map(({ label, text }) => (
+                <li key={label} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0073B1] text-[10px] font-black text-white">→</span>
+                  <p className="text-[15px] leading-7 text-[#444444]">
+                    <span className="font-black text-[#0073B1]">{label}:</span>{" "}{text}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Right: Form */}
+          <div className="relative overflow-hidden rounded-2xl bg-white p-7 shadow-xl ring-1 ring-[#EEEEEE]">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,115,177,0.06),transparent_55%),radial-gradient(circle_at_bottom_left,rgba(0,30,60,0.04),transparent_50%)]" />
+            <div className="relative space-y-5">
+
+              {error ? (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+              ) : null}
+
+              <Field label="Your LinkedIn profile URL">
+                <div className="relative">
+                  <ShieldCheck className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#CCCCCC]" />
+                  <input
+                    className={cn(inputCls, "pl-9")}
+                    inputMode="url"
+                    onChange={(e) => setProfileUrl(e.target.value)}
+                    placeholder="linkedin.com/in/your-profile"
+                    value={profileUrl}
+                  />
+                </div>
+              </Field>
+
+              <Field label="What role are you targeting?">
+                <input
+                  className={inputCls}
+                  onChange={(e) => setTargetRole(e.target.value)}
+                  placeholder="e.g. Senior Product Manager, FinTech"
+                  value={targetRole}
+                />
+              </Field>
+
+              <Field label="What is your preferred industry?">
+                <select
+                  className={cn(inputCls, "cursor-pointer")}
+                  onChange={(e) => setPreferredIndustry(e.target.value)}
+                  value={preferredIndustry}
+                >
+                  <option value="">Select an industry</option>
+                  {INDUSTRIES.map((industry) => (
+                    <option key={industry} value={industry}>{industry}</option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field label="What is your dream company?">
+                <input
+                  className={inputCls}
+                  onChange={(e) => setDreamCompany(e.target.value)}
+                  placeholder="e.g. Netflix, Stripe, Amazon"
+                  value={dreamCompany}
+                />
+              </Field>
+
+              <Field label="What is your location preference?">
+                <div className="relative">
+                  <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#CCCCCC]" />
+                  <input
+                    className={cn(inputCls, "pl-9")}
+                    onChange={(e) => setLocationPreference(e.target.value)}
+                    placeholder="e.g. Austin, TX · Berlin, Germany · Remote (USA)"
+                    value={locationPreference}
+                  />
+                </div>
+              </Field>
+
+              <Field label="Do you prefer remote, hybrid, or in office?">
+                <div className="flex overflow-hidden rounded-full border border-[#EEEEEE]">
+                  {workPreferences.map((item) => (
+                    <button
+                      className={cn(
+                        "flex-1 py-2.5 text-sm font-semibold transition-all duration-200",
+                        workPreference === item
+                          ? "bg-[#0073B1] text-white"
+                          : "bg-white text-[#666666] hover:bg-[#F7F9FC]"
+                      )}
+                      key={item}
+                      onClick={() => setWorkPreference(item)}
+                      type="button"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+
+              <Field label="Anything you wish your LinkedIn highlighted better? (optional)">
+                <textarea
+                  className="min-h-24 w-full resize-none rounded-lg border border-[#EEEEEE] bg-white px-3 py-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0073B1]/40 focus:border-[#0073B1] focus:ring-2 focus:ring-[#0073B1]/10"
+                  onChange={(e) => setWins(e.target.value)}
+                  placeholder="Recent projects, awards, internships, coursework, or achievements relevant to the role you want"
+                  value={wins}
+                />
+              </Field>
+
+              <button
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0073B1] py-3.5 text-base font-black text-white transition-all hover:bg-[#005f96] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.99]"
+                disabled={!canSubmit || scraping}
+                onClick={analyzeProfile}
+                type="button"
               >
-                <option value="">Select an industry</option>
-                {INDUSTRIES.map((industry) => (
-                  <option key={industry} value={industry}>{industry}</option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="What is your dream company?">
-              <Input
-                onChange={(event) => setDreamCompany(event.target.value)}
-                placeholder="Google, Deloitte, Salesforce"
-                value={dreamCompany}
-              />
-            </Field>
-            <Field label="What is your location preference?">
-              <Input
-                onChange={(event) => setLocationPreference(event.target.value)}
-                placeholder="New York, Bengaluru, London, anywhere in the US"
-                value={locationPreference}
-              />
-            </Field>
-            <Field label="Do you prefer remote, hybrid, or in office?">
-              <div className="grid grid-cols-3 gap-2">
-                {workPreferences.map((item) => (
-                  <button
-                    className={cn(
-                      "h-11 rounded-lg border px-2 text-sm font-bold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.99]",
-                      workPreference === item ? "border-teal-600 bg-teal-50 text-teal-800" : "border-slate-200 bg-white text-slate-700"
-                    )}
-                    key={item}
-                    onClick={() => setWorkPreference(item)}
-                    type="button"
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </Field>
-            <Field label="Anything you wish your LinkedIn highlighted better? (optional)">
-              <Textarea
-                onChange={(event) => setWins(event.target.value)}
-                placeholder="Recent projects, awards, internships, coursework, or achievements that are relevant to the role you want but not well represented on your profile"
-                value={wins}
-              />
-            </Field>
-            <Button disabled={!canSubmit || scraping} loading={scraping} onClick={analyzeProfile}>
-              Analyze My Profile
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+                {scraping ? "Analyzing your profile…" : "Analyze My Profile"}
+                {!scraping && <ArrowRight className="h-5 w-5" />}
+              </button>
+
+            </div>
           </div>
         </div>
-
       </section>
+
+      {/* ── Trust Band ── */}
+      <section className="w-full border-y border-[#EEEEEE] bg-[#FAFAFA] py-10">
+        <div className="landing-container">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-[#AAAAAA]">
+            A trusted platform used for applications at
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-10 lg:gap-20">
+            <Image alt="Goldman Sachs" height={68} src="/logo-goldman-sachs.svg" width={180} />
+            <Image alt="EY" height={88} src="/logo-ey.svg" width={110} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer CTA ── */}
+      <section className="landing-container py-20 text-center">
+        <h2 className="text-3xl font-black text-[#333333] lg:text-4xl">Ready to get noticed by recruiters?</h2>
+        <p className="mt-3 text-[15px] text-[#666666]">
+          Join thousands of professionals improving their LinkedIn score today.
+        </p>
+        <button
+          className="mt-8 inline-flex items-center gap-2 rounded-xl bg-[#0073B1] px-10 py-4 text-lg font-black text-white transition-all hover:bg-[#005f96] hover:shadow-xl active:scale-[0.98]"
+          onClick={scrollToForm}
+          type="button"
+        >
+          Analyze My Profile
+          <ArrowRight className="h-5 w-5" />
+        </button>
+      </section>
+
     </main>
   );
 }
@@ -277,7 +347,7 @@ export default function HomePage() {
 function Field({ children, label }: { children: ReactNode; label: string }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-black text-slate-950">{label}</span>
+      <span className="text-sm font-black text-[#333333]">{label}</span>
       {children}
     </label>
   );
