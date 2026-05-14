@@ -21,6 +21,8 @@ export default function UnlockedResultsPage() {
   const [refreshingFixes, setRefreshingFixes] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
   const [unlockEmail, setUnlockEmail] = useState("");
+  const [unlockFirstName, setUnlockFirstName] = useState("");
+  const [unlockLastName, setUnlockLastName] = useState("");
   const [unlocking, setUnlocking] = useState(false);
   const [unlockSent, setUnlockSent] = useState(false);
   const [unlockError, setUnlockError] = useState("");
@@ -85,10 +87,11 @@ export default function UnlockedResultsPage() {
     setUnlocking(true);
     setUnlockError("");
     try {
+      const friendName = [unlockFirstName.trim(), unlockLastName.trim()].filter(Boolean).join(" ");
       const response = await fetch("/api/invites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId, friendEmail: unlockEmail, inviterName: profile?.name })
+        body: JSON.stringify({ analysisId, friendEmail: unlockEmail, inviterName: profile?.name, friendName: friendName || undefined })
       });
       if (!response.ok) {
         setUnlockError("Invite could not be sent. Please try again.");
@@ -213,6 +216,18 @@ export default function UnlockedResultsPage() {
                       </div>
                     ) : (
                       <>
+                        <div className="flex gap-2">
+                          <Input
+                            onChange={(e) => setUnlockFirstName(e.target.value)}
+                            placeholder="First name"
+                            value={unlockFirstName}
+                          />
+                          <Input
+                            onChange={(e) => setUnlockLastName(e.target.value)}
+                            placeholder="Last name"
+                            value={unlockLastName}
+                          />
+                        </div>
                         <Input
                           inputMode="email"
                           onChange={(e) => setUnlockEmail(e.target.value)}
