@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "iHeartLinkedIn | Free LinkedIn Profile Review Tool",
-  description: "Transform your LinkedIn profile into a recruiter magnet with iHeartLinkedIn. Our data driven platform analyzes your profile against your target role, industry, and company to deliver a personalized roadmap for improvement. Stop applying to jobs and get discovered by recruiters actively seeking talent like you. Whether you're targeting tech roles at FAANG companies, finance positions at top banks, or consulting opportunities, iHeartLinkedIn aligns every section of your profile to maximize visibility and inbound outreach.",
+  description: "Free AI-powered LinkedIn profile review. Get a personalized fix roadmap tailored to your role, industry & dream company. Get recruited, don't just apply.",
   openGraph: {
     title: "iHeartLinkedIn | Free LinkedIn Profile Review Tool",
     description: "Transform your LinkedIn profile into a recruiter magnet. Get a personalized roadmap to maximize visibility and inbound recruiter outreach.",
