@@ -143,7 +143,7 @@ export default function HomePage() {
     <main className="landing-screen">
 
       {/* ── Header ── */}
-      <header className="sticky top-0 z-30 w-full border-b border-[#EEEEEE] bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 w-full border-b border-[#0A66C2]/40 bg-white/95 backdrop-blur" style={{ boxShadow: "0 1px 16px rgba(10,102,194,0.22)" }}>
         <div className="landing-container flex items-center justify-between py-3">
           <div className="flex items-center">
             <img src="/logo-iheartlinkedin.svg" alt="iHeartLinkedIn" style={{ height: "32px", width: "auto" }} />
@@ -165,18 +165,20 @@ export default function HomePage() {
       </header>
 
       {/* ── Hero ── */}
-      <section className="w-full px-6">
+      <section className="w-full bg-[#0A66C2]/[0.08] px-6 pb-6">
         <h1 className="pt-6 pb-4 text-[2.4rem] font-black leading-[1.06] text-[#0A66C2]">
           Get Recruited,<br />Don&apos;t Just Apply.
         </h1>
-        <Image
-          alt="Before and after LinkedIn profile transformation"
-          className="h-auto w-full object-cover"
-          height={454}
-          priority
-          src="/hero-before-after.png"
-          width={492}
-        />
+        <div className="overflow-hidden">
+          <Image
+            alt="Before and after LinkedIn profile transformation"
+            className="h-auto w-full object-cover transition-transform duration-500 ease-out hover:scale-[1.06]"
+            height={454}
+            priority
+            src="/hero-before-after.png"
+            width={492}
+          />
+        </div>
       </section>
 
       {/* ── Copy + Form ── */}
