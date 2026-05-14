@@ -61,8 +61,8 @@ export function UnlockOnboardingModal({ isFullyUnlocked, onInviteNow }: Props) {
                 <span className="text-sm font-black text-[#0A66C2]">@</span>
               </div>
               <div>
-                <p className="text-sm font-black text-slate-900">Enter a friend's email</p>
-                <p className="text-xs text-slate-500 leading-relaxed">They'll get a personal invite to improve their own LinkedIn</p>
+                <p className="text-sm font-black text-slate-900">Enter a friend&apos;s email</p>
+                <p className="text-xs text-slate-500 leading-relaxed">They&apos;ll get a personal invite to improve their own LinkedIn</p>
               </div>
             </div>
 
@@ -88,7 +88,7 @@ export function UnlockOnboardingModal({ isFullyUnlocked, onInviteNow }: Props) {
               className="w-full py-2 text-xs font-semibold text-slate-400 transition-colors hover:text-slate-600"
               onClick={dismiss}
             >
-              I'll do it later
+              I&apos;ll do it later
             </button>
           </div>
         </div>
