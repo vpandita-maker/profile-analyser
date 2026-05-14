@@ -166,6 +166,9 @@ export default function HomePage() {
 
       {/* ── Hero ── */}
       <section className="w-full px-6">
+        <h1 className="pt-6 pb-4 text-[2.4rem] font-black leading-[1.06] text-[#0A66C2]">
+          Get Recruited,<br />Don&apos;t Just Apply.
+        </h1>
         <Image
           alt="Before and after LinkedIn profile transformation"
           className="h-auto w-full object-cover"
@@ -178,10 +181,7 @@ export default function HomePage() {
 
       {/* ── Copy + Form ── */}
       <section className="landing-container py-8" id="profile-intake">
-          <h1 className="text-[2.4rem] font-black leading-[1.06] text-[#0A66C2]">
-            Get Recruited,<br />Don&apos;t Just Apply.
-          </h1>
-          <ul className="mt-5 mb-7 space-y-4">
+          <ul className="mb-7 space-y-4">
             {[
               { label: "Direct", text: "Align your LinkedIn to the exact role you're targeting." },
               { label: "Personalized", text: "Receive a data-driven fix roadmap built around your background." },
