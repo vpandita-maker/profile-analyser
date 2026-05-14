@@ -184,7 +184,8 @@ export default function HomePage() {
       </section>
 
       {/* ── Copy + Form ── */}
-      <section className="landing-container py-8" id="profile-intake">
+      <section className="w-full bg-[#0A66C2]/[0.08]" id="profile-intake">
+      <div className="landing-container py-8">
           <ul className="mb-7 space-y-4">
             {[
               { label: "Direct", text: "Align your LinkedIn to the exact role you're targeting." },
@@ -306,6 +307,7 @@ export default function HomePage() {
 
             </div>
           </div>
+      </div>
       </section>
 
       {/* ── Trust Band ── */}
