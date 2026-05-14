@@ -10,7 +10,7 @@ import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { normalizeAnalysis } from "@/lib/analysis";
-import { useAnalyzerStore } from "@/lib/store";
+import { useAnalyzerStore, useStoreHydrated } from "@/lib/store";
 import { isEmail } from "@/lib/utils";
 
 export default function UnlockedResultsPage() {
@@ -27,6 +27,7 @@ export default function UnlockedResultsPage() {
   const [unlockSent, setUnlockSent] = useState(false);
   const [unlockError, setUnlockError] = useState("");
 
+  const hydrated = useStoreHydrated();
   const profile = useAnalyzerStore((state) => state.linkedinData);
   const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
@@ -83,7 +84,11 @@ export default function UnlockedResultsPage() {
   }, [analysis, contextAnswers, hasFixes, profile, setAnalysis, setLinkedinData]);
 
   async function sendUnlockInvite() {
-    if (!isEmail(unlockEmail) || !analysisId) return;
+    if (!isEmail(unlockEmail)) return;
+    if (!analysisId) {
+      setUnlockError("Analysis data missing. Please go back and run the analysis again.");
+      return;
+    }
     setUnlocking(true);
     setUnlockError("");
     try {
@@ -104,6 +109,10 @@ export default function UnlockedResultsPage() {
     } finally {
       setUnlocking(false);
     }
+  }
+
+  if (!hydrated) {
+    return <main className="app-screen grid place-items-center px-4" />;
   }
 
   if (!analysis) {

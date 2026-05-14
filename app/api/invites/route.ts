@@ -4,6 +4,16 @@ import { sendInviteEmail } from "@/lib/email";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { isEmail } from "@/lib/utils";
 
+const rateMap = new Map<string, { count: number; reset: number }>();
+function checkRate(ip: string, max: number, windowMs: number) {
+  const now = Date.now();
+  const rec = rateMap.get(ip);
+  if (!rec || now > rec.reset) { rateMap.set(ip, { count: 1, reset: now + windowMs }); return true; }
+  if (rec.count >= max) return false;
+  rec.count++;
+  return true;
+}
+
 const inviteSchema = z.object({
   analysisId: z.string().min(1),
   friendEmail: z.string().email(),
@@ -12,7 +22,17 @@ const inviteSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const body = inviteSchema.parse(await request.json());
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+  if (!checkRate(ip, 10, 60_000)) {
+    return NextResponse.json({ error: "Too many requests. Please wait a minute and try again." }, { status: 429 });
+  }
+
+  let body: z.infer<typeof inviteSchema>;
+  try {
+    body = inviteSchema.parse(await request.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid request data." }, { status: 400 });
+  }
   const inviteId = crypto.randomUUID();
   const inviteToken = crypto.randomUUID();
   let savedInviteId = inviteId;
@@ -43,10 +63,13 @@ export async function POST(request: Request) {
 
   try {
     const email = await sendInviteEmail({ friendEmail: body.friendEmail.toLowerCase(), inviteToken, inviterName: body.inviterName, friendName: body.friendName });
-    return NextResponse.json({ inviteId: savedInviteId, status: "sent", unlocked: true, email });
+    if (!email.sent) {
+      return NextResponse.json({ error: "Invite could not be sent. Please check the email address and try again." }, { status: 502 });
+    }
+    return NextResponse.json({ inviteId: savedInviteId, status: "sent", unlocked: true });
   } catch (error) {
     console.error("Invite email failed", error);
-    return NextResponse.json({ inviteId: savedInviteId, status: "sent", unlocked: true, email: { sent: false } });
+    return NextResponse.json({ error: "Invite could not be sent. Please try again." }, { status: 502 });
   }
 }
 

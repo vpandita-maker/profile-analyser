@@ -29,8 +29,28 @@ const analyzeSchema = z.object({
   contextAnswers: z.record(z.unknown())
 });
 
+const rateMap = new Map<string, { count: number; reset: number }>();
+function checkRate(ip: string, max: number, windowMs: number) {
+  const now = Date.now();
+  const rec = rateMap.get(ip);
+  if (!rec || now > rec.reset) { rateMap.set(ip, { count: 1, reset: now + windowMs }); return true; }
+  if (rec.count >= max) return false;
+  rec.count++;
+  return true;
+}
+
 export async function POST(request: Request) {
-  const body = analyzeSchema.parse(await request.json());
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+  if (!checkRate(ip, 5, 60_000)) {
+    return NextResponse.json({ error: "Too many requests. Please wait a minute and try again." }, { status: 429 });
+  }
+
+  let body: z.infer<typeof analyzeSchema>;
+  try {
+    body = analyzeSchema.parse(await request.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid request data." }, { status: 400 });
+  }
   const profile = normalizeLinkedInProfile({
     linkedinId: body.linkedinId,
     profileUrl: body.profileUrl,
@@ -56,7 +76,14 @@ export async function POST(request: Request) {
   if (!["Job Search", "Internship Search"].includes(contextAnswers.goal)) {
     contextAnswers.goal = "Job Search";
   }
-  const rawAnalysis = await analyzeLinkedInProfile(profile, contextAnswers);
+
+  let rawAnalysis;
+  try {
+    rawAnalysis = await analyzeLinkedInProfile(profile, contextAnswers);
+  } catch (err) {
+    console.error("Analysis failed", err);
+    return NextResponse.json({ error: "Analysis could not be completed. Please try again." }, { status: 500 });
+  }
   const analysis = normalizeAnalysis(rawAnalysis) || rawAnalysis;
   const supabase = getSupabaseAdmin();
   const userId = profile.linkedinId;

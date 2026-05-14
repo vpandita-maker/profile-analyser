@@ -8,7 +8,7 @@ import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
 import { ScoreBadge } from "@/components/ui/Badge";
 import { normalizeAnalysis } from "@/lib/analysis";
-import { useAnalyzerStore } from "@/lib/store";
+import { useAnalyzerStore, useStoreHydrated } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -40,14 +40,19 @@ function scoreLabel(score: number): { label: string; className: string } {
 }
 
 const PROGRESS_VISIBLE = 3;
-const APP_URL = "https://iheartlinkedin.vercel.app";
+const APP_URL = "https://iheartlinkedin.app";
 
 export default function ResultsPage() {
   const router = useRouter();
+  const hydrated = useStoreHydrated();
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
   const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
   const [offsetFromEnd, setOffsetFromEnd] = useState(0);
+
+  if (!hydrated) {
+    return <main className="app-screen grid place-items-center px-4" />;
+  }
 
   if (!analysis) {
     return (

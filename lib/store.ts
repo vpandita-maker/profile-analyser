@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useEffect, useState } from "react";
 import { isFallbackHeadline, isFallbackName, normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import type { AnalysisResult, ContextAnswers, LinkedInProfile } from "@/lib/types";
 
@@ -125,3 +126,13 @@ export const useAnalyzerStore = create<AnalyzerState>()(
     { name: "linkedin-analyzer-store" }
   )
 );
+
+export function useStoreHydrated() {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    const unsub = useAnalyzerStore.persist.onFinishHydration(() => setHydrated(true));
+    if (useAnalyzerStore.persist.hasHydrated()) setHydrated(true);
+    return unsub;
+  }, []);
+  return hydrated;
+}

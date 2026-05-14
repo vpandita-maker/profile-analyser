@@ -323,7 +323,7 @@ export async function analyzeLinkedInProfile(profile: LinkedInProfile, context: 
   }
 
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
+    const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY, timeout: 30_000 });
     const response = await anthropic.messages.create({
       model: process.env.CLAUDE_MODEL || "claude-sonnet-4-6",
       max_tokens: 2000,

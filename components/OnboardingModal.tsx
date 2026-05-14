@@ -9,22 +9,22 @@ const slides = [
   {
     icon: <Search className="h-8 w-8 text-[#0A66C2]" />,
     title: "Know exactly why recruiters scroll past you",
-    body: "Your LinkedIn score tells recruiters whether to click your profile. Most people never know what's costing them opportunities — until now.",
+    body: "Your LinkedIn score tells recruiters whether to click your profile. Most people never know what is costing them opportunities. Until now.",
   },
   {
     icon: <BarChart2 className="h-8 w-8 text-[#0A66C2]" />,
     title: "Get a score built around your target role",
-    body: "We analyze your profile against the specific role, industry, and company you're going after — not a generic checklist.",
+    body: "We analyze your profile against the specific role, industry, and company you are going after. Not a generic checklist.",
     steps: [
       "Paste your LinkedIn URL",
-      "Tell us your target role & dream company",
-      "Receive a personalized score + fix roadmap",
+      "Tell us your target role and dream company",
+      "Receive a personalized score and fix roadmap",
     ],
   },
   {
     icon: <ListChecks className="h-8 w-8 text-[#0A66C2]" />,
     title: "Walk away with a fix roadmap",
-    body: "Every fix is ranked by impact, labeled by difficulty, and ready to copy-paste. Most users see a meaningful score improvement within a week.",
+    body: "Every fix is ranked by impact, labeled by difficulty, and ready to copy paste. Most users see a meaningful score improvement within a week.",
   },
 ];
 
@@ -33,13 +33,15 @@ export function OnboardingModal() {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    try {
+      if (!localStorage.getItem(STORAGE_KEY)) setOpen(true);
+    } catch {
       setOpen(true);
     }
   }, []);
 
   function dismiss() {
-    localStorage.setItem(STORAGE_KEY, "1");
+    try { localStorage.setItem(STORAGE_KEY, "1"); } catch { /* private browsing */ }
     setOpen(false);
   }
 
