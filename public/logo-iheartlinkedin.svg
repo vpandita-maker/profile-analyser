@@ -2,7 +2,7 @@
   <!-- Bold "I" -->
   <text x="2" y="100"
     font-family="'Arial Black','Helvetica Neue',Arial,sans-serif"
-    font-size="90" font-weight="900" fill="#ffffff">I</text>
+    font-size="90" font-weight="900" fill="#1a1a1a">I</text>
 
   <!-- Red heart: centered at x=112, equal ~20px gap from I and box -->
   <path d="M112,42 C112,28 90,12 68,22 C48,34 48,58 112,108 C176,58 176,34 156,22 C134,12 112,28 112,42Z" fill="#CC1F1A"/>
