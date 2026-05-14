@@ -184,8 +184,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Copy + Form ── */}
-      <section className="w-full bg-[#0A66C2]/[0.08]" id="profile-intake">
-      <div className="landing-container py-8">
+      <section className="landing-container py-8" id="profile-intake">
           <ul className="mb-7 space-y-4">
             {[
               { label: "Direct", text: "Align your LinkedIn to the exact role you're targeting." },
@@ -307,11 +306,10 @@ export default function HomePage() {
 
             </div>
           </div>
-      </div>
       </section>
 
       {/* ── Trust Band ── */}
-      <section className="w-full border-y border-[#EEEEEE] bg-[#F3F2EF] py-10">
+      <section className="w-full border-y border-[#0A66C2]/20 bg-[#0A66C2]/[0.08] py-10">
         <div className="landing-container">
           <p className="text-center text-xs font-semibold uppercase tracking-widest text-[#AAAAAA]">
             A trusted platform used for applications at
