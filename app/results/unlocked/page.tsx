@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FixCard } from "@/components/FixCard";
 import { Loading } from "@/components/Loading";
+import { UnlockOnboardingModal } from "@/components/UnlockOnboardingModal";
 import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -15,6 +16,7 @@ import { isEmail } from "@/lib/utils";
 export default function UnlockedResultsPage() {
   const router = useRouter();
   const startedFixRefresh = useRef(false);
+  const lockSectionRef = useRef<HTMLDivElement>(null);
   const [introLoading, setIntroLoading] = useState(false);
   const [refreshingFixes, setRefreshingFixes] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
@@ -125,8 +127,13 @@ export default function UnlockedResultsPage() {
   const totalBump = allFixes.reduce((sum, fix) => sum + bumpFor(fix), 0);
   const projectedScore = Math.min(100, analysis.overallScore + totalBump);
 
+  function scrollToLock() {
+    lockSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   return (
     <main className="app-screen safe-bottom">
+      <UnlockOnboardingModal isFullyUnlocked={isFullyUnlocked} onInviteNow={scrollToLock} />
       <div className="app-container">
         <div className="sticky top-0 z-20 -mx-4 border-b border-slate-200 bg-white/90 backdrop-blur">
           <div className="flex items-center justify-between px-4 py-2">
@@ -189,7 +196,7 @@ export default function UnlockedResultsPage() {
                       <FixCard key={fix.title} fix={fix} />
                     ))}
                   </div>
-                  <div className="mt-1 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 space-y-3">
+                  <div ref={lockSectionRef} className="mt-1 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 space-y-3">
                     <div className="flex items-center gap-2">
                       <LockKeyhole className="h-5 w-5 text-teal-600" />
                       <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
