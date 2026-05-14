@@ -425,7 +425,7 @@ function SlideToAnswer({ onSlide }: { onSlide: () => void }) {
       onPointerUp={onPointerUp}
     >
       <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-medium text-white">
-        {done ? "Swipe back to reset" : "Slide to answer"}
+        {done ? "Connected!" : "Slide to answer"}
       </span>
       <div
         className="relative z-10 flex aspect-square h-[88%] items-center justify-center rounded-full bg-white shadow"
