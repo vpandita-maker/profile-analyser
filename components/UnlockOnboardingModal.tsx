@@ -52,7 +52,7 @@ export function UnlockOnboardingModal({ isFullyUnlocked, onInviteNow }: Props) {
               </div>
               <div>
                 <p className="text-sm font-black text-slate-900">2 fixes are locked right now</p>
-                <p className="text-xs text-slate-500 leading-relaxed">They're blurred below your current results</p>
+                <p className="text-xs text-slate-500 leading-relaxed">They&apos;re blurred below your current results</p>
               </div>
             </div>
 
