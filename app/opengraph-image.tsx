@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "iHeartLinkedIn | Free LinkedIn profile review";
+export const alt = "iHeartLinkedIn | Free LinkedIn Profile Review Tool";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -57,7 +57,7 @@ export default function OGImage() {
           borderRadius: "999px", padding: "12px 32px",
           fontSize: "20px", fontWeight: "700", color: "#ffffff"
         }}>
-          iheartlinkedin.vercel.app
+          iheartlinkedin.app
         </div>
       </div>
     ),
