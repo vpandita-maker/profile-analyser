@@ -1,9 +1,7 @@
 "use client";
 
 import { Gift, LockKeyhole, LockKeyholeOpen, X } from "lucide-react";
-import { useEffect, useState } from "react";
-
-const STORAGE_KEY = "ihl-unlock-onboarding-seen";
+import { useState } from "react";
 
 interface Props {
   isFullyUnlocked: boolean;
@@ -11,16 +9,9 @@ interface Props {
 }
 
 export function UnlockOnboardingModal({ isFullyUnlocked, onInviteNow }: Props) {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isFullyUnlocked && !localStorage.getItem(STORAGE_KEY)) {
-      setOpen(true);
-    }
-  }, [isFullyUnlocked]);
+  const [open, setOpen] = useState(!isFullyUnlocked);
 
   function dismiss() {
-    localStorage.setItem(STORAGE_KEY, "1");
     setOpen(false);
   }
 
