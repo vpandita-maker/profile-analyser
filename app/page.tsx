@@ -9,6 +9,7 @@ import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { ContextAnswers, LinkedInProfile, WorkPreference } from "@/lib/types";
+import { OnboardingModal } from "@/components/OnboardingModal";
 
 const workPreferences: WorkPreference[] = ["Remote", "Hybrid", "In office"];
 
@@ -141,6 +142,7 @@ export default function HomePage() {
 
   return (
     <main className="landing-screen">
+      <OnboardingModal />
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-30 w-full border-b border-[#0A66C2]/40 bg-white/95 backdrop-blur" style={{ boxShadow: "0 1px 16px rgba(10,102,194,0.22)" }}>
