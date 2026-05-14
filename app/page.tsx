@@ -165,19 +165,15 @@ export default function HomePage() {
       </header>
 
       {/* ── Hero ── */}
-      <section className="w-full bg-gradient-to-br from-[#0d1b2e] via-[#0a2d4a] to-[#004e8a]">
-        <div className="landing-container flex justify-center py-6">
-          <div className="w-full max-w-sm px-6">
-            <Image
-              alt="Before and after LinkedIn profile transformation"
-              className="h-auto w-full rounded-2xl object-cover shadow-2xl"
-              height={454}
-              priority
-              src="/hero-before-after.png"
-              width={492}
-            />
-          </div>
-        </div>
+      <section className="w-full px-6">
+        <Image
+          alt="Before and after LinkedIn profile transformation"
+          className="h-auto w-full object-cover"
+          height={454}
+          priority
+          src="/hero-before-after.png"
+          width={492}
+        />
       </section>
 
       {/* ── Copy + Form ── */}
