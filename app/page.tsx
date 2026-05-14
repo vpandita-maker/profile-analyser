@@ -3,7 +3,7 @@
 import { ArrowRight, MapPin, ShieldCheck, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
@@ -167,7 +167,7 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section className="w-full overflow-hidden bg-gradient-to-br from-[#0d1b2e] via-[#0a2d4a] to-[#004e8a]">
         <div className="landing-container flex justify-center py-0">
-          <div className="w-full max-w-sm overflow-hidden">
+          <div className="relative w-full max-w-sm overflow-hidden">
             <Image
               alt="The big leagues"
               className="h-auto w-full object-cover"
@@ -176,6 +176,13 @@ export default function HomePage() {
               src="/big-leagues.svg"
               width={492}
             />
+            {/* Interactive slide button positioned over where the SVG button was */}
+            <div
+              className="absolute"
+              style={{ left: "17.5%", top: "76.6%", width: "65%", height: "15%" }}
+            >
+              <SlideToAnswer onSlide={scrollToForm} />
+            </div>
           </div>
         </div>
       </section>
@@ -363,5 +370,61 @@ function Field({ children, label }: { children: ReactNode; label: string }) {
       <span className="text-sm font-black text-[#333333]">{label}</span>
       {children}
     </label>
+  );
+}
+
+function SlideToAnswer({ onSlide }: { onSlide: () => void }) {
+  const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [done, setDone] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const startRef = useRef(0);
+
+  function onPointerDown(e: React.PointerEvent) {
+    if (done) return;
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    setDragging(true);
+    startRef.current = e.clientX - offset;
+  }
+
+  function onPointerMove(e: React.PointerEvent) {
+    if (!dragging || done) return;
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const max = rect.width - rect.height - 4;
+    const newOffset = Math.max(0, Math.min(e.clientX - startRef.current, max));
+    setOffset(newOffset);
+    if (newOffset >= max * 0.82) {
+      setDone(true);
+      setDragging(false);
+      onSlide();
+    }
+  }
+
+  function onPointerUp() {
+    if (!done) setOffset(0);
+    setDragging(false);
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex h-full w-full touch-none select-none items-center rounded-full bg-[#0A66C2] px-1 shadow-lg"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+    >
+      <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-medium text-white">
+        {done ? "Connecting…" : "Slide to answer"}
+      </span>
+      <div
+        className="relative z-10 flex aspect-square h-[88%] items-center justify-center rounded-full bg-white shadow"
+        style={{ transform: `translateX(${offset}px)`, transition: dragging ? "none" : "transform 0.3s ease" }}
+      >
+        <svg viewBox="0 0 24 24" className="h-[45%] w-[45%] fill-[#0A66C2]">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.27-.27.65-.38 1-.2 1.1.37 2.3.57 3.6.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.57 21 3 13.43 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.3.2 2.5.57 3.6.1.32 0 .7-.22.97L6.6 10.8z"/>
+        </svg>
+      </div>
+    </div>
   );
 }
