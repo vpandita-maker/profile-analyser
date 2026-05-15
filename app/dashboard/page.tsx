@@ -9,7 +9,7 @@ interface DashboardData {
   viralCoeff: number;
   invitesSent: number;
   unlocked: number;
-  visitorsToday: number | null;
+  uniquePageViewsToday: number | null;
   funnel: Array<{ label: string; value: number }>;
   recent: Array<{ role: string; industry: string; score: number; unlocked: boolean; timeIST: string }>;
   topRoles: Array<[string, number]>;
@@ -155,9 +155,9 @@ export default function DashboardPage() {
         <Stat label="Invites Sent" value={data.invitesSent} sub={<span className="text-[11px] text-slate-500">{pct(data.invitesSent, data.analyses)} of users</span>} />
         <Stat label="Unlocked" value={data.unlocked} sub={<span className="text-[11px] text-slate-500">{pct(data.unlocked, data.analyses)} of users</span>} />
         <Stat
-          label={isToday ? "Visitors Today" : "Visitors"}
-          value={data.visitorsToday !== null ? data.visitorsToday : "—"}
-          sub={data.visitorsToday === null ? <span className="text-[11px] text-slate-600">{isToday ? "Connect GA4" : "Today only"}</span> : undefined}
+          label={isToday ? "Unique Page Views Today" : "Unique Page Views"}
+          value={data.uniquePageViewsToday !== null ? data.uniquePageViewsToday : "—"}
+          sub={data.uniquePageViewsToday === null ? <span className="text-[11px] text-slate-600">{isToday ? "Connect GA4" : "Today only"}</span> : undefined}
         />
       </div>
 

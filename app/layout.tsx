@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-RJ8W3KVJSV";
 
 export const metadata: Metadata = {
   title: "iHeartLinkedIn | Free LinkedIn Profile Review Tool",
@@ -35,18 +36,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8W3KVJSV" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-RJ8W3KVJSV');
-            `,
-          }}
-        />
+        {gaMeasurementId && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${gaMeasurementId}');
+                `,
+              }}
+            />
+          </>
+        )}
       </head>
       <body className={inter.className}>
         <div className="phone-shell">

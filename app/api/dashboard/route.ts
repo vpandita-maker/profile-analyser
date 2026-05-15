@@ -86,7 +86,7 @@ export async function GET(request: Request) {
     viralCoeff,
     invitesSent: invites.length,
     unlocked: analyses.filter((a) => a.is_unlocked).length,
-    visitorsToday: isToday ? (ga4?.visitorsToday ?? null) : null,
+    uniquePageViewsToday: isToday ? (ga4?.uniquePageViewsToday ?? null) : null,
     funnel: [
       { label: "Analyses", value: analyses.length },
       { label: "Got Fixes", value: analyses.filter((a) => a.analysis_json?.topFixes?.length > 0).length },

@@ -1,43 +1,75 @@
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
 export interface GA4Stats {
-  visitorsToday: number;
-  visitorsYesterday: number;
+  uniquePageViewsToday: number;
+  uniquePageViewsYesterday: number;
   sessionsToday: number;
   sessionsYesterday: number;
 }
 
+function getGoogleCredentials() {
+  const credentialsJson =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON ??
+    (process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64
+      ? Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64, "base64").toString("utf8")
+      : null);
+
+  if (!credentialsJson) return undefined;
+
+  const credentials = JSON.parse(credentialsJson) as { private_key?: string };
+
+  if (credentials.private_key) {
+    credentials.private_key = credentials.private_key.replace(/\\n/g, "\n");
+  }
+
+  return credentials;
+}
+
 export async function getGA4Stats(): Promise<GA4Stats | null> {
   const propertyId = process.env.GA4_PROPERTY_ID;
-  const credentialsJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
 
-  if (!propertyId || !credentialsJson) return null;
+  if (!propertyId) return null;
 
   try {
-    const credentials = JSON.parse(credentialsJson);
-    const client = new BetaAnalyticsDataClient({ credentials });
+    const credentials = getGoogleCredentials();
+    const client = new BetaAnalyticsDataClient({ credentials, fallback: true });
 
-    const [response] = await client.runReport({
-      property: `properties/${propertyId}`,
-      dateRanges: [
-        { startDate: "today", endDate: "today" },
-        { startDate: "yesterday", endDate: "yesterday" },
-      ],
-      metrics: [{ name: "activeUsers" }, { name: "sessions" }],
-      dimensions: [{ name: "dateRange" }],
-    });
+    const [todayResponse, yesterdayResponse] = await Promise.all([
+      client.runReport({
+        property: `properties/${propertyId}`,
+        dateRanges: [{ startDate: "today", endDate: "today" }],
+        metrics: [{ name: "activeUsers" }, { name: "sessions" }],
+        dimensionFilter: {
+          filter: {
+            fieldName: "eventName",
+            stringFilter: { matchType: "EXACT", value: "page_view" },
+          },
+        },
+      }),
+      client.runReport({
+        property: `properties/${propertyId}`,
+        dateRanges: [{ startDate: "yesterday", endDate: "yesterday" }],
+        metrics: [{ name: "activeUsers" }, { name: "sessions" }],
+        dimensionFilter: {
+          filter: {
+            fieldName: "eventName",
+            stringFilter: { matchType: "EXACT", value: "page_view" },
+          },
+        },
+      }),
+    ]);
 
-    const rows = response.rows ?? [];
-    const todayRow = rows.find((r) => r.dimensionValues?.[0]?.value === "date_range_0");
-    const yestRow = rows.find((r) => r.dimensionValues?.[0]?.value === "date_range_1");
+    const todayRow = todayResponse[0].rows?.[0];
+    const yestRow = yesterdayResponse[0].rows?.[0];
 
     return {
-      visitorsToday: parseInt(todayRow?.metricValues?.[0]?.value ?? "0"),
-      visitorsYesterday: parseInt(yestRow?.metricValues?.[0]?.value ?? "0"),
+      uniquePageViewsToday: parseInt(todayRow?.metricValues?.[0]?.value ?? "0"),
+      uniquePageViewsYesterday: parseInt(yestRow?.metricValues?.[0]?.value ?? "0"),
       sessionsToday: parseInt(todayRow?.metricValues?.[1]?.value ?? "0"),
       sessionsYesterday: parseInt(yestRow?.metricValues?.[1]?.value ?? "0"),
     };
-  } catch {
+  } catch (error) {
+    console.error("Failed to fetch GA4 dashboard stats", error);
     return null;
   }
 }
