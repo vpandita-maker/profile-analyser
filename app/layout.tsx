@@ -14,13 +14,13 @@ export const metadata: Metadata = {
     url: "https://iheartlinkedin.app",
     siteName: "iHeartLinkedIn",
     type: "website",
-    images: [{ url: "https://iheartlinkedin.app/opengraph-image", width: 1200, height: 630 }]
+    images: [{ url: "https://iheartlinkedin.app/og-image.png", width: 3600, height: 1890 }]
   },
   twitter: {
     card: "summary_large_image",
     title: "iHeartLinkedIn | Free LinkedIn Profile Review Tool",
     description: "Transform your LinkedIn profile into a recruiter magnet. Get a personalized roadmap to maximize visibility and inbound recruiter outreach.",
-    images: ["https://iheartlinkedin.app/opengraph-image"]
+    images: ["https://iheartlinkedin.app/og-image.png"]
   }
 };
 
