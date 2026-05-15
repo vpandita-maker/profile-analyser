@@ -8,11 +8,82 @@ import type { ReactNode } from "react";
 import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { ContextAnswers, LinkedInProfile, WorkPreference } from "@/lib/types";
+import type { ContextAnswers, LinkedInProfile, Seniority, WorkPreference } from "@/lib/types";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { analytics } from "@/lib/analytics";
 
 const workPreferences: WorkPreference[] = ["Remote", "Hybrid", "In office"];
+
+const SENIORITY_OPTIONS: Seniority[] = [
+  "Internship",
+  "Entry-level",
+  "Associate",
+  "Mid-level",
+  "Senior",
+  "Lead / Staff",
+  "Manager",
+  "Executive",
+  "Student"
+];
+
+const ROLE_GROUPS = [
+  {
+    label: "Software / Engineering",
+    roles: [
+      "Frontend Engineer",
+      "Backend Engineer",
+      "Full Stack Engineer",
+      "Software Engineer",
+      "Mobile Engineer",
+      "DevOps Engineer",
+      "Machine Learning Engineer",
+      "AI Engineer",
+      "Data Engineer",
+      "QA Engineer"
+    ]
+  },
+  {
+    label: "Data",
+    roles: [
+      "Data Analyst",
+      "Business Intelligence Analyst",
+      "Product Analyst",
+      "Data Scientist",
+      "Analytics Engineer"
+    ]
+  },
+  {
+    label: "Product / Design",
+    roles: [
+      "Associate Product Manager",
+      "Product Manager",
+      "Product Designer",
+      "UX Designer",
+      "UI Designer"
+    ]
+  },
+  {
+    label: "Business / Finance",
+    roles: [
+      "Business Analyst",
+      "Strategy Analyst",
+      "Management Consultant",
+      "Investment Banking Analyst",
+      "Financial Analyst",
+      "Operations Analyst"
+    ]
+  },
+  {
+    label: "Marketing / Sales",
+    roles: [
+      "Growth Marketer",
+      "Digital Marketing Specialist",
+      "Content Marketer",
+      "Sales Development Representative",
+      "Account Executive"
+    ]
+  }
+];
 
 const INDUSTRIES = [
   "Technology",
@@ -35,9 +106,9 @@ const INDUSTRIES = [
 const inputCls =
   "h-11 w-full rounded-lg border border-[#EEEEEE] bg-white px-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0A66C2]/40 focus:border-[#0A66C2] focus:ring-2 focus:ring-[#0A66C2]/10";
 
-function inferGoal(role: string): ContextAnswers["goal"] {
+function inferGoal(role: string, seniority: Seniority | ""): ContextAnswers["goal"] {
   const n = role.toLowerCase();
-  return n.includes("intern") || n.includes("summer analyst") ? "Internship Search" : "Job Search";
+  return seniority === "Internship" || n.includes("intern") || n.includes("summer analyst") ? "Internship Search" : "Job Search";
 }
 
 function inferGeography(location: string): ContextAnswers["geography"] {
@@ -49,6 +120,16 @@ function inferGeography(location: string): ContextAnswers["geography"] {
   return "Other";
 }
 
+function formatTargetRole(role: string, seniority: Seniority | "") {
+  const trimmedRole = role.trim();
+  const normalizedRole = trimmedRole.toLowerCase();
+  if (!trimmedRole || !seniority) return trimmedRole;
+  if (seniority === "Internship") return `${trimmedRole} Intern`;
+  if (seniority === "Student") return `Student targeting ${trimmedRole}`;
+  if (normalizedRole.startsWith(`${seniority.toLowerCase()} `)) return trimmedRole;
+  return `${seniority} ${trimmedRole}`;
+}
+
 export default function HomePage() {
   const router = useRouter();
   const setLinkedinData = useAnalyzerStore((state) => state.setLinkedinData);
@@ -57,7 +138,9 @@ export default function HomePage() {
   const clearAnalysis = useAnalyzerStore((state) => state.clearAnalysis);
 
   const [profileUrl, setProfileUrl] = useState("");
-  const [targetRole, setTargetRole] = useState("");
+  const [targetRoleSelection, setTargetRoleSelection] = useState("");
+  const [customTargetRole, setCustomTargetRole] = useState("");
+  const [seniority, setSeniority] = useState<Seniority | "">("");
   const [preferredIndustry, setPreferredIndustry] = useState("");
   const [dreamCompany, setDreamCompany] = useState("");
   const [locationPreference, setLocationPreference] = useState("");
@@ -66,12 +149,14 @@ export default function HomePage() {
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
 
-  const requiredFields = [profileUrl, targetRole, preferredIndustry, dreamCompany, locationPreference];
+  const selectedRole = targetRoleSelection === "Other" ? customTargetRole.trim() : targetRoleSelection;
+  const targetRole = formatTargetRole(selectedRole, seniority);
+  const requiredFields = [profileUrl, selectedRole, seniority, preferredIndustry, dreamCompany, locationPreference];
   const filledCount = requiredFields.filter((f) => f.trim()).length + (workPreference ? 1 : 0);
-  const progress = Math.round((filledCount / 6) * 100);
+  const progress = Math.round((filledCount / 7) * 100);
 
   const canSubmit = Boolean(
-    profileUrl.trim() && targetRole.trim() && preferredIndustry.trim() &&
+    profileUrl.trim() && selectedRole.trim() && seniority && preferredIndustry.trim() &&
     dreamCompany.trim() && locationPreference.trim() && workPreference
   );
 
@@ -83,7 +168,7 @@ export default function HomePage() {
     if (!canSubmit) return;
     setError("");
     setScraping(true);
-    analytics.analysisStarted(targetRole.trim(), preferredIndustry.trim());
+    analytics.analysisStarted(targetRole, preferredIndustry.trim());
     try {
       const response = await fetch("/api/profile/scrape", {
         method: "POST",
@@ -106,16 +191,16 @@ export default function HomePage() {
       resetContext();
       clearAnalysis();
       setContextAnswers({
-        goal: inferGoal(targetRole.trim()),
-        seniority: "",
+        goal: inferGoal(targetRole, seniority),
+        seniority,
         industry: preferredIndustry.trim(),
-        targetRole: targetRole.trim(),
+        targetRole,
         geography: inferGeography(locationPreference.trim()),
         city: locationPreference.trim(),
         timeline: "",
         challenges: [],
         targetCompanies: dreamCompany.trim(),
-        outcome: `You are targeting ${targetRole.trim()} roles in ${preferredIndustry.trim()}. Your dream company is ${dreamCompany.trim()}. Your location preference is ${locationPreference.trim()}. Your preferred work style is ${workPreference}.`,
+        outcome: `You are targeting ${targetRole} roles in ${preferredIndustry.trim()}. Your dream company is ${dreamCompany.trim()}. Your location preference is ${locationPreference.trim()}. Your preferred work style is ${workPreference}.`,
         networkSize: "",
         relocation: null,
         workPreference,
@@ -219,12 +304,45 @@ export default function HomePage() {
               </Field>
 
               <Field label="What role are you targeting?">
-                <input
-                  className={inputCls}
-                  onChange={(e) => setTargetRole(e.target.value)}
-                  placeholder="e.g. Product Manager"
-                  value={targetRole}
-                />
+                <select
+                  className={cn(inputCls, "cursor-pointer")}
+                  onChange={(e) => setTargetRoleSelection(e.target.value)}
+                  value={targetRoleSelection}
+                >
+                  <option value="">Select a target role</option>
+                  {ROLE_GROUPS.map((group) => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.roles.map((role) => (
+                        <option key={role} value={role}>{role}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                  <option value="Other">Other / Custom title</option>
+                </select>
+              </Field>
+
+              {targetRoleSelection === "Other" ? (
+                <Field label="Enter your target role">
+                  <input
+                    className={inputCls}
+                    onChange={(e) => setCustomTargetRole(e.target.value)}
+                    placeholder="e.g. Customer Success Manager"
+                    value={customTargetRole}
+                  />
+                </Field>
+              ) : null}
+
+              <Field label="What seniority are you targeting?">
+                <select
+                  className={cn(inputCls, "cursor-pointer")}
+                  onChange={(e) => setSeniority(e.target.value as Seniority | "")}
+                  value={seniority}
+                >
+                  <option value="">Select seniority</option>
+                  {SENIORITY_OPTIONS.map((level) => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
               </Field>
 
               <Field label="What is your preferred industry?">
@@ -361,4 +479,3 @@ function Field({ children, label }: { children: ReactNode; label: string }) {
     </label>
   );
 }
-

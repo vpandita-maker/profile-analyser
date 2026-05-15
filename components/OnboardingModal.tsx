@@ -17,7 +17,7 @@ const slides = [
     body: "We analyze your profile against the specific role, industry, and company you are going after. Not a generic checklist.",
     steps: [
       "Paste your LinkedIn URL",
-      "Tell us your target role and dream company",
+      "Tell us your target role, seniority, and dream company",
       "Receive a personalized score and fix roadmap",
     ],
   },

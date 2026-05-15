@@ -1,5 +1,5 @@
 export type CareerGoal = "Job Search" | "Internship Search";
-export type Seniority = "Entry level" | "Mid level" | "Senior" | "Executive" | "Student";
+export type Seniority = "Internship" | "Entry-level" | "Associate" | "Mid-level" | "Senior" | "Lead / Staff" | "Manager" | "Executive" | "Student";
 export type Timeline = "Urgent" | "Near term" | "Flexible";
 export type Geography = "India" | "US" | "Other";
 export type WorkPreference = "Remote" | "Hybrid" | "In office";
