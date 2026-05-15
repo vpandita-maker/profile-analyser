@@ -61,7 +61,7 @@ export async function GET(request: Request) {
   const inviteRate = analyses.length > 0 ? Math.round((uniqueInviters / analyses.length) * 100) : 0;
   const viralCoeff = analyses.length > 0 ? parseFloat((invites.length / analyses.length).toFixed(2)) : 0;
 
-  const recent = analyses.slice(0, 20).map((a) => {
+  const recent = analyses.map((a) => {
     const { role, industry } = extractRoleIndustry(a.analysis_json);
     return {
       role,
