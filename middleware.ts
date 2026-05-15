@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { hostname, pathname } = request.nextUrl;
+
+  if (hostname === "www.iheartlinkedin.app") {
+    const canonicalUrl = request.nextUrl.clone();
+    canonicalUrl.hostname = "iheartlinkedin.app";
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
 
   if (!pathname.startsWith("/dashboard") || pathname === "/dashboard/login") {
     return NextResponse.next();
@@ -21,5 +27,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/dashboard/:path*",
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };
