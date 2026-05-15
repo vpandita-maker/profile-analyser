@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 interface DashboardData {
   analyses: number;
@@ -11,43 +11,12 @@ interface DashboardData {
   unlocked: number;
   visitorsToday: number | null;
   funnel: Array<{ label: string; value: number }>;
-  hours: Array<{ hour: string; count: number }>;
-  recent: Array<{ role: string; industry: string; score: number; unlocked: boolean; timeAgo: string }>;
+  recent: Array<{ role: string; industry: string; score: number; unlocked: boolean; timeIST: string }>;
   topRoles: Array<[string, number]>;
   topIndustries: Array<[string, number]>;
   date: string;
+  isToday: boolean;
   updatedAt: string;
-}
-
-function HourChart({ hours }: { hours: Array<{ hour: string; count: number }> }) {
-  if (!hours.length) return <p className="text-xs text-slate-600">No activity yet today</p>;
-  const max = Math.max(...hours.map((h) => h.count), 1);
-  const W = 400; const H = 72; const pad = 6;
-  const pts = hours.map((h, i) => [
-    pad + (i / Math.max(hours.length - 1, 1)) * (W - pad * 2),
-    H - pad - (h.count / max) * (H - pad * 2),
-  ] as [number, number]);
-  const linePath = `M ${pts.map(([x, y]) => `${x},${y}`).join(" L ")}`;
-  const areaPath = `${linePath} L ${pts[pts.length - 1][0]},${H - pad} L ${pts[0][0]},${H - pad} Z`;
-  return (
-    <div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 72 }}>
-        <defs>
-          <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#14b8a6" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#14b8a6" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <path d={areaPath} fill="url(#hg)" />
-        <path d={linePath} fill="none" stroke="#14b8a6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        {pts.map(([x, y], i) => hours[i].count > 0 ? <circle key={i} cx={x} cy={y} r="3" fill="#14b8a6" /> : null)}
-      </svg>
-      <div className="mt-1.5 flex justify-between">
-        <span className="text-[10px] text-slate-600">{hours[0].hour}</span>
-        <span className="text-[10px] text-slate-600">{hours[hours.length - 1].hour}</span>
-      </div>
-    </div>
-  );
 }
 
 function BarRow({ label, value, max }: { label: string; value: number; max: number }) {
@@ -79,20 +48,29 @@ function pct(n: number, d: number) {
 
 const CARD = "rounded-xl border border-slate-800 bg-slate-900 transition-transform duration-200 hover:scale-[1.02] cursor-default";
 
-function formatDate(dateStr: string) {
+function formatDisplayDate(dateStr: string) {
   const d = new Date(dateStr + "T12:00:00Z");
   return d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 }
 
+// Today in IST as YYYY-MM-DD
+function todayIST() {
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  return new Date(Date.now() + IST_OFFSET_MS).toISOString().slice(0, 10);
+}
+
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [selectedDate, setSelectedDate] = useState(todayIST);
   const [lastUpdated, setLastUpdated] = useState("");
   const [pulse, setPulse] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pickerRef = useRef<HTMLInputElement>(null);
 
-  async function fetchData() {
+  async function fetchData(date: string) {
     try {
-      const res = await fetch("/api/dashboard");
+      const res = await fetch(`/api/dashboard?date=${date}`);
       if (!res.ok) return;
       const json: DashboardData = await res.json();
       setData(json);
@@ -103,10 +81,21 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    void fetchData();
-    intervalRef.current = setInterval(() => void fetchData(), 30_000);
+    void fetchData(selectedDate);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    // Only auto-refresh when viewing today
+    if (selectedDate === todayIST()) {
+      intervalRef.current = setInterval(() => void fetchData(selectedDate), 30_000);
+    }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, []);
+  }, [selectedDate]);
+
+  function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.value) {
+      setSelectedDate(e.target.value);
+      setShowPicker(false);
+    }
+  }
 
   if (!data) {
     return (
@@ -119,6 +108,8 @@ export default function DashboardPage() {
     );
   }
 
+  const isToday = selectedDate === todayIST();
+
   return (
     <main className="min-h-screen w-full bg-[#0f172a] px-4 py-6 text-white sm:px-6 lg:px-8 lg:py-8">
 
@@ -126,31 +117,53 @@ export default function DashboardPage() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 lg:mb-8">
         <div>
           <h1 className="text-lg font-black tracking-tight text-white sm:text-xl">iHeartLinkedIn</h1>
-          <p className="mt-0.5 text-xs text-slate-500">{formatDate(data.date)}</p>
+          <p className="mt-0.5 text-xs text-slate-500">{formatDisplayDate(data.date)}</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className={`h-1.5 w-1.5 rounded-full bg-teal-500 transition-all duration-300 ${pulse ? "scale-150 opacity-100" : "opacity-60"}`} />
-            <span className="text-[11px] text-slate-500">{lastUpdated ? `${lastUpdated}` : "Updating..."}</span>
+          {isToday && (
+            <div className="flex items-center gap-1.5">
+              <span className={`h-1.5 w-1.5 rounded-full bg-teal-500 transition-all duration-300 ${pulse ? "scale-150 opacity-100" : "opacity-60"}`} />
+              <span className="text-[11px] text-slate-500">{lastUpdated}</span>
+            </div>
+          )}
+
+          {/* Date picker */}
+          <div className="relative">
+            <button
+              onClick={() => { setShowPicker((v) => !v); setTimeout(() => pickerRef.current?.showPicker?.(), 50); }}
+              className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 transition-all hover:border-teal-500/50 hover:text-white"
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+              {isToday ? "Today" : data.date}
+            </button>
+            <input
+              ref={pickerRef}
+              type="date"
+              value={selectedDate}
+              max={todayIST()}
+              onChange={handleDateChange}
+              className="absolute right-0 top-8 opacity-0 pointer-events-none"
+              style={{ width: 1, height: 1 }}
+            />
           </div>
         </div>
       </div>
 
       {/* KPI Row */}
       <div className="mb-4 grid grid-cols-2 gap-3 lg:mb-6 lg:grid-cols-4 lg:gap-4">
-        <Stat label="Analyses Today" value={data.analyses} />
+        <Stat label="Analyses" value={data.analyses} />
         <Stat label="Invites Sent" value={data.invitesSent} sub={<span className="text-[11px] text-slate-500">{pct(data.invitesSent, data.analyses)} of users</span>} />
         <Stat label="Unlocked" value={data.unlocked} sub={<span className="text-[11px] text-slate-500">{pct(data.unlocked, data.analyses)} of users</span>} />
         <Stat
-          label="Visitors Today"
+          label={isToday ? "Visitors Today" : "Visitors"}
           value={data.visitorsToday !== null ? data.visitorsToday : "—"}
-          sub={data.visitorsToday === null ? <span className="text-[11px] text-slate-600">Connect GA4</span> : undefined}
+          sub={data.visitorsToday === null ? <span className="text-[11px] text-slate-600">{isToday ? "Connect GA4" : "Today only"}</span> : undefined}
         />
       </div>
 
       {/* Funnel */}
       <div className={`${CARD} mb-4 p-4 lg:mb-6 lg:p-5`}>
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Today&apos;s Funnel</p>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Funnel</p>
 
         {/* Mobile */}
         <div className="flex flex-col gap-2 md:hidden">
@@ -209,58 +222,55 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Hourly chart + Recent */}
-      <div className="mb-4 grid gap-4 lg:mb-6 lg:grid-cols-2">
-        <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Activity by Hour (IST)</p>
-          <HourChart hours={data.hours} />
-        </div>
-
-        <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">
-            Today&apos;s Analyses {data.analyses > 0 && <span className="ml-1 text-teal-500">{data.analyses}</span>}
-          </p>
-          {data.recent.length === 0 ? (
-            <p className="text-xs text-slate-600">No analyses yet today</p>
-          ) : (
-            <div className="space-y-2.5">
-              {data.recent.map((r, i) => (
-                <div key={i} className="flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-slate-800">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-black text-teal-400">
-                    {r.score}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-semibold text-slate-200">{r.role}</p>
-                    <p className="text-[10px] text-slate-500">{r.industry} · {r.timeAgo}</p>
-                  </div>
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${r.unlocked ? "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/20" : "bg-slate-800 text-slate-500"}`}>
+      {/* Analyses list — full width */}
+      <div className={`${CARD} mb-4 p-4 lg:mb-6 lg:p-5`}>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">
+          Analyses{" "}
+          {data.analyses > 0 && <span className="text-teal-500">{data.analyses}</span>}
+        </p>
+        {data.recent.length === 0 ? (
+          <p className="text-xs text-slate-600">No analyses on this date</p>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {data.recent.map((r, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-slate-800">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-black text-teal-400">
+                  {r.score}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-slate-200">{r.role}</p>
+                  <p className="text-[10px] text-slate-500">{r.industry}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-[11px] font-semibold text-slate-400">{r.timeIST}</p>
+                  <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${r.unlocked ? "bg-teal-500/10 text-teal-400" : "bg-slate-800 text-slate-600"}`}>
                     {r.unlocked ? "Unlocked" : "Locked"}
                   </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Bar Charts */}
       <div className="grid gap-4 lg:grid-cols-2">
         <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Roles Today</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Roles</p>
           {data.topRoles.length > 0
             ? data.topRoles.map(([role, count]) => <BarRow key={role} label={role} value={count} max={data.topRoles[0][1]} />)
-            : <p className="text-xs text-slate-600">No data yet</p>}
+            : <p className="text-xs text-slate-600">No data</p>}
         </div>
         <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Industries Today</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Industries</p>
           {data.topIndustries.length > 0
             ? data.topIndustries.map(([ind, count]) => <BarRow key={ind} label={ind} value={count} max={data.topIndustries[0][1]} />)
-            : <p className="text-xs text-slate-600">No data yet</p>}
+            : <p className="text-xs text-slate-600">No data</p>}
         </div>
       </div>
 
       <p className="mt-6 text-center text-[10px] text-slate-700">
-        Auto-refreshes every 30s · Today&apos;s data only
+        {isToday ? "Auto-refreshes every 30s · " : ""}All times in IST
       </p>
     </main>
   );
