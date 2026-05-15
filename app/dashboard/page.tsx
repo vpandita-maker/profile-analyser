@@ -14,6 +14,8 @@ interface DashboardData {
   recent: Array<{ role: string; industry: string; score: number; unlocked: boolean; timeIST: string }>;
   topRoles: Array<[string, number]>;
   topIndustries: Array<[string, number]>;
+  topVisitorPlaces: Array<[string, number]>;
+  topVisitorPlatforms: Array<[string, number]>;
   date: string;
   isToday: boolean;
   updatedAt: string;
@@ -254,7 +256,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Bar Charts */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
         <div className={`${CARD} p-4 lg:p-5`}>
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Roles</p>
           {data.topRoles.length > 0
@@ -266,6 +268,18 @@ export default function DashboardPage() {
           {data.topIndustries.length > 0
             ? data.topIndustries.map(([ind, count]) => <BarRow key={ind} label={ind} value={count} max={data.topIndustries[0][1]} />)
             : <p className="text-xs text-slate-600">No data</p>}
+        </div>
+        <div className={`${CARD} p-4 lg:p-5`}>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Visitor Platforms</p>
+          {data.topVisitorPlatforms.length > 0
+            ? data.topVisitorPlatforms.map(([platform, count]) => <BarRow key={platform} label={platform} value={count} max={data.topVisitorPlatforms[0][1]} />)
+            : <p className="text-xs text-slate-600">No source data yet</p>}
+        </div>
+        <div className={`${CARD} p-4 lg:p-5`}>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Visitor Places</p>
+          {data.topVisitorPlaces.length > 0
+            ? data.topVisitorPlaces.map(([place, count]) => <BarRow key={place} label={place} value={count} max={data.topVisitorPlaces[0][1]} />)
+            : <p className="text-xs text-slate-600">No GA4 location data</p>}
         </div>
       </div>
 

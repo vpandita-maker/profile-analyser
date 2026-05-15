@@ -57,10 +57,13 @@ CREATE TABLE IF NOT EXISTS visitor_events (
   first_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_path TEXT,
+  referrer TEXT,
+  source_platform TEXT,
   UNIQUE(visitor_id, visit_date)
 );
 
 CREATE INDEX IF NOT EXISTS idx_visitor_events_visit_date ON visitor_events(visit_date);
+CREATE INDEX IF NOT EXISTS idx_visitor_events_visit_date_source ON visitor_events(visit_date, source_platform);
 
 -- Migrations: run these in Supabase SQL Editor if the tables already exist
 -- ALTER TABLE analyses ADD COLUMN IF NOT EXISTS user_email TEXT;

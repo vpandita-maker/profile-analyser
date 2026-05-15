@@ -11,7 +11,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     void fetch("/api/visitors", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path: window.location.pathname }),
+      body: JSON.stringify({
+        path: window.location.pathname,
+        referrer: document.referrer,
+        search: window.location.search,
+      }),
       keepalive: true,
       signal: controller.signal,
     }).catch(() => {

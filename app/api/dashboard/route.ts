@@ -20,6 +20,16 @@ function toISTTimeStr(iso: string) {
   return `${h12}:${m} ${ampm}`;
 }
 
+function topCounts(values: string[], limit = 5): Array<[string, number]> {
+  const counts: Record<string, number> = {};
+  for (const value of values) {
+    const label = value?.trim() || "Direct / Unknown";
+    if (label === "Internal") continue;
+    counts[label] = (counts[label] ?? 0) + 1;
+  }
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, limit);
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
@@ -36,7 +46,7 @@ export async function GET(request: Request) {
   const supabase = getSupabaseAdmin();
 
   const [ga4, supabaseResult] = await Promise.all([
-    isToday ? getGA4Stats() : Promise.resolve(null),
+    getGA4Stats(selectedDate),
     supabase
       ? Promise.all([
           supabase.from("analyses").select("id,created_at,is_unlocked,invites_fulfilled,analysis_json")
@@ -49,8 +59,10 @@ export async function GET(request: Request) {
             .order("created_at", { ascending: false }),
           supabase.from("visitor_events").select("visitor_id", { count: "exact", head: true })
             .eq("visit_date", selectedDate),
+          supabase.from("visitor_events").select("source_platform")
+            .eq("visit_date", selectedDate),
         ])
-      : Promise.resolve([{ data: [] }, { data: [] }, { count: null }] as const),
+      : Promise.resolve([{ data: [] }, { data: [] }, { count: null }, { data: [] }] as const),
   ]);
 
   const analyses = (supabaseResult[0]?.data ?? []) as Array<{
@@ -59,6 +71,11 @@ export async function GET(request: Request) {
   }>;
   const invites = (supabaseResult[1]?.data ?? []) as Array<{ analysis_id: string; status: string; created_at: string }>;
   const uniqueViewers = supabaseResult[2]?.count ?? ga4?.uniqueViewersToday ?? null;
+  const sourceResult = supabaseResult[3] as { data?: Array<{ source_platform: string | null }>; error?: unknown } | undefined;
+  const sourceRows = sourceResult && !sourceResult.error ? sourceResult.data ?? [] : [];
+  const topVisitorPlatforms = sourceRows.length > 0
+    ? topCounts(sourceRows.map((row) => row.source_platform || "Direct / Unknown"))
+    : ga4?.topVisitorPlatforms ?? [];
 
   const uniqueInviters = new Set(invites.map((i) => i.analysis_id)).size;
   const inviteRate = analyses.length > 0 ? Math.round((uniqueInviters / analyses.length) * 100) : 0;
@@ -99,6 +116,8 @@ export async function GET(request: Request) {
     recent,
     topRoles: Object.entries(roleCounts).sort((a, b) => b[1] - a[1]).slice(0, 6),
     topIndustries: Object.entries(industryCounts).sort((a, b) => b[1] - a[1]).slice(0, 6),
+    topVisitorPlaces: ga4?.topVisitorPlaces ?? [],
+    topVisitorPlatforms,
     date: selectedDate,
     isToday,
     updatedAt: new Date().toISOString(),
