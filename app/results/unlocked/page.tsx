@@ -10,6 +10,7 @@ import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { normalizeAnalysis } from "@/lib/analysis";
+import { analytics } from "@/lib/analytics";
 import { useAnalyzerStore, useStoreHydrated } from "@/lib/store";
 import { isEmail } from "@/lib/utils";
 
@@ -39,6 +40,10 @@ export default function UnlockedResultsPage() {
   const analysisId = useAnalyzerStore((state) => state.analysisId);
 
   const hasFixes = Boolean(analysis?.topFixes.length);
+
+  useEffect(() => {
+    if (analysis) analytics.unlockPageViewed(isFullyUnlocked);
+  }, [analysis, isFullyUnlocked]);
 
   useEffect(() => {
     if (window.location.search.includes("preparing=1")) {
@@ -102,6 +107,7 @@ export default function UnlockedResultsPage() {
         setUnlockError("Invite could not be sent. Please try again.");
         return;
       }
+      analytics.inviteSent();
       setUnlockSent(true);
       window.setTimeout(() => setFullyUnlocked(true), 600);
     } catch {

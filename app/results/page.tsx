@@ -2,7 +2,8 @@
 
 import { ChevronLeft, ChevronRight, Linkedin, RefreshCw, Sparkles, Trophy, Twitter } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { analytics } from "@/lib/analytics";
 import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
@@ -47,8 +48,15 @@ export default function ResultsPage() {
   const hydrated = useStoreHydrated();
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
+  const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
   const [offsetFromEnd, setOffsetFromEnd] = useState(0);
+
+  useEffect(() => {
+    if (analysis) {
+      analytics.analysisCompleted(analysis.overallScore, contextAnswers.targetRole, contextAnswers.industry);
+    }
+  }, [analysis, contextAnswers.targetRole, contextAnswers.industry]);
 
   if (!hydrated) {
     return <main className="app-screen grid place-items-center px-4" />;

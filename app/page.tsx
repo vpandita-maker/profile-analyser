@@ -10,6 +10,7 @@ import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { ContextAnswers, LinkedInProfile, WorkPreference } from "@/lib/types";
 import { OnboardingModal } from "@/components/OnboardingModal";
+import { analytics } from "@/lib/analytics";
 
 const workPreferences: WorkPreference[] = ["Remote", "Hybrid", "In office"];
 
@@ -82,6 +83,7 @@ export default function HomePage() {
     if (!canSubmit) return;
     setError("");
     setScraping(true);
+    analytics.analysisStarted(targetRole.trim(), preferredIndustry.trim());
     try {
       const response = await fetch("/api/profile/scrape", {
         method: "POST",
@@ -126,12 +128,6 @@ export default function HomePage() {
         name: data.profile.name || "LinkedIn Member",
         importSource: "scrape"
       } satisfies LinkedInProfile));
-      (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.("event", "profile_analyzed", {
-        target_role: targetRole.trim(),
-        industry: preferredIndustry.trim(),
-        work_preference: workPreference,
-        geography: inferGeography(locationPreference.trim()),
-      });
       router.push("/loading");
     } catch {
       setError("Could not import this profile automatically. Please check the URL and try again.");
