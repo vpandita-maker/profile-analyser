@@ -2,30 +2,36 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { getGA4Stats } from "@/lib/ga4";
 
-function toLocalDate(iso: string) {
-  return iso.slice(0, 10);
-}
-
 function extractRoleIndustry(analysisJson: { topFixes?: Array<{ recommended: string }> }) {
   const rec = analysisJson?.topFixes?.[0]?.recommended ?? "";
   const parts = rec.split("|").map((s) => s.trim());
   return { role: parts[0] || "Unknown", industry: parts[1] || "Unknown" };
 }
 
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000; // UTC+5:30
+
+function istHour(iso: string) {
+  return Math.floor(((new Date(iso).getTime() + IST_OFFSET_MS) % 86400000) / 3600000);
+}
+
 export async function GET() {
   const supabase = getSupabaseAdmin();
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // Today in IST
+  const nowIST = new Date(Date.now() + IST_OFFSET_MS);
+  const todayISTStr = nowIST.toISOString().slice(0, 10); // "YYYY-MM-DD" in IST
+  // Convert IST midnight back to UTC for Supabase filter
+  const todayStartUTC = new Date(new Date(`${todayISTStr}T00:00:00.000Z`).getTime() - IST_OFFSET_MS).toISOString();
 
   const [ga4, supabaseResult] = await Promise.all([
     getGA4Stats(),
     supabase
       ? Promise.all([
           supabase.from("analyses").select("id,created_at,is_unlocked,invites_fulfilled,analysis_json")
-            .gte("created_at", `${todayStr}T00:00:00.000Z`)
+            .gte("created_at", todayStartUTC)
             .order("created_at", { ascending: false }),
           supabase.from("invites").select("analysis_id,status,created_at")
-            .gte("created_at", `${todayStr}T00:00:00.000Z`)
+            .gte("created_at", todayStartUTC)
             .order("created_at", { ascending: false }),
         ])
       : Promise.resolve([{ data: [] }, { data: [] }] as const),
@@ -41,13 +47,12 @@ export async function GET() {
   const inviteRate = analyses.length > 0 ? Math.round((uniqueInviters / analyses.length) * 100) : 0;
   const viralCoeff = analyses.length > 0 ? parseFloat((invites.length / analyses.length).toFixed(2)) : 0;
 
-  // Hourly breakdown for today (0–23)
-  const currentHour = new Date().getUTCHours();
-  const hours = Array.from({ length: currentHour + 1 }, (_, h) => {
-    const label = `${String(h).padStart(2, "0")}:00`;
-    const count = analyses.filter((a) => new Date(a.created_at).getUTCHours() === h).length;
-    return { hour: label, count };
-  });
+  // Hourly breakdown in IST
+  const currentISTHour = Math.floor(((Date.now() + IST_OFFSET_MS) % 86400000) / 3600000);
+  const hours = Array.from({ length: currentISTHour + 1 }, (_, h) => ({
+    hour: `${String(h).padStart(2, "0")}:00`,
+    count: analyses.filter((a) => istHour(a.created_at) === h).length,
+  }));
 
   const recent = analyses.slice(0, 10).map((a) => {
     const { role, industry } = extractRoleIndustry(a.analysis_json);
@@ -84,7 +89,7 @@ export async function GET() {
     recent,
     topRoles,
     topIndustries,
-    date: todayStr,
+    date: todayISTStr,
     updatedAt: new Date().toISOString(),
   });
 }

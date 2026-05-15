@@ -212,7 +212,7 @@ export default function DashboardPage() {
       {/* Hourly chart + Recent */}
       <div className="mb-4 grid gap-4 lg:mb-6 lg:grid-cols-2">
         <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Activity by Hour (UTC)</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Activity by Hour (IST)</p>
           <HourChart hours={data.hours} />
         </div>
 
