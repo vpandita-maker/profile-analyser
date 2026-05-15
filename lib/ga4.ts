@@ -1,8 +1,8 @@
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
 export interface GA4Stats {
-  uniquePageViewsToday: number;
-  uniquePageViewsYesterday: number;
+  uniqueViewersToday: number;
+  uniqueViewersYesterday: number;
   sessionsToday: number;
   sessionsYesterday: number;
 }
@@ -39,23 +39,11 @@ export async function getGA4Stats(): Promise<GA4Stats | null> {
         property: `properties/${propertyId}`,
         dateRanges: [{ startDate: "today", endDate: "today" }],
         metrics: [{ name: "activeUsers" }, { name: "sessions" }],
-        dimensionFilter: {
-          filter: {
-            fieldName: "eventName",
-            stringFilter: { matchType: "EXACT", value: "page_view" },
-          },
-        },
       }),
       client.runReport({
         property: `properties/${propertyId}`,
         dateRanges: [{ startDate: "yesterday", endDate: "yesterday" }],
         metrics: [{ name: "activeUsers" }, { name: "sessions" }],
-        dimensionFilter: {
-          filter: {
-            fieldName: "eventName",
-            stringFilter: { matchType: "EXACT", value: "page_view" },
-          },
-        },
       }),
     ]);
 
@@ -63,8 +51,8 @@ export async function getGA4Stats(): Promise<GA4Stats | null> {
     const yestRow = yesterdayResponse[0].rows?.[0];
 
     return {
-      uniquePageViewsToday: parseInt(todayRow?.metricValues?.[0]?.value ?? "0"),
-      uniquePageViewsYesterday: parseInt(yestRow?.metricValues?.[0]?.value ?? "0"),
+      uniqueViewersToday: parseInt(todayRow?.metricValues?.[0]?.value ?? "0"),
+      uniqueViewersYesterday: parseInt(yestRow?.metricValues?.[0]?.value ?? "0"),
       sessionsToday: parseInt(todayRow?.metricValues?.[1]?.value ?? "0"),
       sessionsYesterday: parseInt(yestRow?.metricValues?.[1]?.value ?? "0"),
     };

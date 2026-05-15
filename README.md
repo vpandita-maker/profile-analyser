@@ -57,9 +57,9 @@ Use the Project URL as `NEXT_PUBLIC_SUPABASE_URL`.
 
 Use a server-side secret key as `SUPABASE_SERVICE_ROLE_KEY`.
 
-## Google Analytics Dashboard Unique Page Views
+## Google Analytics Dashboard Unique Viewers
 
-The dashboard "Unique Page Views Today" card uses the Google Analytics Data API and reads unique active users who triggered a `page_view` event in GA4.
+The dashboard "Unique Viewers Today" card uses the Google Analytics Data API and reads daily active users from GA4.
 
 1. In Google Cloud, create a service account and download its JSON key.
 2. In GA4 Admin, open the property access settings and add the service account email with Viewer access.
@@ -67,7 +67,7 @@ The dashboard "Unique Page Views Today" card uses the Google Analytics Data API 
 4. Set `GOOGLE_SERVICE_ACCOUNT_JSON` to the full service account JSON. If your host has trouble with multiline JSON, base64 encode the file and set `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64` instead.
 5. Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to the public web data stream measurement ID so pageviews keep flowing into GA4.
 
-When those env vars are present, `/api/dashboard` returns `uniquePageViewsToday` for today's date and the dashboard card stops showing "Connect GA4".
+When those env vars are present, `/api/dashboard` returns `uniqueViewersToday` for today's date and the dashboard card stops showing "Connect GA4".
 
 ## Scripts
 
