@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@google-analytics/data": "^6.0.0",
     "@supabase/supabase-js": "^2.47.10",
     "apify-client": "^2.23.2",
     "clsx": "^2.1.1",

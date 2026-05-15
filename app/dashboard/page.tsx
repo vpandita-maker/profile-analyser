@@ -1,4 +1,5 @@
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { getGA4Stats } from "@/lib/ga4";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
 interface AnalysisRow {
@@ -93,11 +94,18 @@ export default async function DashboardPage() {
   let analyses: AnalysisRow[] = [];
   let invites: InviteRow[] = [];
 
-  if (supabase) {
-    const [{ data: a }, { data: inv }] = await Promise.all([
-      supabase.from("analyses").select("id,created_at,is_unlocked,invites_fulfilled,analysis_json").order("created_at", { ascending: false }),
-      supabase.from("invites").select("analysis_id,status,created_at").order("created_at", { ascending: false }),
-    ]);
+  const [ga4, supabaseResult] = await Promise.all([
+    getGA4Stats(),
+    supabase
+      ? Promise.all([
+          supabase.from("analyses").select("id,created_at,is_unlocked,invites_fulfilled,analysis_json").order("created_at", { ascending: false }),
+          supabase.from("invites").select("analysis_id,status,created_at").order("created_at", { ascending: false }),
+        ])
+      : Promise.resolve([{ data: [] }, { data: [] }] as const),
+  ]);
+
+  if (supabase && supabaseResult) {
+    const [{ data: a }, { data: inv }] = supabaseResult;
     analyses = (a ?? []) as AnalysisRow[];
     invites = (inv ?? []) as InviteRow[];
   }
@@ -191,7 +199,13 @@ export default async function DashboardPage() {
             { label: "Total Analyses", value: analyses.length, sub: <Delta today={analysesToday} yesterday={analysesYesterday} /> },
             { label: "Invite Send Rate", value: `${inviteRate}%`, sub: <Delta today={inviteRate} yesterday={inviteRateYday} /> },
             { label: "Viral Coefficient", value: viralCoeff, sub: <Delta today={parseFloat(viralCoeff)} yesterday={parseFloat(viralCoeffYday)} /> },
-            { label: "Avg Score", value: scoreAvg, sub: <span className="text-xs text-slate-500">out of 100</span> },
+            {
+              label: "Visitors Today",
+              value: ga4 ? ga4.visitorsToday : "—",
+              sub: ga4
+                ? <Delta today={ga4.visitorsToday} yesterday={ga4.visitorsYesterday} />
+                : <span className="text-xs text-slate-500">Connect GA4</span>
+            },
           ].map(({ label, value, sub }) => (
             <div key={label} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
               <p className="text-xs font-medium text-slate-500">{label}</p>
