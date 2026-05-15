@@ -78,9 +78,7 @@ export async function GET(request: Request) {
   const uniqueViewers = supabaseResult[2]?.count ?? ga4?.uniqueViewersToday ?? null;
   const sourceResult = supabaseResult[3] as { data?: Array<{ visitor_id: string | null; source_platform: string | null }>; error?: unknown } | undefined;
   const sourceRows = sourceResult && !sourceResult.error ? sourceResult.data ?? [] : [];
-  const topVisitorPlatforms = sourceRows.length > 0
-    ? topUniquePlatformCounts(sourceRows)
-    : ga4?.topVisitorPlatforms ?? [];
+  const topVisitorPlatforms = topUniquePlatformCounts(sourceRows);
 
   const uniqueInviters = new Set(invites.map((i) => i.analysis_id)).size;
   const inviteRate = analyses.length > 0 ? Math.round((uniqueInviters / analyses.length) * 100) : 0;
