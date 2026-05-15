@@ -85,7 +85,7 @@ export default function DashboardPage() {
     if (intervalRef.current) clearInterval(intervalRef.current);
     // Only auto-refresh when viewing today
     if (selectedDate === todayIST()) {
-      intervalRef.current = setInterval(() => void fetchData(selectedDate), 30_000);
+      intervalRef.current = setInterval(() => void fetchData(selectedDate), 5 * 60_000);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [selectedDate]);
@@ -270,7 +270,7 @@ export default function DashboardPage() {
       </div>
 
       <p className="mt-6 text-center text-[10px] text-slate-700">
-        {isToday ? "Auto-refreshes every 30s · " : ""}All times in IST
+        {isToday ? "Auto-refreshes every 5 min · " : ""}All times in IST
       </p>
     </main>
   );
