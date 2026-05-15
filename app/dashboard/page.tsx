@@ -270,7 +270,7 @@ export default function DashboardPage() {
             : <p className="text-xs text-slate-600">No data</p>}
         </div>
         <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Visitor Platforms</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Unique Visitor Platforms</p>
           {data.topVisitorPlatforms.length > 0
             ? data.topVisitorPlatforms.map(([platform, count]) => <BarRow key={platform} label={platform} value={count} max={data.topVisitorPlatforms[0][1]} />)
             : <p className="text-xs text-slate-600">No source data yet</p>}

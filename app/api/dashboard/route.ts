@@ -20,14 +20,19 @@ function toISTTimeStr(iso: string) {
   return `${h12}:${m} ${ampm}`;
 }
 
-function topCounts(values: string[], limit = 5): Array<[string, number]> {
-  const counts: Record<string, number> = {};
-  for (const value of values) {
-    const label = value?.trim() || "Direct / Unknown";
+function topUniquePlatformCounts(rows: Array<{ visitor_id: string | null; source_platform: string | null }>, limit = 5): Array<[string, number]> {
+  const visitorsByPlatform: Record<string, Set<string>> = {};
+  for (const row of rows) {
+    const label = row.source_platform?.trim() || "Direct / Unknown";
     if (label === "Internal") continue;
-    counts[label] = (counts[label] ?? 0) + 1;
+    const visitorId = row.visitor_id || `anonymous-${label}`;
+    visitorsByPlatform[label] ??= new Set();
+    visitorsByPlatform[label].add(visitorId);
   }
-  return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, limit);
+  return Object.entries(visitorsByPlatform)
+    .map(([label, visitors]) => [label, visitors.size] as [string, number])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
 }
 
 export async function GET(request: Request) {
@@ -59,7 +64,7 @@ export async function GET(request: Request) {
             .order("created_at", { ascending: false }),
           supabase.from("visitor_events").select("visitor_id", { count: "exact", head: true })
             .eq("visit_date", selectedDate),
-          supabase.from("visitor_events").select("source_platform")
+          supabase.from("visitor_events").select("visitor_id,source_platform")
             .eq("visit_date", selectedDate),
         ])
       : Promise.resolve([{ data: [] }, { data: [] }, { count: null }, { data: [] }] as const),
@@ -71,10 +76,10 @@ export async function GET(request: Request) {
   }>;
   const invites = (supabaseResult[1]?.data ?? []) as Array<{ analysis_id: string; status: string; created_at: string }>;
   const uniqueViewers = supabaseResult[2]?.count ?? ga4?.uniqueViewersToday ?? null;
-  const sourceResult = supabaseResult[3] as { data?: Array<{ source_platform: string | null }>; error?: unknown } | undefined;
+  const sourceResult = supabaseResult[3] as { data?: Array<{ visitor_id: string | null; source_platform: string | null }>; error?: unknown } | undefined;
   const sourceRows = sourceResult && !sourceResult.error ? sourceResult.data ?? [] : [];
   const topVisitorPlatforms = sourceRows.length > 0
-    ? topCounts(sourceRows.map((row) => row.source_platform || "Direct / Unknown"))
+    ? topUniquePlatformCounts(sourceRows)
     : ga4?.topVisitorPlatforms ?? [];
 
   const uniqueInviters = new Set(invites.map((i) => i.analysis_id)).size;
