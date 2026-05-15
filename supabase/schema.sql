@@ -50,6 +50,18 @@ CREATE TABLE IF NOT EXISTS score_history (
 
 CREATE INDEX IF NOT EXISTS idx_score_history_linkedin_id ON score_history(linkedin_id);
 
+CREATE TABLE IF NOT EXISTS visitor_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  visitor_id TEXT NOT NULL,
+  visit_date DATE NOT NULL,
+  first_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  last_path TEXT,
+  UNIQUE(visitor_id, visit_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_visitor_events_visit_date ON visitor_events(visit_date);
+
 -- Migrations: run these in Supabase SQL Editor if the tables already exist
 -- ALTER TABLE analyses ADD COLUMN IF NOT EXISTS user_email TEXT;
 -- ALTER TABLE leaderboard ADD COLUMN IF NOT EXISTS industry TEXT;

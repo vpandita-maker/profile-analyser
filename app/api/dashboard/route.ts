@@ -47,8 +47,10 @@ export async function GET(request: Request) {
             .gte("created_at", dayStartUTC)
             .lte("created_at", dayEndUTC)
             .order("created_at", { ascending: false }),
+          supabase.from("visitor_events").select("visitor_id", { count: "exact", head: true })
+            .eq("visit_date", selectedDate),
         ])
-      : Promise.resolve([{ data: [] }, { data: [] }] as const),
+      : Promise.resolve([{ data: [] }, { data: [] }, { count: null }] as const),
   ]);
 
   const analyses = (supabaseResult[0]?.data ?? []) as Array<{
@@ -56,6 +58,7 @@ export async function GET(request: Request) {
     analysis_json: { overallScore: number; topFixes: Array<{ recommended: string }> };
   }>;
   const invites = (supabaseResult[1]?.data ?? []) as Array<{ analysis_id: string; status: string; created_at: string }>;
+  const uniqueViewers = supabaseResult[2]?.count ?? ga4?.uniqueViewersToday ?? null;
 
   const uniqueInviters = new Set(invites.map((i) => i.analysis_id)).size;
   const inviteRate = analyses.length > 0 ? Math.round((uniqueInviters / analyses.length) * 100) : 0;
@@ -86,7 +89,7 @@ export async function GET(request: Request) {
     viralCoeff,
     invitesSent: invites.length,
     unlocked: analyses.filter((a) => a.is_unlocked).length,
-    uniqueViewersToday: isToday ? (ga4?.uniqueViewersToday ?? null) : null,
+    uniqueViewersToday: isToday ? uniqueViewers : null,
     funnel: [
       { label: "Analyses", value: analyses.length },
       { label: "Got Fixes", value: analyses.filter((a) => a.analysis_json?.topFixes?.length > 0).length },
