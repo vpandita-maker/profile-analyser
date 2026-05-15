@@ -1,13 +1,10 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function DashboardLogin() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,8 +23,7 @@ export default function DashboardLogin() {
         setError("Wrong password.");
         return;
       }
-      const from = searchParams.get("from") || "/dashboard";
-      router.replace(from);
+      router.replace("/dashboard");
     } catch {
       setError("Something went wrong.");
     } finally {
