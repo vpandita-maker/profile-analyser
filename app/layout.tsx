@@ -5,6 +5,8 @@ import { Providers } from "@/components/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-RJ8W3KVJSV";
+const appUrl = "https://iheartlinkedin.app";
+const socialImageUrl = `${appUrl}/og-image-v2.png`;
 
 export const metadata: Metadata = {
   title: "iHeartLinkedIn | Free LinkedIn Profile Review Tool",
@@ -12,16 +14,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "iHeartLinkedIn | Free LinkedIn Profile Review Tool",
     description: "Transform your LinkedIn profile into a recruiter magnet. Get a personalized roadmap to maximize visibility and inbound recruiter outreach.",
-    url: "https://iheartlinkedin.app",
+    url: appUrl,
     siteName: "iHeartLinkedIn",
     type: "website",
-    images: [{ url: "https://iheartlinkedin.app/og-image.png", width: 3600, height: 1890 }]
+    images: [{ url: socialImageUrl, width: 3600, height: 1890, alt: "Get Recruited, Don't Just Apply." }]
   },
   twitter: {
     card: "summary_large_image",
     title: "iHeartLinkedIn | Free LinkedIn Profile Review Tool",
     description: "Transform your LinkedIn profile into a recruiter magnet. Get a personalized roadmap to maximize visibility and inbound recruiter outreach.",
-    images: ["https://iheartlinkedin.app/og-image.png"]
+    images: [socialImageUrl]
   }
 };
 
