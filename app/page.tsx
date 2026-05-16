@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, MapPin, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -8,11 +8,9 @@ import type { ReactNode } from "react";
 import { normalizeLinkedInProfile } from "@/lib/profile-normalize";
 import { useAnalyzerStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { ContextAnswers, LinkedInProfile, Seniority, WorkPreference } from "@/lib/types";
+import type { ContextAnswers, LinkedInProfile, Seniority } from "@/lib/types";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { analytics } from "@/lib/analytics";
-
-const workPreferences: WorkPreference[] = ["Remote", "Hybrid", "In office"];
 
 const SENIORITY_OPTIONS: Seniority[] = [
   "Internship",
@@ -111,15 +109,6 @@ function inferGoal(role: string, seniority: Seniority | ""): ContextAnswers["goa
   return seniority === "Internship" || n.includes("intern") || n.includes("summer analyst") ? "Internship Search" : "Job Search";
 }
 
-function inferGeography(location: string): ContextAnswers["geography"] {
-  const n = location.toLowerCase();
-  const india = ["india","bengaluru","bangalore","mumbai","delhi","hyderabad","pune","chennai","gurgaon","noida","ahmedabad"];
-  const us = ["us","usa","united states","new york","bay area","san francisco","california","boston","chicago","seattle","austin"];
-  if (india.some((s) => n.includes(s))) return "India";
-  if (us.some((s) => n.includes(s))) return "US";
-  return "Other";
-}
-
 function formatTargetRole(role: string, seniority: Seniority | "") {
   const trimmedRole = role.trim();
   const normalizedRole = trimmedRole.toLowerCase();
@@ -142,22 +131,17 @@ export default function HomePage() {
   const [customTargetRole, setCustomTargetRole] = useState("");
   const [seniority, setSeniority] = useState<Seniority | "">("");
   const [preferredIndustry, setPreferredIndustry] = useState("");
-  const [dreamCompany, setDreamCompany] = useState("");
-  const [locationPreference, setLocationPreference] = useState("");
-  const [workPreference, setWorkPreference] = useState<WorkPreference | "">("");
-  const [wins, setWins] = useState("");
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
 
   const selectedRole = targetRoleSelection === "Other" ? customTargetRole.trim() : targetRoleSelection;
   const targetRole = formatTargetRole(selectedRole, seniority);
-  const requiredFields = [profileUrl, selectedRole, seniority, preferredIndustry, dreamCompany, locationPreference];
-  const filledCount = requiredFields.filter((f) => f.trim()).length + (workPreference ? 1 : 0);
-  const progress = Math.round((filledCount / 7) * 100);
+  const requiredFields = [profileUrl, selectedRole, seniority, preferredIndustry];
+  const filledCount = requiredFields.filter((f) => f.trim()).length;
+  const progress = Math.round((filledCount / 4) * 100);
 
   const canSubmit = Boolean(
-    profileUrl.trim() && selectedRole.trim() && seniority && preferredIndustry.trim() &&
-    dreamCompany.trim() && locationPreference.trim() && workPreference
+    profileUrl.trim() && selectedRole.trim() && seniority && preferredIndustry.trim()
   );
 
   function scrollToForm() {
@@ -195,16 +179,16 @@ export default function HomePage() {
         seniority,
         industry: preferredIndustry.trim(),
         targetRole,
-        geography: inferGeography(locationPreference.trim()),
-        city: locationPreference.trim(),
+        geography: "",
+        city: "",
         timeline: "",
         challenges: [],
-        targetCompanies: dreamCompany.trim(),
-        outcome: `You are targeting ${targetRole} roles in ${preferredIndustry.trim()}. Your dream company is ${dreamCompany.trim()}. Your location preference is ${locationPreference.trim()}. Your preferred work style is ${workPreference}.`,
+        targetCompanies: "",
+        outcome: `You are targeting ${targetRole} roles in ${preferredIndustry.trim()}.`,
         networkSize: "",
         relocation: null,
-        workPreference,
-        wins: wins.trim()
+        workPreference: "",
+        wins: ""
       });
       setLinkedinData(importedProfile || ({
         ...data.profile,
@@ -356,56 +340,6 @@ export default function HomePage() {
                     <option key={industry} value={industry}>{industry}</option>
                   ))}
                 </select>
-              </Field>
-
-              <Field label="What is your dream company?">
-                <input
-                  className={inputCls}
-                  onChange={(e) => setDreamCompany(e.target.value)}
-                  placeholder="e.g. Google, Stripe"
-                  value={dreamCompany}
-                />
-              </Field>
-
-              <Field label="What is your location preference?">
-                <div className="relative">
-                  <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#CCCCCC]" />
-                  <input
-                    className={cn(inputCls, "pl-9")}
-                    onChange={(e) => setLocationPreference(e.target.value)}
-                    placeholder="e.g. Austin, TX or Remote"
-                    value={locationPreference}
-                  />
-                </div>
-              </Field>
-
-              <Field label="Do you prefer remote, hybrid, or in office?">
-                <div className="flex overflow-hidden rounded-full border border-[#EEEEEE]">
-                  {workPreferences.map((item) => (
-                    <button
-                      className={cn(
-                        "flex-1 py-2.5 text-sm font-semibold transition-all duration-200",
-                        workPreference === item
-                          ? "bg-[#0A66C2] text-white"
-                          : "bg-white text-[#666666] hover:bg-[#F7F9FC]"
-                      )}
-                      key={item}
-                      onClick={() => setWorkPreference(item)}
-                      type="button"
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </Field>
-
-              <Field label="Anything you wish your LinkedIn highlighted better? (optional)">
-                <textarea
-                  className="min-h-24 w-full resize-none rounded-lg border border-[#EEEEEE] bg-white px-3 py-3 text-[15px] text-[#333333] outline-none transition-all placeholder:text-[#AAAAAA] hover:border-[#0A66C2]/40 focus:border-[#0A66C2] focus:ring-2 focus:ring-[#0A66C2]/10"
-                  onChange={(e) => setWins(e.target.value)}
-                  placeholder="e.g. Led a team of 5, shipped X feature, won Y award"
-                  value={wins}
-                />
               </Field>
 
               <button
