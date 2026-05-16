@@ -34,8 +34,8 @@ Education and credential signal, 8 points. Score whether school, degree, coursew
 Target role alignment, 12 points. Score whether the profile as a whole clearly points toward the stated job or internship target instead of looking scattered.
 Geography and market fit, 5 points. Score whether the profile fits the user's target market, city, country, location preference, work style preference, seniority, and timeline.
 Credibility and social proof, 5 points. Score whether the profile has proof signals such as wins, strong employers, projects, network scale, recommendations, publications, leadership, or portfolio evidence.
-Add these component scores mentally and set overallScore to the total. Do not default to 62, 52, 38, 34, 30, 70, or any other repeated score unless the weighted evidence genuinely lands there.
-Use the full 1 to 100 range. A nearly empty or unverifiable profile should usually be below 35. A partially built student or early career profile should usually be 35 to 60. A good but improvable profile should usually be 61 to 78. A strong profile with clear proof, keywords, and alignment should usually be 79 to 90. Reserve 91 to 100 for exceptional profiles with obvious recruiter fit and strong proof across nearly every section.
+Add these component scores mentally and set overallScore to the total. Do not default to 72, 68, 65, 62, 52, 38, 34, 30, 70, or any other repeated score unless the weighted evidence genuinely lands there.
+Use the full 1 to 100 range. A nearly empty or unverifiable profile should score below 30. A profile that exists but critically lacks role clarity, specific proof, and keyword depth should score 30 to 44. A foundational profile with some content but missing targeted positioning and proof bullets should score 45 to 59. A profile with clear role direction and partial optimization but gaps in proof or keyword coverage should score 60 to 72. A well built profile with solid role targeting, good proof, and strong keyword coverage should score 73 to 84. A strong recruiter ready profile with sharp positioning and outcome proof should score 85 to 92. Reserve 93 to 100 for exceptional profiles with proof across nearly every section.
 Set categoryScores from the same rubric. Headline maps to headline quality. About maps to About section positioning. Experience maps to experience proof and relevance. Skills maps to skills and keyword coverage. Positioning maps mostly to target role alignment, geography and market fit, and credibility signals.
 If a section is not returned by the profile import, do not automatically give it 1 out of 10. Score it based on all available evidence, and explain that the import did not return enough data to verify it.
 
@@ -57,6 +57,7 @@ Do not assign a 1 out of 10 score solely because a URL import did not return a f
 Treat imported profile text as profile evidence. If headline, about, experience, education, or skills appear in the imported profile text, do not describe that section as missing.
 Avoid generic advice. Each recommendation must be grounded in at least one supplied field or explicitly call out a missing field.
 Recommended text should be ready to paste into a profile where possible.
+Never write placeholder phrases in recommended text such as "Projects, tools, and outcomes aligned to hiring needs", "relevant skills and experience", "proof points aligned to your target role", or any generic template language. Every recommended headline must contain at least one specific element drawn from the actual profile: a named skill, tool, technology, company, institution, quantified outcome, project type, or real domain. If the profile does not include enough specifics, use the most concrete detail available and tell the user exactly what to replace or add.
 Be specific, honest, and actionable. Consider geography, job market expectations, internship market expectations, seniority benchmarks, role keywords, proof of impact, and industry norms.
 
 Output ONLY valid JSON, no markdown or preamble.`;
@@ -210,8 +211,24 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
   const headlineCurrent = profile.headline || (isProfileImport ? "Headline was not returned by the profile import" : "No headline provided");
   const aboutCurrent = profile.about || (isProfileImport ? "About text was not returned by the profile import" : "No About section provided");
 
+  const hasHeadline = Boolean(profile.headline?.trim());
+  const hasAbout = Boolean(profile.about?.trim());
+  const hasExperience = Boolean(profile.experience?.length);
+  const hasSkills = Boolean(profile.skills?.length);
+  const hasEducation = Boolean(profile.education?.length);
+  const fallbackScore = Math.min(62,
+    22 +
+    (hasHeadline ? 8 : 2) +
+    (hasAbout ? 7 : 1) +
+    (hasExperience ? 10 : 3) +
+    (hasSkills ? 6 : 2) +
+    (hasEducation ? 4 : 1) +
+    (context.targetRole ? 3 : 0) +
+    (context.industry ? 2 : 0)
+  );
+
   return {
-    overallScore: 72,
+    overallScore: fallbackScore,
     personalDiagnosis: `Your profile has a usable professional baseline, but it needs to make your fit for ${role} in ${context.industry || "your target industry"} obvious from the headline, About opener, and proof bullets.`,
     categoryScores: {
       headline: profile.headline ? 7 : isProfileImport ? 5 : 4,
@@ -273,7 +290,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
         title: "Rewrite the headline",
         profileEvidence: headlineCurrent,
         current: headlineCurrent,
-        recommended: `${role} | ${context.industry || "Target industry"} | Projects, tools, and outcomes aligned to hiring needs`,
+        recommended: `${role}${context.industry ? " | " + context.industry : ""} | Add 2 to 3 specific skills, tools, or proof points that match your target job descriptions`,
         whyMatters: "The headline is the highest visibility surface for recruiter search, profile visits, and referral checks.",
         difficulty: "Easy",
         scoreBump: 10
@@ -356,7 +373,7 @@ export async function analyzeLinkedInProfile(profile: LinkedInProfile, context: 
     const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY, timeout: 30_000 });
     const response = await anthropic.messages.create({
       model: process.env.CLAUDE_MODEL || "claude-sonnet-4-6",
-      max_tokens: 3200,
+      max_tokens: 4000,
       system: LINKEDIN_ANALYSIS_SYSTEM_PROMPT,
       tools: [analysisTool],
       tool_choice: { type: "tool", name: "return_analysis" },
