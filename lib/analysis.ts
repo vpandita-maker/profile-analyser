@@ -17,7 +17,7 @@ function cleanItem(value: unknown, fallbackTitle: string): AnalysisItem {
     score: cleanScore(item.score, 5, 10),
     explanation,
     profileEvidence: typeof item.profileEvidence === "string" && item.profileEvidence.trim() ? item.profileEvidence : undefined,
-    whyThisMattersForYou: typeof item.whyThisMattersForYou === "string" && item.whyThisMattersForYou.trim() ? item.whyThisMattersForYou : explanation
+    whyThisMattersForYou: typeof item.whyThisMattersForYou === "string" && item.whyThisMattersForYou.trim() ? item.whyThisMattersForYou : undefined
   };
 }
 
