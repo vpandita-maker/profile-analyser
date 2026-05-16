@@ -7,9 +7,18 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
+function nextStepLabel(title: string) {
+  const normalized = title.toLowerCase();
+  if (normalized.includes("headline")) return "Copy this headline";
+  if (normalized.includes("about") || normalized.includes("summary")) return "Add this to About";
+  if (normalized.includes("experience") || normalized.includes("bullet") || normalized.includes("proof") || normalized.includes("project")) return "Rewrite this bullet";
+  return "Update LinkedIn now";
+}
+
 export function FixCard({ fix, defaultOpen = false }: { fix: FixItem; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   const [copied, setCopied] = useState(false);
+  const nextStep = nextStepLabel(fix.title);
 
   async function copy() {
     await navigator.clipboard.writeText(fix.recommended);
@@ -50,9 +59,13 @@ export function FixCard({ fix, defaultOpen = false }: { fix: FixItem; defaultOpe
             <p className="font-mono text-xs font-bold leading-5 text-slate-900">{fix.recommended}</p>
           </div>
           <p className="text-sm leading-6 text-slate-600">{fix.whyMatters}</p>
+          <div className="rounded-lg bg-[#0A66C2]/5 p-3 ring-1 ring-[#0A66C2]/10">
+            <p className="text-[10px] font-black uppercase tracking-wide text-[#0A66C2]">Next step</p>
+            <p className="mt-1 text-sm font-black text-slate-950">{nextStep}</p>
+          </div>
           <Button variant="secondary" className="h-9 min-h-9 text-xs" onClick={copy}>
             {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Clipboard className="h-4 w-4" />}
-            {copied ? "Copied" : "Copy to Clipboard"}
+            {copied ? "Copied" : nextStep}
           </Button>
         </div>
       ) : null}
