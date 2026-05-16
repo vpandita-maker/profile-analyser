@@ -13,10 +13,11 @@ Every recommendation should help the user get interviews, internship conversatio
 
 Return a JSON object with:
 overallScore from 1 to 100
+personalDiagnosis, one direct sentence that names the gap between what the profile currently signals and what the user is targeting
 categoryScores for headline, about, experience, skills, and positioning, each from 1 to 10
-strengths with 3 to 5 items, each with title, score from 1 to 10, and explanation
-weaknesses with 3 to 5 items, each with title, score from 1 to 10, and explanation
-topFixes with 3 items, each with title, current text, recommended text, why it matters, difficulty, and scoreBump
+strengths with 3 to 5 items, each with title, score from 1 to 10, profileEvidence, explanation, and whyThisMattersForYou
+weaknesses with 3 to 5 items, each with title, score from 1 to 10, profileEvidence, explanation, and whyThisMattersForYou
+topFixes with 3 items, each with title, profileEvidence, current text, recommended text, why it matters, difficulty, and scoreBump
 secondaryFixes with exactly 3 items using the same structure
 The topFixes must be based on the most important weaknesses. Every topFix must directly repair something that is not working in the profile.
 The secondaryFixes must address lower priority issues or missing profile signals.
@@ -43,6 +44,10 @@ Always write directly to the user in second person: "you", "your", "you should".
 Never write about the user in third person. Do not say "the user should", "[Name] should", "their profile", or "Vansh should".
 Do not use dash punctuation in any written explanation, title, current text, recommended text, or why it matters. Avoid hyphens, en dashes, and em dashes. Use commas, periods, or separate sentences instead.
 Make every strength, weakness, and fix specific to the provided profile data and context answers. Mention the user's target role, industry, geography, location preference, work style preference, target employers, outcomes, market benchmarks, or recent wins when relevant.
+Start by identifying the gap between what the user wants and what their profile currently signals. Use their target role, seniority, industry, headline, About section, experience, skills, education, and imported profile text.
+Every strength, weakness, and fix must reference at least one concrete detail from the supplied profile or context. Concrete details include exact headline phrases, current role, company, school, project, tool, skill, industry, target role, seniority, or imported profile text. If you cannot cite a concrete detail, rewrite the item until you can.
+profileEvidence must quote or tightly summarize the exact profile or context detail that caused the item. Do not use generic evidence such as "your profile" or "your experience" by itself.
+Weakness titles should name the personal mismatch where possible, for example "Your headline does not yet say Product Manager" or "Your experience needs analytics style outcomes". Avoid generic titles such as "Missing measurable proof" unless followed by concrete profile evidence.
 For each topFix, use the related weakness as the source. Do not give a fix unless it clearly improves recruiter fit, internship fit, search visibility, proof of impact, or conversion to interviews.
 Do not ask for or depend on the user's desired salary. When compensation or market positioning matters, infer expectations from the target role, seniority, geography, industry, and broadly available market benchmarks.
 If a profile field is not returned by the profile import, do not claim that section is absent from the actual LinkedIn profile. Say the import did not return enough data to verify that section, then recommend what the user should verify or improve based on the evidence you do have.
@@ -62,9 +67,10 @@ const analysisTool = {
   input_schema: {
     type: "object",
     additionalProperties: false,
-    required: ["overallScore", "categoryScores", "strengths", "weaknesses", "topFixes", "secondaryFixes"],
+    required: ["overallScore", "personalDiagnosis", "categoryScores", "strengths", "weaknesses", "topFixes", "secondaryFixes"],
     properties: {
       overallScore: { type: "integer", minimum: 1, maximum: 100 },
+      personalDiagnosis: { type: "string" },
       categoryScores: {
         type: "object",
         additionalProperties: false,
@@ -84,11 +90,13 @@ const analysisTool = {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["title", "score", "explanation"],
+          required: ["title", "score", "profileEvidence", "explanation", "whyThisMattersForYou"],
           properties: {
             title: { type: "string" },
             score: { type: "integer", minimum: 1, maximum: 10 },
-            explanation: { type: "string" }
+            profileEvidence: { type: "string" },
+            explanation: { type: "string" },
+            whyThisMattersForYou: { type: "string" }
           }
         }
       },
@@ -99,11 +107,13 @@ const analysisTool = {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["title", "score", "explanation"],
+          required: ["title", "score", "profileEvidence", "explanation", "whyThisMattersForYou"],
           properties: {
             title: { type: "string" },
             score: { type: "integer", minimum: 1, maximum: 10 },
-            explanation: { type: "string" }
+            profileEvidence: { type: "string" },
+            explanation: { type: "string" },
+            whyThisMattersForYou: { type: "string" }
           }
         }
       },
@@ -114,9 +124,10 @@ const analysisTool = {
       fix: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "current", "recommended", "whyMatters", "difficulty", "scoreBump"],
+        required: ["title", "profileEvidence", "current", "recommended", "whyMatters", "difficulty", "scoreBump"],
         properties: {
           title: { type: "string" },
+          profileEvidence: { type: "string" },
           current: { type: "string" },
           recommended: { type: "string" },
           whyMatters: { type: "string" },
@@ -201,6 +212,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
 
   return {
     overallScore: 72,
+    personalDiagnosis: `Your profile has a usable professional baseline, but it needs to make your fit for ${role} in ${context.industry || "your target industry"} obvious from the headline, About opener, and proof bullets.`,
     categoryScores: {
       headline: profile.headline ? 7 : isProfileImport ? 5 : 4,
       about: profile.about ? 7 : isProfileImport ? 5 : 4,
@@ -212,41 +224,54 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       {
         title: "Clear starting point",
         score: 7,
-        explanation: `You have enough signal to begin positioning for ${opportunity.toLowerCase()}, especially if you sharpen your role narrative for ${role}.`
+        profileEvidence: `Target role is ${role}. Target opportunity type is ${opportunity}.`,
+        explanation: `You have enough signal to begin positioning for ${opportunity.toLowerCase()}, especially if you sharpen your role narrative for ${role}.`,
+        whyThisMattersForYou: `Because you are targeting ${role}, recruiters need the profile to make that direction obvious before they read every section.`
       },
       {
         title: "Role aware targeting",
         score: 8,
-        explanation: `Your answers make your target role clearer, which helps tune your headline, about, and experience sections for ${audience}.`
+        profileEvidence: `You selected ${role} and ${context.seniority || "a target seniority"} seniority.`,
+        explanation: `Your answers make your target role clearer, which helps tune your headline, about, and experience sections for ${audience}.`,
+        whyThisMattersForYou: `This gives the analysis a clearer benchmark than a generic LinkedIn review.`
       },
       {
         title: "Readable professional baseline",
         score: 7,
-        explanation: "You can upgrade your current profile quickly by adding sharper proof points and more audience specific keywords."
+        profileEvidence: profile.headline || profile.currentRole || profile.rawProfileText?.slice(0, 160) || "The imported profile provided enough evidence to evaluate a professional baseline.",
+        explanation: "You can upgrade your current profile quickly by adding sharper proof points and more audience specific keywords.",
+        whyThisMattersForYou: `Small changes can make your fit for ${role} much easier to scan.`
       }
     ],
     weaknesses: [
       {
-        title: "Headline needs stronger positioning",
+        title: `Your headline needs to signal ${role}`,
         score: profile.headline ? 5 : isProfileImport ? 5 : 3,
+        profileEvidence: headlineCurrent,
         explanation: profile.headline
           ? `Your headline should state the role you want, the domain you fit, and the proof that makes you credible for ${role}.`
-          : `The profile import did not return a headline, so verify that your headline is public and make sure it states the role you want, the domain you fit, and the proof that makes you credible for ${role}.`
+          : `The profile import did not return a headline, so verify that your headline is public and make sure it states the role you want, the domain you fit, and the proof that makes you credible for ${role}.`,
+        whyThisMattersForYou: "The headline is often the first field a recruiter sees in search results and profile previews."
       },
       {
-        title: "Missing measurable proof",
+        title: `Your experience needs ${role} style proof`,
         score: 5,
-        explanation: "Recruiters and hiring teams scan for outcomes. Add metrics, scope, tools, projects, and named domains wherever possible."
+        profileEvidence: compactList(profile.experience) || profile.rawProfileText?.slice(0, 160) || "The imported profile did not return enough detailed experience proof.",
+        explanation: "Recruiters and hiring teams scan for outcomes. Add metrics, scope, tools, projects, and named domains wherever possible.",
+        whyThisMattersForYou: `For ${role}, proof of work matters more than broad responsibility statements.`
       },
       {
-        title: "Audience fit can be tighter",
+        title: `Your profile can speak more directly to ${context.industry || "your target industry"}`,
         score: 6,
-        explanation: `Your profile should speak directly to ${context.geography || "your market"} expectations, ${context.seniority || "your"} seniority benchmarks, and the skills needed for ${role}.`
+        profileEvidence: `Target industry is ${context.industry || "not specified"}. Target seniority is ${context.seniority || "not specified"}.`,
+        explanation: `Your profile should speak directly to ${context.geography || "your market"} expectations, ${context.seniority || "your"} seniority benchmarks, and the skills needed for ${role}.`,
+        whyThisMattersForYou: "Recruiters compare you against people targeting the same function and level, not against every LinkedIn profile."
       }
     ],
     topFixes: [
       {
         title: "Rewrite the headline",
+        profileEvidence: headlineCurrent,
         current: headlineCurrent,
         recommended: `${role} | ${context.industry || "Target industry"} | Projects, tools, and outcomes aligned to hiring needs`,
         whyMatters: "The headline is the highest visibility surface for recruiter search, profile visits, and referral checks.",
@@ -255,6 +280,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       },
       {
         title: "Add a proof led About opener",
+        profileEvidence: aboutCurrent,
         current: aboutCurrent,
         recommended: `I am targeting ${role} opportunities in ${context.industry || "my target industry"}. I bring hands on experience with relevant projects, tools, and measurable outcomes that match what hiring teams screen for.`,
         whyMatters: "The first two lines decide whether a recruiter understands your fit before moving to experience.",
@@ -263,6 +289,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       },
       {
         title: "Turn experience into outcomes",
+        profileEvidence: compactList(profile.experience) || profile.rawProfileText?.slice(0, 160) || "The imported profile did not return enough detailed experience proof.",
         current: "Experience reads like responsibilities.",
         recommended: "Use bullets that combine action, scale, metric, and business result.",
         whyMatters: "Outcome bullets make role fit and impact obvious without asking the recruiter to infer it.",
@@ -273,6 +300,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
     secondaryFixes: [
       {
         title: "Reorder skills for search intent",
+        profileEvidence: compactList(profile.skills) || "The profile import did not return enough skills data to verify keyword coverage.",
         current: compactList(profile.skills),
         recommended: `Prioritize skills tied to ${role}, ${context.industry || "your target industry"}, and the job descriptions you want to match.`,
         whyMatters: "Skill ordering influences profile scanning, recruiter search, and keyword matching.",
@@ -281,6 +309,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       },
       {
         title: "Add credibility markers",
+        profileEvidence: profile.rawProfileText?.slice(0, 160) || compactList(profile.education) || "The imported profile needs clearer proof signals.",
         current: "Credibility signals are not prominent enough.",
         recommended: "Surface awards, shipped projects, coursework, certifications, tools, business outcomes, or employer names where relevant.",
         whyMatters: "Specific credibility markers reduce trust friction for recruiters and referral partners.",
@@ -289,6 +318,7 @@ export function fallbackAnalysis(profile: LinkedInProfile, context: ContextAnswe
       },
       {
         title: "Strengthen education and credentials",
+        profileEvidence: compactList(profile.education) || "The profile import did not return enough education or credential detail.",
         current: "Education section lacks specific proof points tied to the target role.",
         recommended: `Add relevant coursework, academic projects, certifications, or honors that align with ${role} expectations.`,
         whyMatters: "Education signals help recruiters validate your foundation, especially for early career and internship searches.",
@@ -326,7 +356,7 @@ export async function analyzeLinkedInProfile(profile: LinkedInProfile, context: 
     const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY, timeout: 30_000 });
     const response = await anthropic.messages.create({
       model: process.env.CLAUDE_MODEL || "claude-sonnet-4-6",
-      max_tokens: 2000,
+      max_tokens: 3200,
       system: LINKEDIN_ANALYSIS_SYSTEM_PROMPT,
       tools: [analysisTool],
       tool_choice: { type: "tool", name: "return_analysis" },

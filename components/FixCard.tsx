@@ -35,6 +35,12 @@ export function FixCard({ fix, defaultOpen = false }: { fix: FixItem; defaultOpe
       </button>
       {open ? (
         <div className="mt-4 space-y-3">
+          {fix.profileEvidence ? (
+            <div className="rounded-lg bg-white p-3 ring-1 ring-slate-100">
+              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-500">Profile evidence</p>
+              <p className="text-xs leading-5 text-slate-600">{fix.profileEvidence}</p>
+            </div>
+          ) : null}
           <div className="rounded-lg bg-slate-50 p-3">
             <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-500">Current</p>
             <p className="font-mono text-xs leading-5 text-slate-600">{fix.current}</p>

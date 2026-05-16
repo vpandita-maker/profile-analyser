@@ -47,6 +47,8 @@ export interface AnalysisItem {
   title: string;
   score: number;
   explanation: string;
+  profileEvidence?: string;
+  whyThisMattersForYou?: string;
 }
 
 export interface FixItem {
@@ -54,12 +56,14 @@ export interface FixItem {
   current: string;
   recommended: string;
   whyMatters: string;
+  profileEvidence?: string;
   difficulty: "Easy" | "Medium" | "Hard" | string;
   scoreBump?: number;
 }
 
 export interface AnalysisResult {
   overallScore: number;
+  personalDiagnosis?: string;
   categoryScores: {
     headline: number;
     about: number;

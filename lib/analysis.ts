@@ -11,10 +11,13 @@ function cleanScore(value: unknown, fallback: number, max: number) {
 
 function cleanItem(value: unknown, fallbackTitle: string): AnalysisItem {
   const item = isRecord(value) ? value : {};
+  const explanation = typeof item.explanation === "string" && item.explanation.trim() ? item.explanation : "This section needs more profile evidence before it can be judged clearly.";
   return {
     title: typeof item.title === "string" && item.title.trim() ? item.title : fallbackTitle,
     score: cleanScore(item.score, 5, 10),
-    explanation: typeof item.explanation === "string" && item.explanation.trim() ? item.explanation : "This section needs more profile evidence before it can be judged clearly."
+    explanation,
+    profileEvidence: typeof item.profileEvidence === "string" && item.profileEvidence.trim() ? item.profileEvidence : undefined,
+    whyThisMattersForYou: typeof item.whyThisMattersForYou === "string" && item.whyThisMattersForYou.trim() ? item.whyThisMattersForYou : explanation
   };
 }
 
@@ -25,6 +28,7 @@ function cleanFix(value: unknown, fallbackTitle: string): FixItem {
     current: typeof fix.current === "string" && fix.current.trim() ? fix.current : "Not enough current text was found.",
     recommended: typeof fix.recommended === "string" && fix.recommended.trim() ? fix.recommended : "Add a clearer role target, proof of impact, and keywords that match the jobs or internships you want.",
     whyMatters: typeof fix.whyMatters === "string" && fix.whyMatters.trim() ? fix.whyMatters : "Recruiters need a fast signal that your profile matches the opportunity you are targeting.",
+    profileEvidence: typeof fix.profileEvidence === "string" && fix.profileEvidence.trim() ? fix.profileEvidence : undefined,
     difficulty: typeof fix.difficulty === "string" && fix.difficulty.trim() ? fix.difficulty : "Easy",
     scoreBump: typeof fix.scoreBump === "number" && fix.scoreBump > 0 ? Math.min(20, Math.round(fix.scoreBump)) : undefined
   };
@@ -45,6 +49,7 @@ function fixFromWeakness(item: AnalysisItem, index: number): FixItem {
     current: item.explanation,
     recommended: `Rewrite this part of your profile so it directly addresses ${focus} with clearer job or internship keywords, proof of work, measurable outcomes, and a stronger recruiter signal.`,
     whyMatters: `This matters because ${item.explanation}`,
+    profileEvidence: item.profileEvidence,
     difficulty: index === 0 ? "Easy" : "Medium"
   };
 }
@@ -84,6 +89,9 @@ export function normalizeAnalysis(value: AnalysisResult | null): AnalysisResult 
 
   return {
     overallScore: cleanScore(value.overallScore, 70, 100),
+    personalDiagnosis: typeof value.personalDiagnosis === "string" && value.personalDiagnosis.trim()
+      ? value.personalDiagnosis
+      : "Your profile has enough signal to evaluate, but the fastest improvement will come from making your target role, proof of impact, and recruiter keywords clearer.",
     categoryScores: {
       headline: cleanScore(categoryScores.headline, 5, 10),
       about: cleanScore(categoryScores.about, 5, 10),

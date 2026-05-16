@@ -49,6 +49,7 @@ export default function ResultsPage() {
   const hydrated = useStoreHydrated();
   const storedAnalysis = useAnalyzerStore((state) => state.analysis);
   const analysis = normalizeAnalysis(storedAnalysis);
+  const profile = useAnalyzerStore((state) => state.linkedinData);
   const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
   const [offsetFromEnd, setOffsetFromEnd] = useState(0);
@@ -76,6 +77,7 @@ export default function ResultsPage() {
 
   const { label: sLabel, className: sClass } = scoreLabel(analysis.overallScore);
   const isGoodScore = analysis.overallScore >= 61;
+  const firstName = profile?.name?.split(" ")[0] || "Your";
   const shareText = `I just scored ${analysis.overallScore}/100 on iHeartLinkedIn! Get your free LinkedIn profile review →`;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(APP_URL)}`;
   const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`;
@@ -206,6 +208,14 @@ export default function ResultsPage() {
               </div>
             )}
           </section>
+
+          {analysis.personalDiagnosis ? (
+            <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+              <p className="mb-2 text-xs font-black uppercase tracking-wide text-teal-700">Recruiter readiness diagnosis</p>
+              <h2 className="text-lg font-black text-slate-950">{firstName === "Your" ? "Your profile gap" : `${firstName}, here is the gap`}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{analysis.personalDiagnosis}</p>
+            </section>
+          ) : null}
 
           <section className="mb-6">
             <h2 className="mb-3 text-lg font-black text-slate-950">What&apos;s Working</h2>
