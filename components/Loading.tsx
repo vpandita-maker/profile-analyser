@@ -17,9 +17,11 @@ const businessFacts = [
   "Coca Cola was first sold at a pharmacy soda fountain in Atlanta."
 ];
 
-export function Loading({ label = "Loading" }: { label?: string }) {
+export function Loading({ label = "Loading", progress }: { label?: string; progress?: number }) {
   const [factIndex, setFactIndex] = useState(() => Math.floor(Math.random() * businessFacts.length));
   const visibleFact = useMemo(() => businessFacts[factIndex], [factIndex]);
+  const visibleProgress = typeof progress === "number" ? Math.max(0, Math.min(100, Math.round(progress))) : null;
+  const activeStep = visibleProgress === null ? -1 : Math.min(steps.length - 1, Math.floor((visibleProgress / 100) * steps.length));
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -39,8 +41,14 @@ export function Loading({ label = "Loading" }: { label?: string }) {
           <div className="relative h-10 w-10 rounded-xl bg-teal-600 shadow-lg shadow-teal-900/20" />
         </div>
         <p className="text-base font-black text-slate-950">{label}</p>
+        {visibleProgress !== null && (
+          <p className="mt-2 text-3xl font-black tabular-nums text-teal-700">{visibleProgress}%</p>
+        )}
         <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full w-2/3 animate-[loading-bar_1.4s_ease-in-out_infinite] rounded-full bg-teal-600" />
+          <div
+            className={`h-full rounded-full bg-teal-600 ${visibleProgress === null ? "w-2/3 animate-[loading-bar_1.4s_ease-in-out_infinite]" : "transition-all duration-500 ease-out"}`}
+            style={visibleProgress !== null ? { width: `${visibleProgress}%` } : undefined}
+          />
         </div>
 
         <div className="mt-5 rounded-lg border border-teal-100 bg-white p-4 text-left shadow-sm">
@@ -52,8 +60,11 @@ export function Loading({ label = "Loading" }: { label?: string }) {
 
         <div className="mt-5 space-y-2 text-left">
           {steps.map((step, index) => (
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500" key={step}>
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal-500" style={{ animationDelay: `${index * 160}ms` }} />
+            <div className={`flex items-center gap-2 text-xs font-semibold ${index <= activeStep ? "text-slate-700" : "text-slate-500"}`} key={step}>
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${index <= activeStep ? "bg-teal-600" : "animate-pulse bg-teal-500"}`}
+                style={{ animationDelay: `${index * 160}ms` }}
+              />
               {step}
             </div>
           ))}
