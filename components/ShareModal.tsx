@@ -7,7 +7,7 @@ import { BottomSheet } from "@/components/ui/Modal";
 import { useAnalyzerStore } from "@/lib/store";
 
 const waMessage = (url: string) =>
-  `Share with anyone job hunting, switching roles, or just curious. You unlock 2 more profile fixes for yourself, they discover exactly what's limiting their recruiter visibility. One share, two wins: ${url}`;
+  `Recruiters spend less than 6 seconds on your LinkedIn profile. I just scored mine and found what was preventing recruiter conversations. If you want to attract better opportunities, check yours: ${url}`;
 
 function WhatsAppIcon() {
   return (

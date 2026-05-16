@@ -119,7 +119,7 @@ export default function UnlockedResultsPage() {
     const url = await getOrCreateShareUrl();
     if (!url) { setUnlockError("Could not generate link. Please try again."); return; }
     const score = analysis?.overallScore ?? 0;
-    const msg = `Share with anyone job hunting, switching roles, or just curious. You unlock 2 more profile fixes for yourself, they discover exactly what's limiting their recruiter visibility. One share, two wins: ${url}`;
+    const msg = `Recruiters spend less than 6 seconds on your LinkedIn profile. I just scored mine and found what was preventing recruiter conversations. If you want to attract better opportunities, check yours: ${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
     analytics.inviteSent();
     setUnlockSent(true);
