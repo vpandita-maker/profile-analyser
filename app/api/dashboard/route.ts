@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 
   const analyses = (supabaseResult[0]?.data ?? []) as Array<{
     id: string; created_at: string; is_unlocked: boolean; invites_fulfilled: number; name: string | null;
-    analysis_json: { overallScore: number; topFixes: Array<{ recommended: string }> };
+    analysis_json: { overallScore: number; topFixes: Array<{ recommended: string }>; sourcePlatform?: string };
   }>;
   const invites = (supabaseResult[1]?.data ?? []) as Array<{ analysis_id: string; status: string; created_at: string }>;
   const sourceResult = supabaseResult[2] as { data?: Array<{ visitor_id: string | null; source_platform: string | null }>; error?: unknown } | undefined;
@@ -96,6 +96,7 @@ export async function GET(request: Request) {
       name: a.name || "Unknown person",
       role,
       industry,
+      sourcePlatform: a.analysis_json?.sourcePlatform || "Direct / Unknown",
       score: a.analysis_json?.overallScore ?? 0,
       unlocked: a.is_unlocked,
       timeIST: toISTTimeStr(a.created_at),

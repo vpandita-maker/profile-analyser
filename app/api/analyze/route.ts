@@ -30,6 +30,9 @@ const analyzeSchema = z.object({
 });
 
 const rateMap = new Map<string, { count: number; reset: number }>();
+const VISITOR_COOKIE = "ihll_visitor_id";
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
 function checkRate(ip: string, max: number, windowMs: number) {
   const now = Date.now();
   const rec = rateMap.get(ip);
@@ -37,6 +40,18 @@ function checkRate(ip: string, max: number, windowMs: number) {
   if (rec.count >= max) return false;
   rec.count++;
   return true;
+}
+
+function todayIST() {
+  return new Date(Date.now() + IST_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+function visitorIdFromCookie(cookieHeader: string) {
+  return cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${VISITOR_COOKIE}=`))
+    ?.split("=")[1];
 }
 
 export async function POST(request: Request) {
@@ -91,6 +106,21 @@ export async function POST(request: Request) {
   let previousScore: number | null = null;
 
   if (supabase) {
+    const visitorId = visitorIdFromCookie(request.headers.get("cookie") ?? "");
+    const { data: visitorEvent } = visitorId
+      ? await supabase
+          .from("visitor_events")
+          .select("source_platform")
+          .eq("visitor_id", visitorId)
+          .eq("visit_date", todayIST())
+          .maybeSingle()
+      : { data: null };
+    const sourcePlatform =
+      typeof visitorEvent?.source_platform === "string" && visitorEvent.source_platform.trim()
+        ? visitorEvent.source_platform.trim()
+        : "Direct / Unknown";
+    const analysisForStorage = { ...(analysis as unknown as Record<string, unknown>), sourcePlatform };
+
     const { data: existing } = await supabase
       .from("analyses")
       .select("analysis_json")
@@ -111,7 +141,7 @@ export async function POST(request: Request) {
           name: profile.name ?? null,
           headline: profile.headline ?? null,
           photo: profile.photo ?? null,
-          analysis_json: analysis,
+          analysis_json: analysisForStorage,
           invites_required: 1,
           invites_fulfilled: 0,
           is_unlocked: false
