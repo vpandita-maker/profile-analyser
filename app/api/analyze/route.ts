@@ -108,6 +108,9 @@ export async function POST(request: Request) {
         {
           user_id: userId,
           linkedin_id: profile.linkedinId,
+          name: profile.name ?? null,
+          headline: profile.headline ?? null,
+          photo: profile.photo ?? null,
           analysis_json: analysis,
           invites_required: 1,
           invites_fulfilled: 0,
