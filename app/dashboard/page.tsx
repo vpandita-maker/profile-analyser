@@ -159,7 +159,7 @@ export default function DashboardPage() {
         <Stat
           label={isToday ? "Unique Viewers Today" : "Unique Viewers"}
           value={data.uniqueViewersToday !== null ? data.uniqueViewersToday : "—"}
-          sub={data.uniqueViewersToday === null ? <span className="text-[11px] text-slate-600">{isToday ? "Connect GA4" : "Today only"}</span> : undefined}
+          sub={data.uniqueViewersToday === null ? <span className="text-[11px] text-slate-600">Connect analytics</span> : undefined}
         />
       </div>
 

@@ -35,6 +35,14 @@ function topUniquePlatformCounts(rows: Array<{ visitor_id: string | null; source
     .slice(0, limit);
 }
 
+function uniqueVisitorCount(rows: Array<{ visitor_id: string | null }>) {
+  const visitorIds = new Set<string>();
+  for (const row of rows) {
+    if (row.visitor_id) visitorIds.add(row.visitor_id);
+  }
+  return visitorIds.size;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
@@ -62,12 +70,10 @@ export async function GET(request: Request) {
             .gte("created_at", dayStartUTC)
             .lte("created_at", dayEndUTC)
             .order("created_at", { ascending: false }),
-          supabase.from("visitor_events").select("visitor_id", { count: "exact", head: true })
-            .eq("visit_date", selectedDate),
           supabase.from("visitor_events").select("visitor_id,source_platform")
             .eq("visit_date", selectedDate),
         ])
-      : Promise.resolve([{ data: [] }, { data: [] }, { count: null }, { data: [] }] as const),
+      : Promise.resolve([{ data: [] }, { data: [] }, { data: [] }] as const),
   ]);
 
   const analyses = (supabaseResult[0]?.data ?? []) as Array<{
@@ -75,9 +81,9 @@ export async function GET(request: Request) {
     analysis_json: { overallScore: number; topFixes: Array<{ recommended: string }> };
   }>;
   const invites = (supabaseResult[1]?.data ?? []) as Array<{ analysis_id: string; status: string; created_at: string }>;
-  const uniqueViewers = supabaseResult[2]?.count ?? ga4?.uniqueViewersToday ?? null;
-  const sourceResult = supabaseResult[3] as { data?: Array<{ visitor_id: string | null; source_platform: string | null }>; error?: unknown } | undefined;
+  const sourceResult = supabaseResult[2] as { data?: Array<{ visitor_id: string | null; source_platform: string | null }>; error?: unknown } | undefined;
   const sourceRows = sourceResult && !sourceResult.error ? sourceResult.data ?? [] : [];
+  const uniqueViewers = sourceRows.length > 0 ? uniqueVisitorCount(sourceRows) : ga4?.uniqueViewersToday ?? 0;
   const topVisitorPlatforms = topUniquePlatformCounts(sourceRows);
 
   const uniqueInviters = new Set(invites.map((i) => i.analysis_id)).size;
@@ -109,7 +115,7 @@ export async function GET(request: Request) {
     viralCoeff,
     invitesSent: invites.length,
     unlocked: analyses.filter((a) => a.is_unlocked).length,
-    uniqueViewersToday: isToday ? uniqueViewers : null,
+    uniqueViewersToday: uniqueViewers,
     funnel: [
       { label: "Analyses", value: analyses.length },
       { label: "Got Fixes", value: analyses.filter((a) => a.analysis_json?.topFixes?.length > 0).length },
