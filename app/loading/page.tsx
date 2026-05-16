@@ -21,8 +21,7 @@ export default function AnalysisLoadingPage() {
     if (analysis) {
       setProgress(100);
       const timeout = window.setTimeout(() => {
-        const { userEmail } = useAnalyzerStore.getState();
-        router.replace(userEmail ? "/results" : "/email-gate");
+        router.replace("/results");
       }, 900);
       return () => window.clearTimeout(timeout);
     }
@@ -65,8 +64,7 @@ export default function AnalysisLoadingPage() {
         }
         setProgress(100);
         window.setTimeout(() => {
-          const { userEmail } = useAnalyzerStore.getState();
-          router.replace(userEmail ? "/results" : "/email-gate");
+          router.replace("/results");
         }, 500);
       } finally {
         window.clearInterval(progressInterval);
