@@ -62,7 +62,7 @@ export async function GET(request: Request) {
     getGA4Stats(selectedDate),
     supabase
       ? Promise.all([
-          supabase.from("analyses").select("id,created_at,is_unlocked,invites_fulfilled,analysis_json")
+          supabase.from("analyses").select("id,created_at,is_unlocked,invites_fulfilled,name,analysis_json")
             .gte("created_at", dayStartUTC)
             .lte("created_at", dayEndUTC)
             .order("created_at", { ascending: false }),
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
   ]);
 
   const analyses = (supabaseResult[0]?.data ?? []) as Array<{
-    id: string; created_at: string; is_unlocked: boolean; invites_fulfilled: number;
+    id: string; created_at: string; is_unlocked: boolean; invites_fulfilled: number; name: string | null;
     analysis_json: { overallScore: number; topFixes: Array<{ recommended: string }> };
   }>;
   const invites = (supabaseResult[1]?.data ?? []) as Array<{ analysis_id: string; status: string; created_at: string }>;
@@ -93,6 +93,7 @@ export async function GET(request: Request) {
   const recent = analyses.map((a) => {
     const { role, industry } = extractRoleIndustry(a.analysis_json);
     return {
+      name: a.name || "Unknown person",
       role,
       industry,
       score: a.analysis_json?.overallScore ?? 0,
