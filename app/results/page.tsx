@@ -235,6 +235,20 @@ export default function ResultsPage() {
               ))}
             </div>
           </section>
+
+          {lockedFixCount > 0 ? (
+            <section className="mb-6">
+              <ShareUnlockCard
+                lockedCount={lockedFixCount}
+                title="Liked the review?"
+                description={`Share iHeartLinkedIn with a friend to unlock ${lockedFixCount} more fixes. If this helped you understand your profile, it can help them see what recruiters may be missing too.`}
+                onUnlocked={() => {
+                  setFullyUnlocked(true);
+                  router.push("/results/unlocked?preparing=1");
+                }}
+              />
+            </section>
+          ) : null}
         </div>
       </div>
       </div>
