@@ -183,6 +183,42 @@ export default function ResultsPage() {
             </div>
           </section>
 
+          <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
+            <p className="mb-3 text-xs font-black uppercase tracking-wide text-teal-700">How to read your results</p>
+            <div className="space-y-3">
+              {[
+                {
+                  step: "1",
+                  title: "Start with your score and diagnosis",
+                  text: "Use this to understand the main gap between your current profile and the role you want."
+                },
+                {
+                  step: "2",
+                  title: "Apply the first three fixes",
+                  text: "These are the highest impact changes. Copy the suggested wording, then adjust it so it still sounds like you."
+                },
+                {
+                  step: "3",
+                  title: "Unlock the deeper fixes if the review helped",
+                  text: "Share the tool with a friend to see the extra recommendations and continue improving your profile."
+                },
+                {
+                  step: "4",
+                  title: "Analyze again after you update LinkedIn",
+                  text: "Come back after your edits to check whether your recruiter readiness score improved."
+                }
+              ].map(({ step, title, text }) => (
+                <div key={step} className="flex gap-3 rounded-lg bg-slate-50 p-3 ring-1 ring-slate-100">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-600 text-xs font-black text-white">{step}</span>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-950">{title}</h3>
+                    <p className="mt-1 text-xs leading-5 text-slate-600">{text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {analysis.personalDiagnosis ? (
             <section className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
               <p className="mb-2 text-xs font-black uppercase tracking-wide text-teal-700">Recruiter readiness diagnosis</p>

@@ -368,45 +368,6 @@ export default function HomePage() {
           </div>
       </section>
 
-      <section className="landing-container pb-10">
-        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-[#EEEEEE]">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#0A66C2]">How to use iHeartLinkedIn</p>
-          <h2 className="mt-2 text-2xl font-black leading-tight text-[#333333]">Turn the review into profile changes</h2>
-          <div className="mt-5 space-y-4">
-            {[
-              {
-                step: "1",
-                title: "Run the review for the role you actually want",
-                text: "Use your target role, seniority, and industry so the feedback matches the recruiters you care about."
-              },
-              {
-                step: "2",
-                title: "Read the score, then fix the first three items",
-                text: "The first fixes are ordered by impact. Start with the headline, proof, and positioning before polishing smaller details."
-              },
-              {
-                step: "3",
-                title: "Copy the recommended wording into LinkedIn",
-                text: "Use the suggested text as a starting point, then adjust it so it still sounds like you."
-              },
-              {
-                step: "4",
-                title: "Analyze again after you update your profile",
-                text: "Use the progress view to see whether your recruiter readiness score is moving in the right direction."
-              }
-            ].map(({ step, title, text }) => (
-              <div key={step} className="flex gap-3 rounded-xl bg-[#F3F8FD] p-4 ring-1 ring-[#0A66C2]/10">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0A66C2] text-sm font-black text-white">{step}</span>
-                <div>
-                  <h3 className="text-sm font-black text-[#333333]">{title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-[#555555]">{text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Trust Band ── */}
       <section className="w-full border-y border-[#0A66C2]/20 bg-[#0A66C2]/[0.08] py-10">
         <div className="landing-container">
