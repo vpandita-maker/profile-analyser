@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 function appUrl() {
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "https://iheartlinkedin.app";
+  return process.env.NEXT_PUBLIC_APP_URL ?? "https://iheartlinkedin.app";
 }
 
 export async function POST(request: Request) {
