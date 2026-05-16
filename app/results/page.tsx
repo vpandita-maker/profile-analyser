@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Linkedin, RefreshCw, Sparkles, Trophy, Twitter } from "lucide-react";
+import { ChevronLeft, ChevronRight, Linkedin, RefreshCw, Sparkles, Twitter } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { analytics } from "@/lib/analytics";
@@ -229,10 +229,6 @@ export default function ResultsPage() {
             <Button onClick={() => router.push("/results/unlocked")}>
               <Sparkles className="h-4 w-4" />
               Check Your Solutions
-            </Button>
-            <Button variant="secondary" onClick={() => router.push("/results/leaderboard")}>
-              <Trophy className="h-4 w-4" />
-              See How You Rank
             </Button>
           </div>
         </div>

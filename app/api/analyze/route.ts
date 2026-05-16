@@ -123,23 +123,6 @@ export async function POST(request: Request) {
     }
 
     const overallScore = (analysis as { overallScore?: number }).overallScore ?? 0;
-    await supabase.from("leaderboard").upsert(
-      {
-        user_id: userId,
-        linkedin_id: profile.linkedinId,
-        name: profile.name,
-        headline: profile.headline || "",
-        profile_photo_url: profile.photo || "",
-        overall_score: overallScore,
-        goal: contextAnswers.goal || "Job Search",
-        geography: contextAnswers.geography || "Other",
-        seniority: contextAnswers.seniority || "",
-        industry: contextAnswers.industry || "",
-        is_public: true
-      },
-      { onConflict: "user_id" }
-    );
-
     await supabase.from("score_history").insert({ linkedin_id: userId, score: overallScore });
 
     const { data: historyRows } = await supabase
