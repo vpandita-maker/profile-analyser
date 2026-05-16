@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Linkedin, RefreshCw, Sparkles, Trophy, Twitt
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { analytics } from "@/lib/analytics";
+import { ShareFooter } from "@/components/ShareFooter";
 import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
@@ -80,7 +81,8 @@ export default function ResultsPage() {
   const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`;
 
   return (
-    <main className="app-screen safe-bottom">
+    <main className="flex h-dvh w-full flex-col bg-[#F3F2EF]">
+      <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="app-container">
         <div className="sticky top-0 z-20 -mx-4 mb-5 border-b border-slate-200 bg-white/90 backdrop-blur">
           <div className="flex items-center justify-between px-4 py-2">
@@ -223,7 +225,7 @@ export default function ResultsPage() {
             </div>
           </section>
 
-          <div className="space-y-3">
+          <div className="space-y-3 pb-4">
             <Button onClick={() => router.push("/results/unlocked")}>
               <Sparkles className="h-4 w-4" />
               Check Your Solutions
@@ -235,6 +237,8 @@ export default function ResultsPage() {
           </div>
         </div>
       </div>
+      </div>
+      <ShareFooter onShared={() => router.push("/results/unlocked?preparing=1")} />
     </main>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ChevronLeft, Copy, LockKeyhole, RefreshCw } from "lucide-react";
+import { ShareFooter } from "@/components/ShareFooter";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FixCard } from "@/components/FixCard";
@@ -8,11 +9,9 @@ import { Loading } from "@/components/Loading";
 import { UnlockOnboardingModal } from "@/components/UnlockOnboardingModal";
 import { Badge, ScoreBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { normalizeAnalysis } from "@/lib/analysis";
 import { analytics } from "@/lib/analytics";
 import { useAnalyzerStore, useStoreHydrated } from "@/lib/store";
-import { isEmail } from "@/lib/utils";
 
 function WhatsAppIcon() {
   return (
@@ -29,8 +28,6 @@ export default function UnlockedResultsPage() {
   const [introLoading, setIntroLoading] = useState(false);
   const [refreshingFixes, setRefreshingFixes] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
-  const [unlockEmail, setUnlockEmail] = useState("");
-  const [unlocking, setUnlocking] = useState(false);
   const [unlockSent, setUnlockSent] = useState(false);
   const [unlockError, setUnlockError] = useState("");
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -96,34 +93,6 @@ export default function UnlockedResultsPage() {
 
     void refreshFixes();
   }, [analysis, contextAnswers, hasFixes, profile, setAnalysis, setLinkedinData]);
-
-  async function sendUnlockInvite() {
-    if (!isEmail(unlockEmail)) return;
-    if (!analysisId) {
-      setUnlockError("Analysis data missing. Please go back and run the analysis again.");
-      return;
-    }
-    setUnlocking(true);
-    setUnlockError("");
-    try {
-      const response = await fetch("/api/invites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId, friendEmail: unlockEmail, inviterName: profile?.name })
-      });
-      if (!response.ok) {
-        setUnlockError("Invite could not be sent. Please try again.");
-        return;
-      }
-      analytics.inviteSent();
-      setUnlockSent(true);
-      window.setTimeout(() => setFullyUnlocked(true), 600);
-    } catch {
-      setUnlockError("Invite could not be sent. Please try again.");
-    } finally {
-      setUnlocking(false);
-    }
-  }
 
   async function getOrCreateShareUrl(): Promise<string | null> {
     if (shareUrl) return shareUrl;
@@ -205,8 +174,9 @@ export default function UnlockedResultsPage() {
   }
 
   return (
-    <main className="app-screen safe-bottom">
+    <main className="flex h-dvh w-full flex-col bg-[#F3F2EF]">
       <UnlockOnboardingModal isFullyUnlocked={isFullyUnlocked} onInviteNow={scrollToLock} />
+      <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="app-container">
         <div className="sticky top-0 z-20 -mx-4 border-b border-slate-200 bg-white/90 backdrop-blur">
           <div className="flex items-center justify-between px-4 py-2">
@@ -275,14 +245,14 @@ export default function UnlockedResultsPage() {
                       <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
                     </div>
                     <p className="text-sm leading-6 text-slate-600">
-                      Share this with anyone on LinkedIn — job hunting, switching roles, or just curious about their score. One share unlocks your remaining fixes instantly.
+                      Share with anyone on LinkedIn — job hunting, switching roles, or just curious. One share reveals everything instantly.
                     </p>
                     {unlockError && (
                       <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{unlockError}</p>
                     )}
                     {unlockSent ? (
                       <div className="rounded-lg bg-teal-50 p-3 text-sm font-semibold text-teal-800">
-                        {copiedLink ? "Link copied! Unlocking your fixes..." : "Shared! Unlocking your fixes..."}
+                        {copiedLink ? "Link copied! Unlocking your fixes…" : "Shared! Unlocking your fixes…"}
                       </div>
                     ) : (
                       <>
@@ -302,20 +272,6 @@ export default function UnlockedResultsPage() {
                           {copiedLink ? <Check className="h-4 w-4 text-teal-600" /> : <Copy className="h-4 w-4" />}
                           {copiedLink ? "Copied!" : "Copy Invite Link"}
                         </button>
-                        <div className="flex items-center gap-3">
-                          <div className="h-px flex-1 bg-slate-100" />
-                          <span className="text-[11px] text-slate-400">or send by email</span>
-                          <div className="h-px flex-1 bg-slate-100" />
-                        </div>
-                        <Input
-                          inputMode="email"
-                          onChange={(e) => setUnlockEmail(e.target.value)}
-                          placeholder="Their email address"
-                          value={unlockEmail}
-                        />
-                        <Button disabled={!isEmail(unlockEmail)} loading={unlocking} onClick={sendUnlockInvite}>
-                          Send Invite to Unlock
-                        </Button>
                       </>
                     )}
                   </div>
@@ -325,6 +281,8 @@ export default function UnlockedResultsPage() {
           )}
         </div>
       </div>
+      </div>
+      <ShareFooter onShared={() => setFullyUnlocked(true)} />
     </main>
   );
 }

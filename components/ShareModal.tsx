@@ -3,11 +3,11 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { BottomSheet } from "@/components/ui/Modal";
 import { useAnalyzerStore } from "@/lib/store";
-import { isEmail } from "@/lib/utils";
+
+const waMessage = (url: string) =>
+  `Recruiters spend less than 6 seconds on your LinkedIn profile. I just scored mine and found what was preventing recruiter conversations. If you want to attract better opportunities, check yours: ${url}`;
 
 function WhatsAppIcon() {
   return (
@@ -19,23 +19,19 @@ function WhatsAppIcon() {
 
 export function ShareModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [generatingLink, setGeneratingLink] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const analysisId = useAnalyzerStore((state) => state.analysisId);
   const setUnlocked = useAnalyzerStore((state) => state.setUnlocked);
-  const inviterName = useAnalyzerStore((state) => state.linkedinData?.name);
-  const score = useAnalyzerStore((state) => state.analysis?.overallScore ?? 0);
 
-  async function getOrCreateShareUrl(): Promise<string | null> {
+  async function getOrCreate(): Promise<string | null> {
     if (shareUrl) return shareUrl;
     if (!analysisId) return null;
-    setGeneratingLink(true);
+    setGenerating(true);
     try {
       const res = await fetch("/api/share-link", {
         method: "POST",
@@ -50,22 +46,20 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
     } catch {
       return null;
     } finally {
-      setGeneratingLink(false);
+      setGenerating(false);
     }
   }
 
   async function shareWhatsApp() {
-    const url = await getOrCreateShareUrl();
+    const url = await getOrCreate();
     if (!url) { setError("Could not generate link. Please try again."); return; }
-    const scoreText = score > 0 ? `My LinkedIn just scored ${score}/100 on this free tool 👀\n\n` : "";
-    const msg = `${scoreText}If you're job hunting, switching roles, or just curious — check yours in 2 min:\n${url}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(waMessage(url))}`, "_blank");
     setSent(true);
     window.setTimeout(() => { onClose(); router.push("/results/unlocked?preparing=1"); }, 700);
   }
 
   async function copyLink() {
-    const url = await getOrCreateShareUrl();
+    const url = await getOrCreate();
     if (!url) { setError("Could not generate link. Please try again."); return; }
     try {
       await navigator.clipboard.writeText(url);
@@ -74,34 +68,6 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
       window.setTimeout(() => { onClose(); router.push("/results/unlocked?preparing=1"); }, 900);
     } catch {
       setError("Could not copy. Please try again.");
-    }
-  }
-
-  async function sendInvite() {
-    if (!isEmail(email)) return;
-    if (!analysisId) {
-      setError("Run your analysis again before sending an invite.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    try {
-      const response = await fetch("/api/invites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId, friendEmail: email, inviterName }),
-      });
-      if (!response.ok) {
-        setError("Invite could not be sent. Please try again.");
-        return;
-      }
-      setSent(true);
-      setUnlocked(true);
-      window.setTimeout(() => { onClose(); router.push("/results/unlocked?preparing=1"); }, 700);
-    } catch {
-      setError("Invite could not be sent. Please try again.");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -120,32 +86,22 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
 
           <button
             onClick={shareWhatsApp}
-            disabled={generatingLink}
+            disabled={generating}
             className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#25D366] py-3.5 text-sm font-black text-white transition-all hover:bg-[#1ebe5d] hover:shadow-lg active:scale-[0.98] disabled:opacity-60"
           >
             <WhatsAppIcon />
-            {generatingLink ? "Generating link…" : "Share on WhatsApp"}
+            {generating ? "Generating link…" : "Share on WhatsApp"}
           </button>
 
           <button
             onClick={copyLink}
-            disabled={generatingLink}
+            disabled={generating}
             className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-black text-slate-800 transition-all hover:border-slate-300 hover:shadow-sm active:scale-[0.98] disabled:opacity-60"
           >
             {copied ? <Check className="h-4 w-4 text-teal-600" /> : <Copy className="h-4 w-4" />}
             {copied ? "Copied!" : "Copy Invite Link"}
           </button>
 
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-slate-100" />
-            <span className="text-[11px] text-slate-400">or send by email</span>
-            <div className="h-px flex-1 bg-slate-100" />
-          </div>
-
-          <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Their email address" inputMode="email" />
-          <Button disabled={!isEmail(email)} loading={loading} onClick={sendInvite}>
-            Send Invite
-          </Button>
           <p className="text-xs leading-5 text-slate-500">Your fixes unlock the moment you share.</p>
         </div>
       )}
