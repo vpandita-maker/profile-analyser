@@ -42,7 +42,7 @@ export function Loading({ label = "Loading", progress }: { label?: string; progr
         </div>
         <p className="text-base font-black text-slate-950">{label}</p>
         {visibleProgress !== null && (
-          <p className="mt-2 text-3xl font-black tabular-nums text-teal-700">{visibleProgress}%</p>
+          <p className="mt-1.5 text-xl font-black tabular-nums text-teal-700">{visibleProgress}%</p>
         )}
         <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-200">
           <div
