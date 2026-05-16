@@ -119,7 +119,7 @@ export default function UnlockedResultsPage() {
     const url = await getOrCreateShareUrl();
     if (!url) { setUnlockError("Could not generate link. Please try again."); return; }
     const score = analysis?.overallScore ?? 0;
-    const msg = `My LinkedIn just scored ${score}/100 on this free tool 👀\n\nIf you're job hunting, switching roles, or just curious — check yours in 2 min:\n${url}`;
+    const msg = `Share with anyone job hunting, switching roles, or just curious. You unlock 2 more profile fixes for yourself, they discover exactly what's limiting their recruiter visibility. One share, two wins: ${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
     analytics.inviteSent();
     setUnlockSent(true);
@@ -245,7 +245,7 @@ export default function UnlockedResultsPage() {
                       <h3 className="font-black text-slate-950">Unlock {lockedFixes.length} More Fixes</h3>
                     </div>
                     <p className="text-sm leading-6 text-slate-600">
-                      Share with anyone on LinkedIn — job hunting, switching roles, or just curious. One share reveals everything instantly.
+                      Share with anyone job hunting, switching roles, or just curious. You unlock 2 more profile fixes for yourself, they discover exactly what&apos;s limiting their recruiter visibility. One share, two wins.
                     </p>
                     {unlockError && (
                       <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{unlockError}</p>

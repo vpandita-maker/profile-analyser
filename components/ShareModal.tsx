@@ -7,7 +7,7 @@ import { BottomSheet } from "@/components/ui/Modal";
 import { useAnalyzerStore } from "@/lib/store";
 
 const waMessage = (url: string) =>
-  `Recruiters spend less than 6 seconds on your LinkedIn profile. I just scored mine and found what was preventing recruiter conversations. If you want to attract better opportunities, check yours: ${url}`;
+  `Share with anyone job hunting, switching roles, or just curious. You unlock 2 more profile fixes for yourself, they discover exactly what's limiting their recruiter visibility. One share, two wins: ${url}`;
 
 function WhatsAppIcon() {
   return (
@@ -80,7 +80,7 @@ export function ShareModal({ open, onClose }: { open: boolean; onClose: () => vo
       ) : (
         <div className="space-y-3">
           <p className="text-sm leading-6 text-slate-600">
-            Share with anyone on LinkedIn — job hunting, switching roles, or just curious about their score. One share unlocks your fixes instantly.
+            Share with anyone job hunting, switching roles, or just curious. You unlock your fixes, they discover what&apos;s limiting their recruiter visibility. One share, two wins.
           </p>
           {error && <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
 
