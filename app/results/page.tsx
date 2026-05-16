@@ -1,10 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Linkedin, RefreshCw, Sparkles, Twitter } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { analytics } from "@/lib/analytics";
 import { ShareFooter } from "@/components/ShareFooter";
+import { ShareUnlockCard } from "@/components/ShareUnlockCard";
+import { FixCard } from "@/components/FixCard";
 import { StrengthCard } from "@/components/StrengthCard";
 import { WeaknessCard } from "@/components/WeaknessCard";
 import { Button } from "@/components/ui/Button";
@@ -42,8 +44,6 @@ function scoreLabel(score: number): { label: string; className: string } {
 }
 
 const PROGRESS_VISIBLE = 3;
-const APP_URL = "https://iheartlinkedin.app";
-
 export default function ResultsPage() {
   const router = useRouter();
   const hydrated = useStoreHydrated();
@@ -52,6 +52,7 @@ export default function ResultsPage() {
   const profile = useAnalyzerStore((state) => state.linkedinData);
   const contextAnswers = useAnalyzerStore((state) => state.contextAnswers);
   const scoreHistory = useAnalyzerStore((state) => state.scoreHistory);
+  const setFullyUnlocked = useAnalyzerStore((state) => state.setFullyUnlocked);
   const [offsetFromEnd, setOffsetFromEnd] = useState(0);
 
   useEffect(() => {
@@ -76,11 +77,9 @@ export default function ResultsPage() {
   }
 
   const { label: sLabel, className: sClass } = scoreLabel(analysis.overallScore);
-  const isGoodScore = analysis.overallScore >= 61;
   const firstName = profile?.name?.split(" ")[0] || "Your";
-  const shareText = `I just scored ${analysis.overallScore}/100 on iHeartLinkedIn! Get your free LinkedIn profile review →`;
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(APP_URL)}`;
-  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`;
+  const freeFixes = analysis.topFixes.slice(0, 3);
+  const lockedFixCount = analysis.secondaryFixes.slice(0, 3).length;
 
   return (
     <main className="flex h-dvh w-full flex-col bg-[#F3F2EF]">
@@ -182,31 +181,6 @@ export default function ResultsPage() {
               </div>
               <ScoreBadge score={analysis.overallScore} />
             </div>
-            {isGoodScore && (
-              <div className="mt-4 border-t border-slate-100 pt-4">
-                <p className="mb-2.5 text-xs font-black uppercase tracking-wide text-slate-400">Share your score</p>
-                <div className="flex gap-3">
-                  <a
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#1D9BF0] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#1a8cd8] hover:shadow-md active:scale-[0.98]"
-                    href={twitterUrl}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <Twitter className="h-4 w-4" />
-                    Twitter
-                  </a>
-                  <a
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#0A66C2] px-4 py-2.5 text-sm font-black text-white transition-all hover:bg-[#004182] hover:shadow-md active:scale-[0.98]"
-                    href={linkedinUrl}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <Linkedin className="h-4 w-4" />
-                    LinkedIn
-                  </a>
-                </div>
-              </div>
-            )}
           </section>
 
           {analysis.personalDiagnosis ? (
@@ -217,8 +191,35 @@ export default function ResultsPage() {
             </section>
           ) : null}
 
+          {freeFixes.length > 0 ? (
+            <section className="mb-6">
+              <h2 className="mb-3 text-lg font-black text-slate-950">Fix These First</h2>
+              <div className="space-y-3">
+                {freeFixes.map((fix, index) => (
+                  <FixCard key={fix.title} fix={fix} defaultOpen={index === 0} />
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {lockedFixCount > 0 ? (
+            <section className="mb-6">
+              <ShareUnlockCard
+                lockedCount={lockedFixCount}
+                onUnlocked={() => {
+                  setFullyUnlocked(true);
+                  router.push("/results/unlocked?preparing=1");
+                }}
+              />
+            </section>
+          ) : (
+            <div className="space-y-3 pb-4">
+              <Button onClick={() => router.push("/results/unlocked")}>View All Fixes</Button>
+            </div>
+          )}
+
           <section className="mb-6">
-            <h2 className="mb-3 text-lg font-black text-slate-950">What&apos;s Working</h2>
+            <h2 className="mb-3 text-lg font-black text-slate-950">Your Strongest Signals</h2>
             <div className="space-y-3">
               {analysis.strengths.map((item) => (
                 <StrengthCard key={item.title} item={item} />
@@ -234,13 +235,6 @@ export default function ResultsPage() {
               ))}
             </div>
           </section>
-
-          <div className="space-y-3 pb-4">
-            <Button onClick={() => router.push("/results/unlocked")}>
-              <Sparkles className="h-4 w-4" />
-              Check Your Solutions
-            </Button>
-          </div>
         </div>
       </div>
       </div>
