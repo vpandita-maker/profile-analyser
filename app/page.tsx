@@ -131,6 +131,7 @@ export default function HomePage() {
   const [customTargetRole, setCustomTargetRole] = useState("");
   const [seniority, setSeniority] = useState<Seniority | "">("");
   const [preferredIndustry, setPreferredIndustry] = useState("");
+  const [recruiterFocus, setRecruiterFocus] = useState("");
   const [scraping, setScraping] = useState(false);
   const [error, setError] = useState("");
 
@@ -188,7 +189,7 @@ export default function HomePage() {
         networkSize: "",
         relocation: null,
         workPreference: "",
-        wins: ""
+        wins: recruiterFocus.trim()
       });
       setLinkedinData(importedProfile || ({
         ...data.profile,
@@ -340,6 +341,17 @@ export default function HomePage() {
                     <option key={industry} value={industry}>{industry}</option>
                   ))}
                 </select>
+              </Field>
+
+              <Field label="Anything you want recruiters to notice?">
+                <textarea
+                  className={cn(inputCls, "min-h-24 resize-none py-3 leading-6")}
+                  maxLength={240}
+                  onChange={(e) => setRecruiterFocus(e.target.value)}
+                  placeholder="Example: my startup project, leadership experience, analytics skills, or international background"
+                  value={recruiterFocus}
+                />
+                <p className="text-xs font-semibold text-[#888888]">Optional</p>
               </Field>
 
               <button

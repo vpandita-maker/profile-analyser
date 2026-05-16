@@ -192,7 +192,7 @@ Network Size: ${context.networkSize || "Not specified"}
 Open To Relocation: ${context.relocation === null ? "Not specified" : context.relocation ? "Yes" : "No"}
 Work Style Preference: ${context.workPreference || "Not specified"}
 Market Benchmarking: Use the target role, seniority, geography, industry, and broadly available market benchmarks. Do not use or ask for desired salary.
-Recent Wins: ${context.wins || "Not specified"}
+Recruiter Focus: ${context.wins || "Not specified"}
 
 Important output style:
 Address the reader as "you" and "your" in every explanation and recommendation.
