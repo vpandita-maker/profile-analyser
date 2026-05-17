@@ -38,9 +38,9 @@ function BarRow({ label, value, max }: { label: string; value: number; max: numb
 
 function Stat({ label, value, sub }: { label: string; value: React.ReactNode; sub?: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900 p-3 transition-transform duration-200 hover:scale-[1.02] sm:p-4">
+    <div className="rounded-lg border border-slate-800 bg-slate-900 p-2.5 transition-transform duration-200 hover:scale-[1.01] sm:p-3">
       <p className="text-[11px] font-medium text-slate-500 sm:text-xs">{label}</p>
-      <p className="mt-1 text-2xl font-black tracking-tight text-white sm:mt-1.5 sm:text-3xl">{value}</p>
+      <p className="mt-1 text-xl font-black tracking-tight text-white sm:text-2xl">{value}</p>
       {sub && <div className="mt-1">{sub}</div>}
     </div>
   );
@@ -50,7 +50,7 @@ function pct(n: number, d: number) {
   return d > 0 ? `${Math.round((n / d) * 100)}%` : "—";
 }
 
-const CARD = "rounded-xl border border-slate-800 bg-slate-900 transition-transform duration-200 hover:scale-[1.02] cursor-default";
+const CARD = "rounded-xl border border-slate-800 bg-slate-900 transition-transform duration-200 hover:scale-[1.01] cursor-default";
 
 function formatDisplayDate(dateStr: string) {
   const d = new Date(dateStr + "T12:00:00Z");
@@ -115,10 +115,10 @@ export default function DashboardPage() {
   const isToday = selectedDate === todayIST();
 
   return (
-    <main className="min-h-screen w-full bg-[#0f172a] px-4 py-6 text-white sm:px-6 lg:px-8 lg:py-8">
+    <main className="min-h-screen w-full bg-[#0f172a] px-4 py-5 text-white sm:px-5 lg:px-6 lg:py-6">
 
       {/* Header */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 lg:mb-8">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 lg:mb-6">
         <div>
           <h1 className="text-lg font-black tracking-tight text-white sm:text-xl">iHeartLinkedIn</h1>
           <p className="mt-0.5 text-xs text-slate-500">{formatDisplayDate(data.date)}</p>
@@ -154,7 +154,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Row */}
-      <div className="mb-4 grid grid-cols-2 gap-3 lg:mb-6 lg:grid-cols-5 lg:gap-4">
+      <div className="mb-3 grid grid-cols-2 gap-2.5 lg:mb-4 lg:grid-cols-5 lg:gap-3">
         <Stat label="Analyses" value={data.analyses} />
         <Stat label="Invites Sent" value={data.invitesSent} sub={<span className="text-[11px] text-slate-500">{pct(data.invitesSent, data.analyses)} of users</span>} />
         <Stat label="Unlocked" value={data.unlocked} sub={<span className="text-[11px] text-slate-500">{pct(data.unlocked, data.analyses)} of users</span>} />
@@ -171,8 +171,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Funnel */}
-      <div className={`${CARD} mb-4 p-4 lg:mb-6 lg:p-5`}>
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Funnel</p>
+      <div className={`${CARD} mb-3 p-3 lg:mb-4 lg:p-4`}>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Funnel</p>
 
         {/* Mobile */}
         <div className="flex flex-col gap-2 md:hidden">
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                 <div className="flex flex-1 flex-col items-center">
                   <div
                     className="mb-2 flex w-full items-center justify-center rounded-md bg-teal-500/10 ring-1 ring-teal-500/20 transition-all duration-500"
-                    style={{ height: `${Math.max(32, widthPct * 0.72)}px` }}
+                    style={{ height: `${Math.max(28, widthPct * 0.56)}px` }}
                   >
                     <span className="text-sm font-black text-teal-400">{step.value}</span>
                   </div>
@@ -232,8 +232,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Analyses list — full width */}
-      <div className={`${CARD} mb-4 p-4 lg:mb-6 lg:p-5`}>
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">
+      <div className={`${CARD} mb-3 p-3 lg:mb-4 lg:p-4`}>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">
           Analyses{" "}
           {data.analyses > 0 && <span className="text-teal-500">{data.analyses}</span>}
         </p>
@@ -242,8 +242,8 @@ export default function DashboardPage() {
         ) : (
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {data.recent.map((r, i) => (
-              <div key={i} className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-slate-800">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-black text-teal-400">
+              <div key={i} className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/30 p-2 transition-colors hover:border-slate-700 hover:bg-slate-800/70">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-[11px] font-black text-teal-400">
                   {r.score}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -253,7 +253,7 @@ export default function DashboardPage() {
                   <p className="truncate text-[10px] text-slate-600">{r.location}</p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="text-[11px] font-semibold text-slate-400">{r.timeIST}</p>
+                  <p className="text-[10px] font-semibold text-slate-400">{r.timeIST}</p>
                   <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${r.unlocked ? "bg-teal-500/10 text-teal-400" : "bg-slate-800 text-slate-600"}`}>
                     {r.unlocked ? "Unlocked" : "Locked"}
                   </span>
@@ -265,27 +265,27 @@ export default function DashboardPage() {
       </div>
 
       {/* Bar Charts */}
-      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
-        <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Roles</p>
+      <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
+        <div className={`${CARD} p-3 lg:p-4`}>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Roles</p>
           {data.topRoles.length > 0
             ? data.topRoles.map(([role, count]) => <BarRow key={role} label={role} value={count} max={data.topRoles[0][1]} />)
             : <p className="text-xs text-slate-600">No data</p>}
         </div>
-        <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Industries</p>
+        <div className={`${CARD} p-3 lg:p-4`}>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Industries</p>
           {data.topIndustries.length > 0
             ? data.topIndustries.map(([ind, count]) => <BarRow key={ind} label={ind} value={count} max={data.topIndustries[0][1]} />)
             : <p className="text-xs text-slate-600">No data</p>}
         </div>
-        <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Unique Visitor Platforms</p>
+        <div className={`${CARD} p-3 lg:p-4`}>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Unique Visitor Platforms</p>
           {data.topVisitorPlatforms.length > 0
             ? data.topVisitorPlatforms.map(([platform, count]) => <BarRow key={platform} label={platform} value={count} max={data.topVisitorPlatforms[0][1]} />)
             : <p className="text-xs text-slate-600">No source data yet</p>}
         </div>
-        <div className={`${CARD} p-4 lg:p-5`}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Visitor Places</p>
+        <div className={`${CARD} p-3 lg:p-4`}>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-500 sm:text-xs">Top Visitor Places</p>
           {data.topVisitorPlaces.length > 0
             ? data.topVisitorPlaces.map(([place, count]) => <BarRow key={place} label={place} value={count} max={data.topVisitorPlaces[0][1]} />)
             : <p className="text-xs text-slate-600">No GA4 location data</p>}
