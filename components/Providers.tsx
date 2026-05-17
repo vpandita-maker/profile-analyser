@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   useEffect(() => {
-    if (window.location.pathname.startsWith("/dashboard")) return;
+    if (pathname.startsWith("/dashboard")) return;
 
     const controller = new AbortController();
 
@@ -12,18 +15,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        path: window.location.pathname,
+        path: pathname,
         referrer: document.referrer,
         search: window.location.search,
       }),
       keepalive: true,
       signal: controller.signal,
-    }).catch(() => {
-      // Visitor tracking should never block the app.
-    });
+    }).catch(() => {});
 
     return () => controller.abort();
-  }, []);
+  }, [pathname]);
 
   return <>{children}</>;
 }
