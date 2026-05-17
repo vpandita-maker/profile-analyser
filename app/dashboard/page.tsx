@@ -10,6 +10,8 @@ interface DashboardData {
   invitesSent: number;
   unlocked: number;
   uniqueViewersToday: number | null;
+  homeBounceRate: number;
+  homeBounceUsers: number;
   funnel: Array<{ label: string; value: number }>;
   recent: Array<{ name: string; role: string; industry: string; sourcePlatform: string; location: string; score: number; unlocked: boolean; timeIST: string }>;
   topRoles: Array<[string, number]>;
@@ -152,7 +154,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Row */}
-      <div className="mb-4 grid grid-cols-2 gap-3 lg:mb-6 lg:grid-cols-4 lg:gap-4">
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:mb-6 lg:grid-cols-5 lg:gap-4">
         <Stat label="Analyses" value={data.analyses} />
         <Stat label="Invites Sent" value={data.invitesSent} sub={<span className="text-[11px] text-slate-500">{pct(data.invitesSent, data.analyses)} of users</span>} />
         <Stat label="Unlocked" value={data.unlocked} sub={<span className="text-[11px] text-slate-500">{pct(data.unlocked, data.analyses)} of users</span>} />
@@ -160,6 +162,11 @@ export default function DashboardPage() {
           label={isToday ? "Unique Viewers Today" : "Unique Viewers"}
           value={data.uniqueViewersToday !== null ? data.uniqueViewersToday : "—"}
           sub={data.uniqueViewersToday === null ? <span className="text-[11px] text-slate-600">Connect analytics</span> : undefined}
+        />
+        <Stat
+          label="Home Bounce Rate"
+          value={`${data.homeBounceRate}%`}
+          sub={<span className="text-[11px] text-slate-500">{data.homeBounceUsers} unique users</span>}
         />
       </div>
 

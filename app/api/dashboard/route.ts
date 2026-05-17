@@ -43,6 +43,34 @@ function uniqueVisitorCount(rows: Array<{ visitor_id: string | null }>) {
   return visitorIds.size;
 }
 
+function homeBounceStats(rows: Array<{ visitor_id: string | null; first_seen_at: string | null; last_seen_at: string | null; last_path: string | null }>) {
+  const uniqueVisitors = new Set<string>();
+  const bouncedVisitors = new Set<string>();
+
+  for (const row of rows) {
+    if (!row.visitor_id) continue;
+
+    uniqueVisitors.add(row.visitor_id);
+
+    const firstSeen = row.first_seen_at ? new Date(row.first_seen_at).getTime() : Number.NaN;
+    const lastSeen = row.last_seen_at ? new Date(row.last_seen_at).getTime() : Number.NaN;
+    const isSingleRecordedPage =
+      Number.isFinite(firstSeen) &&
+      Number.isFinite(lastSeen) &&
+      Math.abs(lastSeen - firstSeen) < 1500;
+    const isHomePage = row.last_path === "/" || row.last_path === "";
+
+    if (isHomePage && isSingleRecordedPage) {
+      bouncedVisitors.add(row.visitor_id);
+    }
+  }
+
+  return {
+    homeBounceUsers: bouncedVisitors.size,
+    homeBounceRate: uniqueVisitors.size > 0 ? Math.round((bouncedVisitors.size / uniqueVisitors.size) * 100) : 0,
+  };
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
@@ -70,7 +98,7 @@ export async function GET(request: Request) {
             .gte("created_at", dayStartUTC)
             .lte("created_at", dayEndUTC)
             .order("created_at", { ascending: false }),
-          supabase.from("visitor_events").select("visitor_id,source_platform")
+          supabase.from("visitor_events").select("visitor_id,source_platform,first_seen_at,last_seen_at,last_path")
             .eq("visit_date", selectedDate),
         ])
       : Promise.resolve([{ data: [] }, { data: [] }, { data: [] }] as const),
@@ -81,10 +109,22 @@ export async function GET(request: Request) {
     analysis_json: { overallScore: number; topFixes: Array<{ recommended: string }>; sourcePlatform?: string; profileLocation?: string };
   }>;
   const invites = (supabaseResult[1]?.data ?? []) as Array<{ analysis_id: string; status: string; created_at: string }>;
-  const sourceResult = supabaseResult[2] as { data?: Array<{ visitor_id: string | null; source_platform: string | null }>; error?: unknown } | undefined;
+  const sourceResult = supabaseResult[2] as {
+    data?: Array<{
+      visitor_id: string | null;
+      source_platform: string | null;
+      first_seen_at: string | null;
+      last_seen_at: string | null;
+      last_path: string | null;
+    }>;
+    error?: unknown;
+  } | undefined;
   const sourceRows = sourceResult && !sourceResult.error ? sourceResult.data ?? [] : [];
   const uniqueViewers = sourceRows.length > 0 ? uniqueVisitorCount(sourceRows) : ga4?.uniqueViewersToday ?? 0;
   const topVisitorPlatforms = topUniquePlatformCounts(sourceRows);
+  const fallbackHomeBounce = homeBounceStats(sourceRows);
+  const homeBounceRate = ga4?.homeBounceRate ?? fallbackHomeBounce.homeBounceRate;
+  const homeBounceUsers = ga4?.homeBounceUsers ?? fallbackHomeBounce.homeBounceUsers;
 
   const uniqueInviters = new Set(invites.map((i) => i.analysis_id)).size;
   const inviteRate = analyses.length > 0 ? Math.round((uniqueInviters / analyses.length) * 100) : 0;
@@ -119,6 +159,8 @@ export async function GET(request: Request) {
     invitesSent: invites.length,
     unlocked: analyses.filter((a) => a.is_unlocked).length,
     uniqueViewersToday: uniqueViewers,
+    homeBounceRate,
+    homeBounceUsers,
     funnel: [
       { label: "Analyses", value: analyses.length },
       { label: "Got Fixes", value: analyses.filter((a) => a.analysis_json?.topFixes?.length > 0).length },

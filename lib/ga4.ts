@@ -5,6 +5,8 @@ export interface GA4Stats {
   uniqueViewersYesterday: number;
   sessionsToday: number;
   sessionsYesterday: number;
+  homeBounceRate: number;
+  homeBounceUsers: number;
   topVisitorPlaces: Array<[string, number]>;
   topVisitorPlatforms: Array<[string, number]>;
 }
@@ -58,6 +60,12 @@ function aggregatePairs(pairs: Array<[string, number]>, limit = 5) {
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
+function normalizeRate(value?: string | null) {
+  const parsed = Number(value ?? "0");
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.round(parsed <= 1 ? parsed * 100 : parsed);
+}
+
 export async function getGA4Stats(date = "today"): Promise<GA4Stats | null> {
   const propertyId = process.env.GA4_PROPERTY_ID;
 
@@ -67,7 +75,7 @@ export async function getGA4Stats(date = "today"): Promise<GA4Stats | null> {
     const credentials = getGoogleCredentials();
     const client = new BetaAnalyticsDataClient({ credentials, fallback: true });
 
-    const [todayResponse, yesterdayResponse, placesResponse, platformsResponse] = await Promise.all([
+    const [todayResponse, yesterdayResponse, placesResponse, platformsResponse, homeBounceResponse] = await Promise.all([
       client.runReport({
         property: `properties/${propertyId}`,
         dateRanges: [{ startDate: date, endDate: date }],
@@ -94,16 +102,36 @@ export async function getGA4Stats(date = "today"): Promise<GA4Stats | null> {
         limit: 5,
         orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
       }).catch(() => null),
+      client.runReport({
+        property: `properties/${propertyId}`,
+        dateRanges: [{ startDate: date, endDate: date }],
+        dimensions: [{ name: "landingPagePlusQueryString" }],
+        metrics: [{ name: "activeUsers" }, { name: "bounceRate" }],
+        dimensionFilter: {
+          filter: {
+            fieldName: "landingPagePlusQueryString",
+            stringFilter: {
+              matchType: "EXACT",
+              value: "/",
+            },
+          },
+        },
+      }).catch(() => null),
     ]);
 
     const todayRow = todayResponse[0].rows?.[0];
     const yestRow = yesterdayResponse[0].rows?.[0];
+    const homeBounceRow = homeBounceResponse?.[0].rows?.[0];
+    const homeBounceRate = normalizeRate(homeBounceRow?.metricValues?.[1]?.value);
+    const homeActiveUsers = parseInt(homeBounceRow?.metricValues?.[0]?.value ?? "0");
 
     return {
       uniqueViewersToday: parseInt(todayRow?.metricValues?.[0]?.value ?? "0"),
       uniqueViewersYesterday: parseInt(yestRow?.metricValues?.[0]?.value ?? "0"),
       sessionsToday: parseInt(todayRow?.metricValues?.[1]?.value ?? "0"),
       sessionsYesterday: parseInt(yestRow?.metricValues?.[1]?.value ?? "0"),
+      homeBounceRate,
+      homeBounceUsers: Math.round((homeActiveUsers * homeBounceRate) / 100),
       topVisitorPlaces: (placesResponse?.[0].rows ?? []).map((row) => [
         placeLabel(row.dimensionValues?.[0]?.value ?? undefined, row.dimensionValues?.[1]?.value ?? undefined),
         parseInt(row.metricValues?.[0]?.value ?? "0"),
