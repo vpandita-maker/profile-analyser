@@ -119,7 +119,8 @@ export async function POST(request: Request) {
       typeof visitorEvent?.source_platform === "string" && visitorEvent.source_platform.trim()
         ? visitorEvent.source_platform.trim()
         : "Direct / Unknown";
-    const analysisForStorage = { ...(analysis as unknown as Record<string, unknown>), sourcePlatform };
+    const profileLocation = [profile.city, profile.country].filter(Boolean).join(", ") || profile.location || "Unknown location";
+    const analysisForStorage = { ...(analysis as unknown as Record<string, unknown>), sourcePlatform, profileLocation };
 
     const { data: existing } = await supabase
       .from("analyses")

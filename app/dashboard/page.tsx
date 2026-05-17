@@ -11,7 +11,7 @@ interface DashboardData {
   unlocked: number;
   uniqueViewersToday: number | null;
   funnel: Array<{ label: string; value: number }>;
-  recent: Array<{ name: string; role: string; industry: string; sourcePlatform: string; score: number; unlocked: boolean; timeIST: string }>;
+  recent: Array<{ name: string; role: string; industry: string; sourcePlatform: string; location: string; score: number; unlocked: boolean; timeIST: string }>;
   topRoles: Array<[string, number]>;
   topIndustries: Array<[string, number]>;
   topVisitorPlaces: Array<[string, number]>;
@@ -243,6 +243,7 @@ export default function DashboardPage() {
                   <p className="truncate text-xs font-semibold text-slate-100">{r.name}</p>
                   <p className="truncate text-[10px] font-medium text-slate-400">{r.role}</p>
                   <p className="truncate text-[10px] text-slate-600">{r.industry} · {r.sourcePlatform}</p>
+                  <p className="truncate text-[10px] text-slate-600">{r.location}</p>
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-[11px] font-semibold text-slate-400">{r.timeIST}</p>
